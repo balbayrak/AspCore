@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
+    <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
+    <ProjectReference Include="..\AspCore.DataAccess\AspCore.DataAccess.csproj" />
+    <ProjectReference Include="..\AspCore.DocumentAccess\AspCore.DocumentAccess.csproj" />
+  </ItemGroup>
+
+</Project>

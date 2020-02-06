@@ -1,0 +1,36 @@
+﻿using AspCore.BackendForFrontend.Concrete;
+using AspCore.Entities.DataTable;
+using AspCore.Entities.EntityType;
+using AspCore.Entities.General;
+using AspCore.WebComponents.HtmlHelpers.DataTable.Storage;
+using AspCore.WebComponents.HtmlHelpers.Extensions;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AspCore.Web.Concrete
+{
+    public abstract class BaseDatatableEntityBffLayer<TViewModel, TEntity> : BaseEntityBffLayer<TViewModel, TEntity>
+        where TViewModel : BaseViewModel<TEntity>, new()
+        where TEntity : class, IEntity, new()
+    {
+        public JQueryDataTablesResponse GetAll(JQueryDataTablesModel jQueryDataTablesModel)
+        {
+            try
+            {
+                ServiceResult<List<TViewModel>> result = GetAllAsync(jQueryDataTablesModel.ToEntityFilter<TEntity>()).Result;
+                if (result.IsSucceeded && result.Result != null)
+                {
+                    var sessionObject = _storage.GetDatatableProperties<TEntity>(jQueryDataTablesModel.datatableId);
+                    var parser = new DatatableParser<TEntity>(result.Result.Select(t => t.dataEntity).ToList(), sessionObject);
+                    return parser.Parse(jQueryDataTablesModel, result.TotalResultCount, result.SearchResultCount);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return null;
+        }
+    }
+}
