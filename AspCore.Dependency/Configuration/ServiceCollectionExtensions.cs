@@ -7,13 +7,13 @@ namespace AspCore.Dependency.Configuration
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Uygulamada ITransientType,IScopedType,ISingletonType olarak tanımlanmış sınıflar verilen namespace de bulunana classlar ile otomatik olarak bind edilir.
-        /// namespace null olarak gönderilirse ilgili katmandaki bütün classlar otomatik olarak bind edilir.
+        /// Types which implements ITransientType,IScopedType,ISingletonType interfaces, inject automatically in this method.
+        /// If namepace is null, all classes injects, but if namespace is not null classes inject only in this namepace.
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="namespaceStr"></param>
+        /// <param name="option"></param>
         /// <returns></returns>
-        public static IServiceCollection AutoBind(this IServiceCollection services, Action<DependencyOption> option)
+        public static IServiceCollection AutoBind(this IServiceCollection services, Action<DependencyOption> option = null)
         {
             using (DependencyOptionBuilder builder = new DependencyOptionBuilder(services))
             {
@@ -22,7 +22,7 @@ namespace AspCore.Dependency.Configuration
             }
         }
 
-        public static IServiceCollection Bind<TInterface>(this IServiceCollection services, Action<DependencyOption> option)
+        public static IServiceCollection Bind<TInterface>(this IServiceCollection services, Action<DependencyOption> option = null)
         {
             using (DependencyOptionBuilder builder = new DependencyOptionBuilder(services))
             {
@@ -32,14 +32,14 @@ namespace AspCore.Dependency.Configuration
         }
 
         /// <summary>
-        /// Bind edilmek istenen TInterface yada Tconcrete daha önceden bind edilmiş ise yeni type ile değiştirilir.
+        /// Inject class to interface with ServiceLifetime.
         /// </summary>
         /// <typeparam name="TInterface"></typeparam>
         /// <typeparam name="TConcrete"></typeparam>
         /// <param name="services"></param>
-        /// <param name="lifeTime"></param>
+        /// <param name="option"></param>
         /// <returns></returns>
-        public static IServiceCollection BindType<TInterface, TConcrete>(this IServiceCollection services, Action<DependencyOption> option)
+        public static IServiceCollection BindType<TInterface, TConcrete>(this IServiceCollection services, Action<DependencyOption> option = null)
         {
             using (DependencyOptionBuilder builder = new DependencyOptionBuilder(services))
             {
@@ -52,10 +52,12 @@ namespace AspCore.Dependency.Configuration
         {
             return new ServicesByNameBuilder<TService>(services, ServiceLifetime.Transient);
         }
+      
         public static ServicesByNameBuilder<TService> BindScopedByName<TService>(this IServiceCollection services)
         {
             return new ServicesByNameBuilder<TService>(services, ServiceLifetime.Scoped);
         }
+       
         public static ServicesByNameBuilder<TService> BindSingletonByName<TService>(this IServiceCollection services)
         {
             return new ServicesByNameBuilder<TService>(services, ServiceLifetime.Singleton);

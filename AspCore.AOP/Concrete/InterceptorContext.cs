@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.AOP.Abstract;
+﻿using AspCore.AOP.Abstract;
 
 namespace AspCore.AOP.Concrete
 {

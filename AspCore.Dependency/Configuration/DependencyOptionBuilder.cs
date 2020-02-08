@@ -62,7 +62,7 @@ namespace AspCore.Dependency.Configuration
 
         private static void BindType<TInterface>(IServiceCollection services, ServiceLifetime lifeTime = ServiceLifetime.Scoped, string namespaceStr = null)
         {
-            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies());
+            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr);
 
             foreach (var typeMap in maps)
             {

@@ -1,13 +1,12 @@
-﻿using System;
+﻿using AspCore.AOP.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using AspCore.AOP.Abstract;
 
 namespace AspCore.AOP.Concrete
 {
-    public class ProxyGenerator : DispatchProxy, IProxyGenerator
+    public class ProxyGenerator : DispatchProxy, IProxyGenerator, IDisposable
     {
         private object _implementationObj { get; set; }
         private IInterceptorContext _context { get; set; }
@@ -38,15 +37,6 @@ namespace AspCore.AOP.Concrete
             return service;
         }
 
-        private void SetParameters(object ImplementationObj, IInterceptorContext context, IProxySelector proxySelector, Type serviceType, Type impType)
-        {
-            this._implementationObj = ImplementationObj;
-            this._context = context;
-            this._proxySelector = proxySelector;
-            this._serviceType = serviceType;
-            this._impType = impType;
-        }
-
         protected override object Invoke(MethodInfo targetMethod, object[] args)
         {
             List<InterceptorType> interceptors = GetInterceptorTypes(targetMethod, _serviceType, _impType);
@@ -58,11 +48,12 @@ namespace AspCore.AOP.Concrete
 
                     _context.invocation = _context.invocation ?? new Invocation(targetMethod, args, _implementationObj);
                     _context.invocation.result = null;
-                    // Before aspectlerimizi çalıştırıyoruz önce ve geriye değer dönen varsa respons'a eşitliyoruz.
+
+                    // run OnBefore method of before interceptor
                     CheckBeforeInterceptor(interceptors);
 
-                    // Response boş değilse, buradaki veri cache üzerinden de geliyor olabilir ve tekrardan invoke etmeye
-                    // gerek yok, direkt olarak geriye response dönebiliriz bu durumda.
+                    //if method proceeded in interceptor, not work again.
+                    //forexample, cache interceptor run before, result gets from cache and function not need to work
                     if (response == null && !_context.invocation.isProceeded)
                     {
                         response = targetMethod.Invoke(_implementationObj, args);
@@ -79,14 +70,25 @@ namespace AspCore.AOP.Concrete
 
             return _context.invocation.result;
         }
+        private void SetParameters(object ImplementationObj, IInterceptorContext context, IProxySelector proxySelector, Type serviceType, Type impType)
+        {
+            this._implementationObj = ImplementationObj;
+            this._context = context;
+            this._proxySelector = proxySelector;
+            this._serviceType = serviceType;
+            this._impType = impType;
+        }
 
         private List<InterceptorType> GetInterceptorTypes(MethodInfo targetMethod, Type serviceType, Type implementationType)
         {
             List<InterceptorType> list = _proxySelector.GetInterceptMethodInterceptors(implementationType, targetMethod);
-            list.AddRange(_proxySelector.GetInterceptTypeInterceptors(implementationType));
+            list = list ?? new List<InterceptorType>();
 
-            list.AddRange(_proxySelector.GetInterceptMethodInterceptors(serviceType, targetMethod));
-            list.AddRange(_proxySelector.GetInterceptTypeInterceptors(serviceType));
+            List<InterceptorType> implementationTypeInterceptors = _proxySelector.GetInterceptTypeInterceptors(implementationType);
+            list.AddRange(implementationTypeInterceptors);
+
+            List<InterceptorType> serviceTypeInterceptors = _proxySelector.GetInterceptTypeInterceptors(serviceType);
+            list.AddRange(serviceTypeInterceptors);
 
             return list.Distinct().OrderBy(t => t.priority).ToList();
         }
@@ -108,6 +110,7 @@ namespace AspCore.AOP.Concrete
                 throw ex;
             }
         }
+
         private void CheckAfterInterceptor(List<InterceptorType> interceptors)
         {
             try
@@ -125,6 +128,7 @@ namespace AspCore.AOP.Concrete
                 throw ex;
             }
         }
+
         private void CheckExceptionInterceptor(Exception exception, List<InterceptorType> interceptors)
         {
             try
@@ -140,6 +144,12 @@ namespace AspCore.AOP.Concrete
             {
                 throw ex;
             }
+        }
+
+        public void Dispose()
+        {
+            this._context = null;
+            this._implementationObj = null;
         }
     }
 }

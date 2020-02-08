@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AspCore.AOP.Concrete
+﻿namespace AspCore.AOP.Concrete
 {
     public enum EnumInterceptorRunType
     {

@@ -59,5 +59,22 @@ namespace AspCore.AOP.Concrete
         {
             return type.GetCustomAttributes<InterceptorBase>(true).Select(t => t.GetInterceptorType()).ToList();
         }
+
+        public bool ShouldInterceptTypes(List<Type> types)
+        {
+            foreach (var item in types)
+            {
+                bool value = ShouldInterceptType(item);
+                if (value) return true;
+                else continue;
+            }
+
+            return false;
+        }
+
+        public void Dispose()
+        {
+
+        }
     }
 }

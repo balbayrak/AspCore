@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AspCore.AOP.Abstract
 {
-    public interface IExceptionInterceptor
+    public interface IExceptionInterceptor : IInterceptor
     {
         void OnException(Exception exception);
     }

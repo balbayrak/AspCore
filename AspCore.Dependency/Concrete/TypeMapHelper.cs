@@ -15,7 +15,6 @@ namespace AspCore.Dependency.Concrete
 
             if (string.IsNullOrEmpty(namespaceStr?.Trim()))
             {
-                var type = types.Where(t => typeof(TInterface).IsAssignableFrom(t)).ToList();
                 types = types.Where(t => t.IsNonAbstractClass(true) && typeof(TInterface).IsAssignableFrom(t));
             }
             else
@@ -24,7 +23,7 @@ namespace AspCore.Dependency.Concrete
             }
 
             Func<TypeInfo, IEnumerable<Type>> selector = t => t.ImplementedInterfaces
-                .Where(x => x.HasMatchingGenericArity(t))
+                .Where(x => x.HasMatchingGenericParameterCount(t))
                 .Select(x => x.GetRegistrationType(t));
 
             Func<Type, IEnumerable<Type>> selector1 = t => selector(t.GetTypeInfo());

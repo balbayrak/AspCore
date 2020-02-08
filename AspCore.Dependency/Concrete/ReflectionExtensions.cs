@@ -147,13 +147,6 @@ namespace AspCore.Dependency.Concrete
             return baseTypeInfo.IsAssignableToGenericTypeDefinition(genericTypeInfo);
         }
 
-        /// <summary>
-        /// Find matching interface by name C# interface name convention.  Optionally use a filter.
-        /// </summary>
-        /// <param name="typeInfo"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-
         private static IEnumerable<Type> GetImplementedInterfacesToMap(TypeInfo typeInfo)
         {
             if (!typeInfo.IsGenericType)
@@ -213,7 +206,7 @@ namespace AspCore.Dependency.Concrete
             return type.GetTypeInfo().IsGenericTypeDefinition;
         }
 
-        public static bool HasMatchingGenericArity(this Type interfaceType, TypeInfo typeInfo)
+        public static bool HasMatchingGenericParameterCount(this Type interfaceType, TypeInfo typeInfo)
         {
             if (typeInfo.IsGenericType)
             {

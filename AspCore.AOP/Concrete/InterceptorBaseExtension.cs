@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.AOP.Abstract;
+﻿using AspCore.AOP.Abstract;
 
 namespace AspCore.AOP.Concrete
 {
@@ -16,7 +13,7 @@ namespace AspCore.AOP.Concrete
             {
                 interceptorType.runType = EnumInterceptorRunType.BeforeAfter;
             }
-            else if(typeof(IAfterInterceptor).IsAssignableFrom(interceptorType.type))
+            else if (typeof(IAfterInterceptor).IsAssignableFrom(interceptorType.type))
             {
                 interceptorType.runType = EnumInterceptorRunType.After;
             }

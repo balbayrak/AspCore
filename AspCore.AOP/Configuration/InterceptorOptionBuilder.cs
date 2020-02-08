@@ -1,19 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using AspCore.AOP.Abstract;
+﻿using AspCore.AOP.Abstract;
 using AspCore.AOP.Concrete;
 using AspCore.Dependency.Abstract;
 using AspCore.Dependency.Concrete;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AspCore.AOP.Configuration
 {
-    public class InterceptorOptionBuilder :IDisposable
+    public class InterceptorOptionBuilder : IDisposable
     {
-        public void AddInterceptors(IServiceCollection services, Action<InterceptorOption> option = null)
+        public void BindWithInterceptors(IServiceCollection services, Action<InterceptorOption> option = null)
         {
             string nameSpaceStr = null;
             if (option != null)
@@ -23,33 +21,21 @@ namespace AspCore.AOP.Configuration
                 nameSpaceStr = interceptorOption.namespaceStr;
             }
 
-
             var proxySelectorCnt = services.FirstOrDefault(t => t.ServiceType.Equals(typeof(IProxySelector)));
             if (proxySelectorCnt == null)
             {
                 services.AddSingleton(typeof(IProxySelector), new AttributeBaseProxySelector());
             }
 
-            var interceptorContextCnt = services.FirstOrDefault(t => t.ServiceType.Equals(typeof(IProxySelector)));
-            if (interceptorContextCnt == null)
-            {
-                services.AddScoped<IInterceptorContext, InterceptorContext>();
-            }
 
-            var proxyGeneratorCnt = services.FirstOrDefault(t => t.ServiceType.Equals(typeof(IProxySelector)));
-            if (proxyGeneratorCnt == null)
-            {
-                services.AddScoped<IProxyGenerator, ProxyGenerator>();
-            }
-
-            BindInterceptorType<ITransientType>(services, nameSpaceStr);
-            BindInterceptorType<IScopedType>(services, nameSpaceStr);
-            BindInterceptorType<ISingletonType>(services, nameSpaceStr);
+            BindType<ITransientType, AttributeBaseProxySelector>(services, nameSpaceStr);
+            BindType<IScopedType, AttributeBaseProxySelector>(services, nameSpaceStr);
+            BindType<ISingletonType, AttributeBaseProxySelector>(services, nameSpaceStr);
 
         }
 
-        public void AddInterceptors<TProxySelector>(IServiceCollection services, Action<InterceptorOption> option = null)
-              where TProxySelector : class, IProxyGenerator, new()
+        public void BindWithInterceptors<TProxySelector>(IServiceCollection services, Action<InterceptorOption> option = null)
+              where TProxySelector : class, IProxySelector, new()
         {
             string nameSpaceStr = null;
 
@@ -79,91 +65,129 @@ namespace AspCore.AOP.Configuration
                 services.AddScoped<IProxyGenerator, ProxyGenerator>();
             }
 
-            BindInterceptorType<ITransientType>(services, nameSpaceStr);
-            BindInterceptorType<IScopedType>(services, nameSpaceStr);
-            BindInterceptorType<ISingletonType>(services, nameSpaceStr);
+            BindType<ITransientType, TProxySelector>(services, nameSpaceStr);
+            BindType<IScopedType, TProxySelector>(services, nameSpaceStr);
+            BindType<ISingletonType, TProxySelector>(services, nameSpaceStr);
 
         }
 
-        private static void BindInterceptorType<TInterface>(IServiceCollection services, string namespaceStr = null)
+        private static void BindType<TInterface, TProxySelector>(IServiceCollection services, string namespaceStr = null)
+             where TProxySelector : class, IProxySelector, new()
         {
-            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies());
 
-            foreach (var typeMap in maps)
+            using (TProxySelector proxySelector = new TProxySelector())
             {
-                var implementationType = typeMap.ImplementationType;
-
-                var descriptor = new ServiceDescriptor(implementationType, implementationType, ServiceLifetime.Scoped);
-                services.Add(descriptor);
-
-
-                foreach (var serviceType in typeMap.ServiceTypes)
+                ServiceLifetime lifetime = ServiceLifetime.Scoped;
+                if (typeof(TInterface) == typeof(ISingletonType))
                 {
-                    var oldDescription = services.FirstOrDefault(t => t.ServiceType.Equals(serviceType));
-                    AddType(services, serviceType, implementationType, oldDescription);
+                    lifetime = ServiceLifetime.Singleton;
+                }
+                else if (typeof(TInterface) == typeof(ITransientType))
+                {
+                    lifetime = ServiceLifetime.Transient;
+                }
+
+                IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr);
+
+                foreach (var typeMap in maps)
+                {
+                    var implementationType = typeMap.ImplementationType;
+
+                    var types = typeMap.ServiceTypes.Where(t => t != typeof(IProxySelector) &&
+                             t != typeof(IInterceptorContext) &&
+                             t != typeof(IProxyGenerator) &&
+                             t != typeof(ISingletonType) &&
+                             t != typeof(IScopedType) &&
+                             t != typeof(ITransientType)).ToList();
+
+                    types.Add(typeMap.ImplementationType);
+
+                    var oldDescriptionImp = services.FirstOrDefault(t => t.ServiceType == implementationType);
+                    if (oldDescriptionImp != null)
+                    {
+                        services.Remove(oldDescriptionImp);
+                    }
+
+                    bool isIncludeAspect = proxySelector.ShouldInterceptTypes(types);
+
+                    if (isIncludeAspect)
+                    {
+                        BindInterceptorTypeMap<TInterface>(services, typeMap, lifetime);
+                    }
+                    else
+                    {
+                        BindTypeMap<TInterface>(services, typeMap, lifetime);
+                    }
                 }
             }
         }
 
-        private static void AddType(IServiceCollection services, Type serviceType, Type implementationType, ServiceDescriptor oldDescription)
+        private static void BindTypeMap<TInterface>(IServiceCollection services, TypeMap typeMap, ServiceLifetime lifeTime)
         {
-            if (oldDescription.Lifetime == ServiceLifetime.Transient)
+            var implementationType = typeMap.ImplementationType;
+
+            foreach (var serviceType in typeMap.ServiceTypes)
             {
-                services.AddTransient(serviceType, sp =>
+                if (!implementationType.IsAssignableTo(serviceType))
                 {
-                    return AddType(services, sp, serviceType, implementationType, oldDescription);
-                });
-            }
-            else if (oldDescription.Lifetime == ServiceLifetime.Scoped)
-            {
-                services.AddScoped(serviceType, sp =>
-                {
-                    return AddType(services, sp, serviceType, implementationType, oldDescription);
-                });
-            }
-            else if (oldDescription.Lifetime == ServiceLifetime.Singleton)
-            {
-                services.AddSingleton(serviceType, sp =>
-                {
-                    return AddType(services, sp, serviceType, implementationType, oldDescription);
-                });
-            }
-        }
+                    throw new InvalidOperationException($@"Type ""{implementationType.ToFriendlyName()}"" is not assignable to ""${serviceType.ToFriendlyName()}"".");
+                }
 
-        private static object AddType(IServiceCollection services, IServiceProvider sp, Type serviceType, Type implementationType, ServiceDescriptor oldDescription = null)
-        {
-            IProxySelector proxySelector = (IProxySelector)sp.GetRequiredService<IProxySelector>();
+                var descriptor = new ServiceDescriptor(serviceType, implementationType, lifeTime);
 
-            bool isIncludeAspect = proxySelector.ShouldInterceptType(implementationType);
-
-            if (!implementationType.IsAssignableTo(serviceType))
-            {
-                throw new InvalidOperationException($@"Type ""{implementationType.ToFriendlyName()}"" is not assignable to ""${serviceType.ToFriendlyName()}"".");
-            }
-            if (!isIncludeAspect) isIncludeAspect = proxySelector.ShouldInterceptType(serviceType);
-
-            if (isIncludeAspect)
-            {
+                var oldDescription = services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
                 if (oldDescription != null)
                 {
                     services.Remove(oldDescription);
                 }
 
-                object obj = sp.GetRequiredService(implementationType);
-                IProxyGenerator objProxy = sp.GetRequiredService<IProxyGenerator>();
-                IInterceptorContext context = sp.GetRequiredService<IInterceptorContext>();
-
-                return objProxy.Create(serviceType, implementationType, obj, context);
+                services.Add(descriptor);
             }
-            else
+        }
+
+        private static void BindInterceptorTypeMap<TInterface>(IServiceCollection services, TypeMap typeMap, ServiceLifetime lifetime)
+        {
+            var implementationType = typeMap.ImplementationType;
+
+            var serviceTypes = typeMap.ServiceTypes.Where(t => t != typeof(IProxySelector) &&
+                     t != typeof(IInterceptorContext) &&
+                     t != typeof(IProxyGenerator) &&
+                     t != typeof(ISingletonType) &&
+                     t != typeof(IScopedType) &&
+                     t != typeof(ITransientType)).ToList();
+
+            foreach (var serviceType in serviceTypes)
             {
-                return sp.GetRequiredService(serviceType);
+                var oldDescription = services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
+                if (oldDescription != null)
+                {
+                    services.Remove(oldDescription);
+                }
+
+                services.Add(new ServiceDescriptor(implementationType, implementationType, lifetime));
+
+                services.AddTransient(serviceType, sp =>
+                {
+                    IProxySelector proxySelector = sp.GetRequiredService<IProxySelector>();
+
+                    bool isIncludeAspect = proxySelector.ShouldInterceptType(implementationType);
+
+                    if (!implementationType.IsAssignableTo(serviceType))
+                    {
+                        throw new InvalidOperationException($@"Type ""{implementationType.ToFriendlyName()}"" is not assignable to ""${serviceType.ToFriendlyName()}"".");
+                    }
+
+                    object obj = sp.GetRequiredService(implementationType);
+                    IProxyGenerator objProxy = new ProxyGenerator(proxySelector);
+                    IInterceptorContext context = new InterceptorContext();
+                    return objProxy.Create(serviceType, implementationType, obj, context);
+
+                });
             }
         }
 
         public void Dispose()
         {
-          
         }
     }
 }
