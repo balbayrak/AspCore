@@ -2,6 +2,7 @@
 using System;
 using AspCore.Dependency.Configuration;
 using AspCore.Entities.Configuration;
+using AspCore.AOP.Configuration;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -12,9 +13,9 @@ namespace AspCore.Web.Configuration.Options
 
         }
 
-        public ConfigurationHelperOption AddDependencyResolver(Action<DependencyOptionBuilder> option)
+        public ConfigurationHelperOption AddDependencyResolver(Action<InterceptorOptionBuilder> option)
         {
-            var dependencyOptionBuilder = new DependencyOptionBuilder(_services);
+            var dependencyOptionBuilder = new InterceptorOptionBuilder(_services);
             option(dependencyOptionBuilder);
 
             return new ConfigurationHelperOption(_services);

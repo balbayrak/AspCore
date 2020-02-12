@@ -2,6 +2,7 @@
 using AspCore.AOP.Concrete;
 using AspCore.Dependency.Abstract;
 using AspCore.Dependency.Concrete;
+using AspCore.Dependency.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,12 @@ using System.Linq;
 
 namespace AspCore.AOP.Configuration
 {
-    public class InterceptorOptionBuilder : IDisposable
+    public class InterceptorOptionBuilder : DependencyOptionBuilder
     {
+        public InterceptorOptionBuilder(IServiceCollection services) : base(services)
+        {
+        }
+
         public void BindWithInterceptors(IServiceCollection services, Action<InterceptorOption> option = null)
         {
             string nameSpaceStr = null;

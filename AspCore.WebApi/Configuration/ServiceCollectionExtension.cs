@@ -1,22 +1,21 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
-using AspCore.AOP.Configuration;
-using AspCore.Business.Security.Abstract;
+﻿using AspCore.Business.Security.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Json;
 using AspCore.Middlewares.WebApi;
 using AspCore.WebApi.Configuration.Options;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System;
 
 namespace AspCore.WebApi.Configuration
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection ConfigureAspCoreServices(this IServiceCollection services, Action<DependencyConfigurationOption> option, Action<InterceptorOptionBuilder> interceptorOptionBuilder = null, Action<MvcOptions> mvcOptions = null)
+        public static IServiceCollection ConfigureAspCoreServices(this IServiceCollection services, Action<DependencyConfigurationOption> option, Action<MvcOptions> mvcOptions = null)
         {
             if (mvcOptions != null)
             {
@@ -26,7 +25,6 @@ namespace AspCore.WebApi.Configuration
             {
                 services.AddMvcCore().AddAuthorization();
             }
-
 
             services.AddControllers().AddNewtonsoftJson(options =>
             {
@@ -47,13 +45,7 @@ namespace AspCore.WebApi.Configuration
             DependencyConfigurationOption configurationHelperOption = new DependencyConfigurationOption(services);
             option(configurationHelperOption);
 
-            //bütün configurasyonlar çalıştı.
-
-            if (interceptorOptionBuilder != null)
-            {
-                InterceptorOptionBuilder interceptorOptionInternal = new InterceptorOptionBuilder();
-                interceptorOptionBuilder(interceptorOptionInternal);
-            }
+            //All configuration completed, resolve initialize all configuration.
 
             DependencyResolver.Init(services.BuildServiceProvider());
 

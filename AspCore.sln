@@ -33,9 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.BackendForFrontend"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.WebApi", "AspCore.WebApi\AspCore.WebApi.csproj", "{6457C98B-E9D1-4054-9DE6-87969746B6E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCore.WebComponents", "AspCore.WebComponents\AspCore.WebComponents.csproj", "{FFE84523-F825-476E-BA65-8D7D838D9433}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.WebComponents", "AspCore.WebComponents\AspCore.WebComponents.csproj", "{FFE84523-F825-476E-BA65-8D7D838D9433}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCore.Web", "AspCore.Web\AspCore.Web.csproj", "{3196D97B-E9DB-4656-B810-294083133EA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.Web", "AspCore.Web\AspCore.Web.csproj", "{3196D97B-E9DB-4656-B810-294083133EA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

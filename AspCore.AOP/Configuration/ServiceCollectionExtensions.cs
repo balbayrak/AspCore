@@ -16,7 +16,7 @@ namespace AspCore.AOP.Concrete
         /// <returns></returns>
         public static IServiceCollection AutoBindWithInterceptors(this IServiceCollection services, Action<InterceptorOption> option = null)
         {
-            using (InterceptorOptionBuilder builder = new InterceptorOptionBuilder())
+            using (InterceptorOptionBuilder builder = new InterceptorOptionBuilder(services))
             {
                 builder.BindWithInterceptors(services, option);
                 return services;
@@ -34,7 +34,7 @@ namespace AspCore.AOP.Concrete
         public static IServiceCollection AutoBindWithInterceptors<TProxySelector>(this IServiceCollection services, Action<InterceptorOption> option = null)
               where TProxySelector : class, IProxySelector, new()
         {
-            using (InterceptorOptionBuilder builder = new InterceptorOptionBuilder())
+            using (InterceptorOptionBuilder builder = new InterceptorOptionBuilder(services))
             {
                 builder.BindWithInterceptors<TProxySelector>(services, option);
                 return services;

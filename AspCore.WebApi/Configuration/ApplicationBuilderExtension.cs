@@ -14,6 +14,5 @@ namespace AspCore.WebApi.Configuration
             app.UseMiddleware<ExceptionMiddleware>();
             //app.UseMiddleware<CustomHeaderMiddleware>();
         }
-
     }
 }

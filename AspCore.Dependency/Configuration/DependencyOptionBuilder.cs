@@ -12,7 +12,6 @@ namespace AspCore.Dependency.Configuration
     {
         public DependencyOptionBuilder(IServiceCollection services) : base(services)
         {
-
         }
         public void AutoBind(Action<DependencyOption> option = null)
         {
@@ -25,9 +24,9 @@ namespace AspCore.Dependency.Configuration
                 nameSpaceStr = dependencyOption.namespaceStr;
             }
 
-            BindType<ITransientType>(_services, ServiceLifetime.Transient, nameSpaceStr);
-            BindType<IScopedType>(_services, ServiceLifetime.Scoped, nameSpaceStr);
-            BindType<ISingletonType>(_services, ServiceLifetime.Singleton, nameSpaceStr);
+            BindType<ITransientType>(ServiceLifetime.Transient, nameSpaceStr);
+            BindType<IScopedType>(ServiceLifetime.Scoped, nameSpaceStr);
+            BindType<ISingletonType>(ServiceLifetime.Singleton, nameSpaceStr);
         }
 
         public void Bind<TInterface>(Action<DependencyOption> option)
@@ -35,7 +34,7 @@ namespace AspCore.Dependency.Configuration
             DependencyOption dependencyOption = new DependencyOption();
             option(dependencyOption);
 
-            BindType<TInterface>(_services, dependencyOption.serviceLifetime, dependencyOption.namespaceStr);
+            BindType<TInterface>(dependencyOption.serviceLifetime, dependencyOption.namespaceStr);
         }
 
         public void Bind<TInterface, TConcrete>(Action<DependencyOption> option)
@@ -60,7 +59,7 @@ namespace AspCore.Dependency.Configuration
             _services.Add(descriptor);
         }
 
-        private static void BindType<TInterface>(IServiceCollection services, ServiceLifetime lifeTime = ServiceLifetime.Scoped, string namespaceStr = null)
+        private void BindType<TInterface>(ServiceLifetime lifeTime = ServiceLifetime.Scoped, string namespaceStr = null)
         {
             IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr);
 
@@ -77,22 +76,21 @@ namespace AspCore.Dependency.Configuration
 
                     var descriptor = new ServiceDescriptor(serviceType, implementationType, lifeTime);
 
-                    var oldDescription = services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
+                    var oldDescription = _services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
                     if (oldDescription != null)
                     {
-                        services.Remove(oldDescription);
+                        _services.Remove(oldDescription);
                     }
 
-                    var oldDescriptionImp = services.FirstOrDefault(t => t.ServiceType == implementationType);
+                    var oldDescriptionImp = _services.FirstOrDefault(t => t.ServiceType == implementationType);
                     if (oldDescriptionImp != null)
                     {
-                        services.Remove(oldDescriptionImp);
+                        _services.Remove(oldDescriptionImp);
                     }
 
-                    services.Add(descriptor);
+                    _services.Add(descriptor);
                 }
             }
-
         }
 
         public void Dispose()

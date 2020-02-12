@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
+﻿using AspCore.Dependency.Concrete;
+using AspCore.Entities.Json;
+using AspCore.Utilities.MimeMapping;
+using AspCore.Web.Configuration.Options;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
@@ -7,17 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
-using AspCore.AOP.Configuration;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.Json;
-using AspCore.Utilities.MimeMapping;
-using AspCore.Web.Configuration.Options;
 
 namespace AspCore.Web.Configuration
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection ConfigureAspCoreServices(this IServiceCollection services, Action<DependencyConfigurationOption> option, Action<InterceptorOptionBuilder> interceptorOptionBuilder = null)
+        public static IServiceCollection ConfigureAspCoreServices(this IServiceCollection services, Action<DependencyConfigurationOption> option)
         {
 
             var provider = new FileExtensionContentTypeProvider();
@@ -48,18 +46,9 @@ namespace AspCore.Web.Configuration
             DependencyConfigurationOption configurationHelperOption = new DependencyConfigurationOption(services);
             option(configurationHelperOption);
 
-            //bütün configurasyonlar çalıştı.
-
-            if (interceptorOptionBuilder != null)
-            {
-                InterceptorOptionBuilder interceptorOptionInternal = new InterceptorOptionBuilder();
-                interceptorOptionBuilder(interceptorOptionInternal);
-            }
-
-
+            //All configuration completed, resolve initialize all configuration.
 
             DependencyResolver.Init(services.BuildServiceProvider());
-
 
             return services;
         }
