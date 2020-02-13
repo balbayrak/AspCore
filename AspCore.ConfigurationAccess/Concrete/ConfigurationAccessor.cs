@@ -4,15 +4,15 @@ using AspCore.Entities.Configuration;
 
 namespace AspCore.ConfigurationAccess.Concrete
 {
-    public class ConfigurationHelper : IConfigurationHelper
+    public class ConfigurationAccessor : IConfigurationAccessor
     {
         public IConfiguration Configuration { get; }
 
-        public ConfigurationHelper()
+        public ConfigurationAccessor()
         {
 
         }
-        public ConfigurationHelper(IConfiguration configuration)
+        public ConfigurationAccessor(IConfiguration configuration)
         {
             Configuration = configuration;
         }

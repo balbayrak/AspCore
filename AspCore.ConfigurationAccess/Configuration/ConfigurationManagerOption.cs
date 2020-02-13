@@ -9,20 +9,20 @@ namespace AspCore.ConfigurationAccess.Configuration
     {
         public ConfigurationManagerOption()
         {
-            enumConfigurationManager = EnumConfigurationManager.None;
+            type = EnumConfigurationAccessorType.None;
         }
-        public EnumConfigurationManager enumConfigurationManager { get; set; }
+        public EnumConfigurationAccessorType type { get; set; }
 
         public void AddConfigurationManager<T>(IServiceCollection services, Action<ConfigurationManagerOption> option)
-          where T : class, IConfigurationHelper, new()
+          where T : class, IConfigurationAccessor, new()
         {
-            var configurationHelper = services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationHelper));
+            var configurationHelper = services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationAccessor));
             if (configurationHelper == null)
             {
                 services.Remove(configurationHelper);
             }
 
-            services.AddSingleton<IConfigurationHelper, T>();
+            services.AddSingleton<IConfigurationAccessor, T>();
         }
     }
 }

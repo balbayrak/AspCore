@@ -50,7 +50,7 @@ namespace AspCore.DataAccess.Configuration
                     }
                     //configuration helper ile setting
 
-                    IConfigurationHelper configurationHelper = serviceProvider.GetRequiredService<IConfigurationHelper>();
+                    IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
                     if (configurationHelper == null)
                     {
                         throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);

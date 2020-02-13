@@ -6,7 +6,7 @@ namespace AspCore.ConfigurationAccess.Configuration
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection AddConfigurationManager(this IServiceCollection services, Action<ConfigurationManagerOption> option)
+        public static IServiceCollection AddConfigurationAccessor(this IServiceCollection services, Action<ConfigurationManagerOption> option)
         {
             using (ConfigurationManagerOptionBuilder builder = new ConfigurationManagerOptionBuilder(services))
             {
@@ -15,8 +15,8 @@ namespace AspCore.ConfigurationAccess.Configuration
             }
         }
 
-        public static IServiceCollection AddConfigurationManager<T>(this IServiceCollection services, Action<ConfigurationManagerOption> option)
-             where T : class, IConfigurationHelper, new()
+        public static IServiceCollection AddConfigurationAccessor<T>(this IServiceCollection services, Action<ConfigurationManagerOption> option)
+             where T : class, IConfigurationAccessor, new()
         {
 
             using (ConfigurationManagerOptionBuilder builder = new ConfigurationManagerOptionBuilder(services))

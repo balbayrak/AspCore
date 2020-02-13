@@ -4,7 +4,7 @@ using AspCore.Entities.Configuration;
 
 namespace AspCore.ConfigurationAccess.Abstract
 {
-    public interface IConfigurationHelper : ISingletonType
+    public interface IConfigurationAccessor : ISingletonType
     {
         string GetConnectionStrings(string key);
         T GetValueByKey<T>(string key) where T : class, IConfigurationEntity, new();

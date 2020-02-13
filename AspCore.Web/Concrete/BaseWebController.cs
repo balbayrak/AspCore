@@ -1,5 +1,6 @@
 ﻿using AspCore.ApiClient.Entities.Concrete;
 using AspCore.BackendForFrontend.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
@@ -24,6 +25,7 @@ namespace AspCore.Web.Concrete
         private readonly IUserBffLayer _userBffLayer;
         protected IDataProtectorHelper DataProtectorHelper;
         protected IDocumentBffLayer<TDocument> DocumentHelper;
+        protected IConfigurationAccessor ConfigurationAccessor;
 
         protected BaseWebController()
         {
@@ -32,6 +34,7 @@ namespace AspCore.Web.Concrete
             AlertService = DependencyResolver.Current.GetService<IAlertService>();
             DataProtectorHelper = DependencyResolver.Current.GetService<IDataProtectorHelper>();
             DocumentHelper = DependencyResolver.Current.GetService<IDocumentBffLayer<TDocument>>();
+            ConfigurationAccessor = DependencyResolver.Current.GetService<IConfigurationAccessor>();
         }
 
         protected ActiveUser activeUser

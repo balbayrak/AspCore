@@ -22,7 +22,7 @@ namespace AspCore.WebApi.Security.Concrete
         where TJWTInfo : class, IJWTEntity, new()
     {
         private IHttpContextAccessor _httpContextAccessor;
-        private IConfigurationHelper _configurationHelper { get; }
+        private IConfigurationAccessor _configurationHelper { get; }
 
         protected TokenSettingOption _tokenOption { get; set; }
 
@@ -31,7 +31,7 @@ namespace AspCore.WebApi.Security.Concrete
         public JwtGenerator(string configurationKey, TokenSettingOption tokenOption = null)
         {
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _configurationHelper = DependencyResolver.Current.GetService<IConfigurationHelper>(); ;
+            _configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>(); ;
 
             if (tokenOption == null && !string.IsNullOrEmpty(configurationKey))
             {

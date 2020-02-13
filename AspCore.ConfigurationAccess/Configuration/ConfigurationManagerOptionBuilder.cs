@@ -20,30 +20,30 @@ namespace AspCore.ConfigurationAccess.Configuration
             option.Invoke(managerOption);
 
 
-            if (managerOption.enumConfigurationManager == EnumConfigurationManager.AppSettingJson)
+            if (managerOption.type == EnumConfigurationAccessorType.AppSettingJson)
             {
-                _services.AddSingleton<IConfigurationHelper, ConfigurationHelper>();
+                _services.AddSingleton<IConfigurationAccessor, ConfigurationAccessor>();
             }
-            else if (managerOption.enumConfigurationManager == EnumConfigurationManager.DataBaseRemoteProvider)
+            else if (managerOption.type == EnumConfigurationAccessorType.DataBaseRemoteProvider)
             {
 
             }
-            else if (managerOption.enumConfigurationManager == EnumConfigurationManager.RedisRemoteProvider)
+            else if (managerOption.type == EnumConfigurationAccessorType.RedisRemoteProvider)
             {
 
             }
         }
 
         public void AddConfigurationHelper<T>(Action<ConfigurationManagerOption> option)
-           where T : class, IConfigurationHelper, new()
+           where T : class, IConfigurationAccessor, new()
         {
-            var configurationHelper = _services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationHelper));
+            var configurationHelper = _services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationAccessor));
             if (configurationHelper == null)
             {
                 _services.Remove(configurationHelper);
             }
 
-            _services.AddSingleton<IConfigurationHelper, T>();
+            _services.AddSingleton<IConfigurationAccessor, T>();
         }
 
         public void Dispose()

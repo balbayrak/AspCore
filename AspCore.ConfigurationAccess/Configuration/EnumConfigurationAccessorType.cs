@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AspCore.ConfigurationAccess.Configuration
 {
-    public enum EnumConfigurationManager
+    public enum EnumConfigurationAccessorType
     {
         None = 0,
         AppSettingJson = 1,

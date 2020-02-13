@@ -22,7 +22,7 @@ namespace AspCore.ApiClient
         where TOption : class, IApiClientConfiguration, new()
     {
         protected IHttpContextAccessor _httpContextAccessor;
-        private readonly IConfigurationHelper _configurationHelper;
+        private readonly IConfigurationAccessor _configurationHelper;
         protected IStorage _accessTokenService;
 
         protected TOption apiConfiguration { get; set; }
@@ -68,7 +68,7 @@ namespace AspCore.ApiClient
             this.apiKey = apiKey;
 
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _configurationHelper = DependencyResolver.Current.GetService<IConfigurationHelper>();
+            _configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>();
             _accessTokenService = DependencyResolver.Current.GetService<IStorage>();
 
             _baseAddress = string.Empty;

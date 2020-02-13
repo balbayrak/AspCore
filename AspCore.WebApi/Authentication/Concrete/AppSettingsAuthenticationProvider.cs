@@ -16,10 +16,10 @@ namespace AspCore.WebApi.Authentication.Concrete
    where TOption : class, IConfigurationEntity, new()
     {
         protected TOption _option { get; private set; }
-        protected IConfigurationHelper configurationHelper { get; private set; }
+        protected IConfigurationAccessor configurationHelper { get; private set; }
         public AppSettingsAuthenticationProvider(string configurationKey, TOption option = null)
         {
-            configurationHelper = DependencyResolver.Current.GetService<IConfigurationHelper>();
+            configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>();
             _option = configurationHelper.GetValueByKey<TOption>(configurationKey);
 
             if (option == null && !string.IsNullOrEmpty(configurationKey))
