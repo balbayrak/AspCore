@@ -31,7 +31,6 @@ namespace AspCore.Middlewares
             }
 
             await _next(httpContext);
-
         }
     }
 }

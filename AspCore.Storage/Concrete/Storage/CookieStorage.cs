@@ -22,20 +22,27 @@ namespace AspCore.Storage.Concrete.Storage
 
         public T GetObject<T>(string key)
         {
-            var list = _contextAccessor.HttpContext.Response.Cookies;
-
-            if (_contextAccessor.HttpContext.Request.Cookies.ContainsKey(key))
+            if (!string.IsNullOrEmpty(key))
             {
-                return JsonConvert.DeserializeObject<T>(_contextAccessor.HttpContext.Request.Cookies[key].ToString().UnCompressString());
+                var list = _contextAccessor.HttpContext.Response.Cookies;
+
+                if (_contextAccessor.HttpContext.Request.Cookies.ContainsKey(key))
+                {
+                    return JsonConvert.DeserializeObject<T>(_contextAccessor.HttpContext.Request.Cookies[key].ToString().UnCompressString());
+                }
             }
             return default(T);
         }
 
         public bool Remove(string key)
         {
-            _contextAccessor.HttpContext.Response.Cookies.Delete(key);
-
-            return true;
+            if (!string.IsNullOrEmpty(key))
+            {
+                _contextAccessor.HttpContext.Response.Cookies.Delete(key);
+                return true;
+            }
+            return false;
+            
         }
 
         public void RemoveAll()

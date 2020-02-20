@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
+    <ProjectReference Include="..\AspCoreTest.DataAccess\AspCoreTest.DataAccess.csproj" />
+    <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
+  </ItemGroup>
+
+</Project>

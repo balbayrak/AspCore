@@ -80,7 +80,6 @@ namespace AspCore.ApiClient
 
                     _accessTokenService.SetObject(tokenStorageKey, tokenResponse, tokenStrorageExpireTime);
                 }
-
             }
 
 

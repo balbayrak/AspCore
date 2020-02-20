@@ -48,8 +48,8 @@ namespace AspCore.BackendForFrontend.Concrete
             _storage = DependencyResolver.Current.GetService<IStorage>();
 
             string tokenStorageKey = _storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+           
             apiClient.tokenStorageKey = tokenStorageKey;
-
         }
 
         public void SetApiClientTokenStorageKey(string tokenStorageKey)

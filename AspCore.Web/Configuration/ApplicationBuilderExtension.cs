@@ -11,6 +11,7 @@ namespace AspCore.Web.Configuration
         public static void UseAspCoreWeb(this IApplicationBuilder app, string authenticationControllerName)
         {
             app.UseMiddleware<WebAuthenticationMiddleware>(authenticationControllerName);
+           
             //app.UseMiddleware<CustomHeaderMiddleware>();
 
             app.UseEndpoints(endpoints =>
