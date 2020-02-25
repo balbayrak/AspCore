@@ -1,7 +1,7 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Entities.DocumentType;
 using AspCoreTest.Entities.Models;
-using AspCoreTest.Models.ViewModels;
+using AspCoreTest.WebUI.Models.ViewModels;
 
 namespace AspCoreTest.Bffs.Abstract
 {
