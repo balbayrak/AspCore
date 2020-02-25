@@ -1,6 +1,6 @@
-﻿using AspCore.Entities.DocumentType;
-using AspCore.Web.Concrete;
+﻿using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.Entities.Models;
 using AspCoreTest.Models.ViewModels;

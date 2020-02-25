@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace AspCore.ViewComponents.Components.Alert.Concrete
+﻿namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
 {
     public static class AlertStyle
     {

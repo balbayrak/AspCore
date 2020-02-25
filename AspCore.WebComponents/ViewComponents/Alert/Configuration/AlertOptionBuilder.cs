@@ -1,15 +1,14 @@
 ﻿using AspCore.Entities.Configuration;
-using AspCore.ViewComponents.Components.Alert.Concrete;
-using AspCore.ViewComponents.ViewComponents;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
+using AspCore.WebComponents.HtmlHelpers.Extensions;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System;
 
-namespace AspCore.ViewComponents.Components.Alert.Configuration
+namespace AspCore.WebComponents.ViewComponents.Alert.Configuration
 {
     public class AlertOptionBuilder : ConfigurationOption
     {
@@ -24,7 +23,7 @@ namespace AspCore.ViewComponents.Components.Alert.Configuration
 
             var assembly = typeof(AlertViewComponent).Assembly;
 
-            string namespaceStr = (string.IsNullOrEmpty(alertOption.baseNameSpace) && string.IsNullOrWhiteSpace(alertOption.baseNameSpace)) ? "AspCore.ViewComponents" : alertOption.baseNameSpace;
+            string namespaceStr = (string.IsNullOrEmpty(alertOption.baseNameSpace) && string.IsNullOrWhiteSpace(alertOption.baseNameSpace)) ? "AspCore.WebComponents" : alertOption.baseNameSpace;
 
             var embeddedFileProvider = new EmbeddedFileProvider(
                 assembly,

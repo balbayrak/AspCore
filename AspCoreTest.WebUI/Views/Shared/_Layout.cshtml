@@ -1,4 +1,5 @@
 ﻿<!DOCTYPE html>
+@using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,6 +7,11 @@
     <title>@ViewData["Title"] - AspCoreTest.WebUI</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/lib/bootstrap-toastr/toastr.min.css" rel="stylesheet" />
+    <link href="~/lib/sweetalert/sweetalert.css" rel="stylesheet" />
+    <link href="~/lib/alertify/alertify.bootstrap.css" rel="stylesheet" />
+    <link href="~/lib/alertify/alertify.core.css" rel="stylesheet" />
+    <link href="~/lib/alertify/alertify.default.css" rel="stylesheet" />
 </head>
 <body>
     <header>
@@ -43,6 +49,17 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-toastr/toastr.js"></script>
+    <script src="~/lib/sweetalert/sweetalert.min.js"></script>
+    <script src="~/lib/alertify/alertify.js"></script>
+    <script src="~/lib/bootbox/bootbox.min.js"></script>
+    <script src="~/js/alert.js"></script>
+
     @RenderSection("Scripts", required: false)
+
+    <div class="row">
+        @await Component.InvokeAsync("Alert")
+
+    </div>
 </body>
 </html>

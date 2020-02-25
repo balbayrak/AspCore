@@ -1,4 +1,4 @@
-﻿namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
+﻿namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
 {
     internal class AlertConstants
     {

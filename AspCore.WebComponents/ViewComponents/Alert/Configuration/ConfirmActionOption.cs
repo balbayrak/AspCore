@@ -1,6 +1,6 @@
 ﻿using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 
-namespace AspCore.ViewComponents.Components.Alert.Configuration
+namespace AspCore.WebComponents.ViewComponents.Alert.Configuration
 {
     public class ConfirmActionOption
     {

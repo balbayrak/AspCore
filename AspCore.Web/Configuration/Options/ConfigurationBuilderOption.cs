@@ -4,9 +4,9 @@ using AspCore.Entities.Configuration;
 using AspCore.Entities.DocumentType;
 using AspCore.Utilities.DataProtector;
 using AspCore.Utilities.MimeMapping;
-using AspCore.ViewComponents.Components.Alert.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AspCore.WebComponents.ViewComponents.Alert.Configuration;
 
 namespace AspCore.Web.Configuration.Options
 {

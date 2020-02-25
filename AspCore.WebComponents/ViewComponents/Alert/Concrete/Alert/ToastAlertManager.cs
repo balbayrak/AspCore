@@ -1,7 +1,6 @@
 ﻿using AspCore.WebComponents.ViewComponents.Alert.Abstract;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 
-namespace AspCore.ViewComponents.Components.Alert.Concrete
+namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
 {
     public class ToastAlertManager : BaseAlertManager, IAlertService
     {

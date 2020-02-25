@@ -1,6 +1,6 @@
 ﻿using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 
-namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
+namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
 {
     public class BootBoxAlertManager : BaseAlertManager, IAlertService
     {

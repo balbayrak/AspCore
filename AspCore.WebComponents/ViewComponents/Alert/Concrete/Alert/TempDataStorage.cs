@@ -1,11 +1,11 @@
-﻿using AspCore.WebComponents.HtmlHelpers.Extensions;
+﻿using System;
+using AspCore.WebComponents.HtmlHelpers.Extensions;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
-using System;
 
-namespace AspCore.ViewComponents.Components.Alert.Concrete
+namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
 {
     public class TempDataStorage : IAlertStorage
     {

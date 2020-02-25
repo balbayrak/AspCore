@@ -1,6 +1,6 @@
-﻿using AspCore.ViewComponents.Components.Alert.Concrete;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete;
+﻿using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using System.Collections.Generic;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 
 namespace AspCore.WebComponents.ViewComponents.Alert.Abstract
 {

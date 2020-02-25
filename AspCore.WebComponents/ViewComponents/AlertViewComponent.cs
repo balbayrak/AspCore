@@ -1,9 +1,9 @@
 ﻿using AspCore.WebComponents.ViewComponents.Alert.Abstract;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace AspCore.ViewComponents.ViewComponents
+namespace AspCore.WebComponents.ViewComponents
 {
     [ViewComponent(Name = "Alert")]
     public class AlertViewComponent : ViewComponent
@@ -17,7 +17,7 @@ namespace AspCore.ViewComponents.ViewComponents
         public IViewComponentResult Invoke()
         {
             var alerts = _alertStorage.GetObject<List<AlertInfo>>(AlertConstants.TEMP_DATA_KEYS);
-            return View("Default", alerts);
+            return View("~/ViewComponents/Views/Shared/Components/Alert/Default.cshtml", alerts);
         }
     }
 }

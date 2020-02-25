@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AspCore.ViewComponents.Components.Alert.Concrete;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete;
+﻿using AspCore.WebComponents.ViewComponents.Alert.Concrete;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 
-namespace AspCore.ViewComponents.Components.Alert.Configuration
+namespace AspCore.WebComponents.ViewComponents.Alert.Configuration
 {
     public class AlertOption
     {
