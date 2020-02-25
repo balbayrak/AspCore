@@ -1,0 +1,31 @@
+﻿@model AspCoreTest.WebUI.Models.ViewModels.PersonViewModel;
+@{
+    ViewData["Title"] = "AddOrEdit";
+}
+
+<addoredit-modalform id="modalId" form-id="formId" ok-text="Tamam" cancel-text="Vazgeç" header-title="Person" header-smalltitle="Person info">
+    @Html.ValidationSummary(false)
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" id="id" name="id" value="@if ( Model != null)
+    { @Html.Raw(Model.dataEntity.EncryptedId) }" />
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label asp-for="dataEntity.Name" class="control-label col-md-4"></label>
+            <div class="col-md-6">
+                <input asp-for="dataEntity.Name" id="Name" class="form-control validate[required]" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label asp-for="dataEntity.Surname" class="control-label col-md-4"></label>
+            <div class="col-md-6">
+                <input asp-for="dataEntity.Surname" id="Surname" class="form-control validate[required]" />
+            </div>
+        </div>
+    </div>
+</addoredit-modalform>
+
