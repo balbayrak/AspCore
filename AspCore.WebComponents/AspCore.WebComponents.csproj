@@ -5,11 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Views\Shared\Components\Alert\Default.cshtml" />
+    <Compile Remove="Views\**" />
+    <EmbeddedResource Remove="Views\**" />
+    <None Remove="Views\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Views\Shared\Components\Alert\Default.cshtml" />
+    <None Remove="ViewComponents\Views\Shared\Components\Alert\Default.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ViewComponents\Views\Shared\Components\Alert\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
