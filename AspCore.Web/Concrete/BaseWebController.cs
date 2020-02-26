@@ -13,6 +13,8 @@ using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
+using AspCore.Authentication.Abstract;
+using AspCore.Authentication.Concrete;
 
 namespace AspCore.Web.Concrete
 {
@@ -36,7 +38,7 @@ namespace AspCore.Web.Concrete
             DocumentHelper = DependencyResolver.Current.GetService<IDocumentBffLayer<TDocument>>();
             ConfigurationAccessor = DependencyResolver.Current.GetService<IConfigurationAccessor>();
         }
-
+     
         protected ActiveUser activeUser
         {
             get
@@ -65,6 +67,11 @@ namespace AspCore.Web.Concrete
                     }
                 }
             }
+            else
+            {
+                Response.Redirect();
+            }
+           
 
             base.OnActionExecuting(context);
         }

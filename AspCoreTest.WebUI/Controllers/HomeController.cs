@@ -1,4 +1,6 @@
-﻿using AspCore.Web.Concrete;
+﻿using System;
+using AspCore.Entities.EntityFilter;
+using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 using AspCoreTest.Bffs.Abstract;
@@ -20,6 +22,7 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult Index()
         {
+         
             return View();
         }
 

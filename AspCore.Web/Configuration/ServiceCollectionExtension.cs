@@ -20,7 +20,7 @@ namespace AspCore.Web.Configuration
 
             var provider = new FileExtensionContentTypeProvider();
             services.AddSingleton<IMimeMappingService>(new MimeMappingManager(provider));
-
+            
 
             services.AddControllers().AddNewtonsoftJson(options =>
             {
