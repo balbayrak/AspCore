@@ -5,7 +5,6 @@ using AspCore.Storage.Concrete.Storage;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 using AspCoreTest.Authentication.Concrete;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

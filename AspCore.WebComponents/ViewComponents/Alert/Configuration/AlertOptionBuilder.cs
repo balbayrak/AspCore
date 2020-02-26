@@ -2,7 +2,7 @@
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.HtmlHelpers.Extensions;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;

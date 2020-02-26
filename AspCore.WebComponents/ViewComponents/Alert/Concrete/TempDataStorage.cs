@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
 
-namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
+namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
 {
     public class TempDataStorage : IAlertStorage
     {

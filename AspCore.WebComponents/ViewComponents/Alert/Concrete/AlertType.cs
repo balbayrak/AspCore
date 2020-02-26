@@ -1,4 +1,4 @@
-﻿namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
+﻿namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
 {
     public enum AlertType
     {

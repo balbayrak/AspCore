@@ -1,7 +1,7 @@
 ﻿
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 
-namespace AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert
+namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
 {
     public class AlertifyAlertManager : BaseAlertManager, IAlertService
     {

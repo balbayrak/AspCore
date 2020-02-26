@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="ViewComponents\Views\Shared\Components\Alert\Default.cshtml" />
+    <None Remove="Views\Shared\Components\Alert\Default.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="ViewComponents\Views\Shared\Components\Alert\Default.cshtml" />
+    <EmbeddedResource Include="Views\Shared\Components\Alert\Default.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
