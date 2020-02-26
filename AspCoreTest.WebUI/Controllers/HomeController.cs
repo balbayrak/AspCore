@@ -1,6 +1,5 @@
 ﻿using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
-using AspCore.WebComponents.ViewComponents.Alert.Concrete.Alert;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.Entities.Models;
 using AspCoreTest.WebUI.Models.ViewModels;
@@ -10,12 +9,8 @@ namespace AspCoreTest.WebUI.Controllers
 {
     public class HomeController : BaseWebEntityController<Person, PersonViewModel, IPersonBff>
     {
-        private readonly IPersonCVBff _personCVBff;
-
-
-        public HomeController(IPersonCVBff personCVBff)
+        public HomeController()
         {
-            _personCVBff = personCVBff;
         }
 
         public IActionResult Index()
