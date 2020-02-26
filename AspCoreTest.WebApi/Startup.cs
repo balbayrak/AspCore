@@ -74,13 +74,13 @@ namespace AspCoreTest.WebApi
                 {
                     option.swaggerDoc = new SwaggerDoc
                     {
-                        title = "TSE Service API",
+                        title = "Service API",
                         version = "1.0",
                         description = "Service API Description",
                         contactName = "Bilal ALBAYRAK",
-                        contactUrl = "http.tse.org.tr",
+                        contactUrl = "http.google.com.tr",
                         apiVersion = "v1",
-                        contactEmail = "balbayrak.tse.org.tr"
+                        contactEmail = "balbayrak87@gmail.com"
                     };
                 });
                 //.AddDocumentAccessLayer(option =>

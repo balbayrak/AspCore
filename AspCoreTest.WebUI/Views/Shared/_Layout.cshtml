@@ -38,9 +38,14 @@
     <div class="animsition">
 
         <div class="page-wrapper">
+            <div class="page-header navbar navbar-fixed-top">
+                @await Component.InvokeAsync("Profile")
+            </div>
             <div class="clearfix"> </div>
             <div class="page-container">
-
+                <div class="page-sidebar-wrapper">
+                    @await Component.InvokeAsync("Menu")
+                </div>
                 <div class="page-content-wrapper">
                     <div class="page-content">
 
@@ -55,7 +60,7 @@
             </div>
             <div class="page-footer">
                 <div class="page-footer-inner">
-                    @DateTime.Now.Year
+                    @DateTime.Now.Year &copy;
                 </div>
                 <div class="scroll-to-top">
                     <i class="icon-arrow-up"></i>
