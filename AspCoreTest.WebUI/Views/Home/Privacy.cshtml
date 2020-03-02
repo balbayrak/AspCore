@@ -1,6 +1,13 @@
-﻿@{
+﻿@using AspCore.WebComponents.TagHelpers;
+@using AspCoreTest.Entities.ComplexTypes
+
+@{
     ViewData["Title"] = "Privacy Policy";
 }
 <h1>@ViewData["Title"]</h1>
 
 <p>Use this page to detail your site's privacy policy.</p>
+
+<select enum-type="@typeof(AjaxResultTypeEnum)" selected-enum-value="3"></select>
+
+<select items="@ViewBag.Models" prop-text="Name" prop-value="Id" selected-list-value="@Guid.Empty"></select>

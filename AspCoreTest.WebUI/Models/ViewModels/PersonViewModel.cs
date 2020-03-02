@@ -7,4 +7,6 @@ namespace AspCoreTest.WebUI.Models.ViewModels
     {
 
     }
+
+  
 }

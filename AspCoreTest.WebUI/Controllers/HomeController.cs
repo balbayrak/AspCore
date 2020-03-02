@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AspCore.Entities.EntityFilter;
 using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
@@ -33,6 +34,11 @@ namespace AspCoreTest.WebUI.Controllers
 
             AlertService.Info("default!", "Default!", AlertType.Default);
 
+            ViewBag.Models = new List<Person>()
+            {
+                new Person() {Id = Guid.NewGuid(), Name = "Yusuf"},
+                new Person() {Id = Guid.NewGuid(), Name = "Bilal"}
+            };
             return View();
         }
     }
