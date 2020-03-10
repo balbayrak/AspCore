@@ -23,6 +23,7 @@ namespace AspCore.DataAccess.EntityFramework
     {
         private TDbContext _context { get; }
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private DbSet<TEntity> _entities;
         private Guid activeUserId
         {
             get
@@ -30,10 +31,13 @@ namespace AspCore.DataAccess.EntityFramework
                 return new Guid(_httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID));
             }
         }
+        protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = _context.Set<TEntity>());
+        protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
         public EfEntityRepositoryBase()
         {
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
             _context = DependencyResolver.Current.GetService<TDbContext>();
+            _entities = _context.Set<TEntity>();
         }
 
         public ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter)
@@ -41,7 +45,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
             try
             {
-                result.Result = _context.Set<TEntity>().FirstOrDefault(filter);
+                result.Result = _entities.FirstOrDefault(filter);
                 result.IsSucceeded = true;
 
             }
@@ -58,8 +62,8 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = _context.Set<TEntity>().AsQueryable();
-                IsDeletedFilter(ref query, filter);
+                var query = _entities.AsQueryable();
+                //IsDeletedFilter(ref query, filter);
                 var countTask = query.Count();
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
@@ -89,9 +93,9 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = _context.Set<TEntity>().AsQueryable();
+                var query = _entities.AsQueryable();
 
-                IsDeletedFilter(ref query, filter);
+                //IsDeletedFilter(ref query, filter);
 
                 var countTask = query.CountAsync();
                 Task<TEntity[]> resultsTask;
@@ -300,9 +304,9 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _context.Set<TEntity>();
+                IQueryable<TEntity> dbQuery = _entities;
 
-                IsDeletedFilter(ref dbQuery, filter);
+                //IsDeletedFilter(ref dbQuery, filter);
 
                 result.Result = dbQuery.AsNoTracking().Where(filter).FirstOrDefault();
                 result.IsSucceeded = true;
@@ -322,9 +326,9 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _context.Set<TEntity>();
+                IQueryable<TEntity> dbQuery = _entities;
 
-                IsDeletedFilter(ref dbQuery, t => t.Id.Equals(id));
+                //IsDeletedFilter(ref dbQuery, t => t.Id.Equals(id));
 
                 result.Result = dbQuery.AsNoTracking().FirstOrDefault();
                 result.IsSucceeded = true;
@@ -343,7 +347,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _context.Set<TEntity>();
+                IQueryable<TEntity> dbQuery = _entities;
 
                 result.Result = dbQuery.Where(t => t.Id.Equals(id)).FirstOrDefault();
                 result.IsSucceeded = true;
@@ -362,12 +366,12 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _context.Set<TEntity>();
+                IQueryable<TEntity> dbQuery = _entities;
 
                 var query = dbQuery.AsQueryable();
                 var countTask = query.Count();
 
-                IsDeletedFilter(ref query, filter);
+                //IsDeletedFilter(ref query, filter);
 
                 if (sorters != null && sorters.Count > 0)
                 {
@@ -403,12 +407,12 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _context.Set<TEntity>();
+                IQueryable<TEntity> dbQuery = _entities;
 
                 var query = dbQuery.AsQueryable();
                 var countTask = query.CountAsync();
 
-                IsDeletedFilter(ref query, filter);
+                //IsDeletedFilter(ref query, filter);
 
 
                 if (sorters != null && sorters.Count > 0)
@@ -546,8 +550,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                DbSet<TEntity> dbSet = _context.Set<TEntity>();
-                dbSet.Add(item);
+                _entities.Add(item);
                 foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
                 {
                     IEntity entity = entry.Entity;
@@ -586,8 +589,7 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     foreach (var item in items)
                     {
-                        DbSet<TEntity> dbSet = _context.Set<TEntity>();
-                        dbSet.Add(item);
+                        _entities.Add(item);
                         foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
                         {
                             IEntity entity = entry.Entity;
@@ -642,22 +644,22 @@ namespace AspCore.DataAccess.EntityFramework
 
         private void IsDeletedFilter(ref IQueryable<TEntity> query, Expression<Func<TEntity, bool>> filter = null)
         {
-            if (filter != null)
-            {
-                if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
-                {
-                    filter = ExpressionBuilder.CombineWithAndAlso(filter, ExpressionBuilder.GetEqualsExpression<TEntity>(nameof(IBaseEntity.IsDeleted), false));
-                    //filter = Expression.Lambda<Func<TEntity, bool>>(expression, filter.Parameters);
-                }
-                query = query.Where(filter);
-            }
-            else
-            {
-                if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
-                {
-                    query = query.Where(ExpressionBuilder.GetEqualsExpression<TEntity>(nameof(IBaseEntity.IsDeleted), false));
-                }
-            }
+            //if (filter != null)
+            //{
+            //    if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
+            //    {
+            //        filter = ExpressionBuilder.CombineWithAndAlso(filter, ExpressionBuilder.GetEqualsExpression<TEntity>(nameof(IBaseEntity.IsDeleted), false));
+            //        //filter = Expression.Lambda<Func<TEntity, bool>>(expression, filter.Parameters);
+            //    }
+            //    query = query.Where(filter);
+            //}
+            //else
+            //{
+            //    if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
+            //    {
+            //        query = query.Where(ExpressionBuilder.GetEqualsExpression<TEntity>(nameof(IBaseEntity.IsDeleted), false));
+            //    }
+            //}
         }
     }
 }

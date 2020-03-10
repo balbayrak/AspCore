@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AspCore.DataAccess.EntityFramework.Mapping;
 using AspCore.Entities.EntityType;
+using AspCore.Extension;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -44,6 +45,7 @@ namespace AspCore.DataAccess.EntityFramework
                 dynamic configurationInstance = Activator.CreateInstance(type);
                 modelBuilder.ApplyConfiguration(configurationInstance);
             }
+            modelBuilder.AddGlobalDeletedFilter();
         }
         public override int SaveChanges()
         {
