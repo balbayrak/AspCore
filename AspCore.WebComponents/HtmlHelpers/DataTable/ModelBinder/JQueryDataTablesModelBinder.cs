@@ -26,6 +26,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder
         private const string sSortDir_Key = "sSortDir_";
         private const string sEchoKey = "sEcho";
         private const string mDataProp_Key = "mDataProp_";
+        private const string columnInfo_Key = "columnInfo";
 
         private ModelBindingContext _bindingContext;
 
@@ -50,7 +51,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder
                 // No need to use a prefix since data tables will not prefix the request names        
                 var valueResult = _bindingContext.ValueProvider.GetValue(newKey);
 
-                if (valueResult == null)
+                if (valueResult == null || (valueResult != null && valueResult.FirstValue == null))
                 {
                     // If valueResult is still null then we know the value is not in the ModelBindingContext
                     // cease execution of this forloop
@@ -77,7 +78,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder
 
                 var valueResult = _bindingContext.ValueProvider.GetValue(newKey);
 
-                if (valueResult == null)
+                if (valueResult == null || (valueResult != null && valueResult.FirstValue == null))
                 {
                     // If valueResult is still null then we know the value is not in the ModelBindingContext
                     // cease execution of this forloop
@@ -178,6 +179,10 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder
                         dataTablesRequest.sSortDir_.Count, dataTablesRequest.iSortingCols.Value));
                 }
             }
+            var value = GetString(columnInfo_Key);
+
+            dataTablesRequest.columnInfos = value;
+
             dataTablesRequest.sSearch = GetString(sSearchKey);
             dataTablesRequest.sSearch_ = GetStringList(sSearch_Key);
             dataTablesRequest.mDataProp_ = GetStringList(mDataProp_Key);

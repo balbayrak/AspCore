@@ -10,8 +10,8 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
         {
         }
 
-        public DefaultActionButton(string id, string text, string iClass, string cssClass, bool blockui, string blockTarget, string actionUrl, EnumHttpMethod httpMethod = EnumHttpMethod.GET) 
-            : base(id,text,iClass,cssClass,blockui,blockTarget,actionUrl,httpMethod)
+        public DefaultActionButton(string id, string text, string iClass, string cssClass, bool blockui, string blockTarget, string actionUrl, EnumHttpMethod httpMethod = EnumHttpMethod.GET)
+            : base(id, text, iClass, cssClass, blockui, blockTarget, actionUrl, httpMethod)
         {
         }
 

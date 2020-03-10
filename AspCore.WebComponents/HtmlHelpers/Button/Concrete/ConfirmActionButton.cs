@@ -21,10 +21,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
         {
             if (!string.IsNullOrEmpty(confirmMessage) || !string.IsNullOrEmpty(confirmTitle))
             {
-                this.confirmOption = new ConfirmOption();
-                this.confirmOption.confirmTitle = confirmTitle;
-                this.confirmOption.confirmMessage = confirmMessage;
-                this.confirmOption.confirmCallBackFuncName = confirmCallbackFunc;
+                this.confirmOption = new ConfirmOption(confirmTitle, confirmMessage, confirmCallbackFunc);
 
                 if (this.action != null)
                 {

@@ -16,7 +16,6 @@
     <link href="~/assets/global/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" type="text/css" />
     <link href="~/assets/global/css/components.min.css" rel="stylesheet" id="style_components" type="text/css" />
     <link href="~/assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
-
     <link href="~/lib/bootstrap-toastr/toastr.min.css" rel="stylesheet" />
     <link href="~/lib/sweetalert/sweetalert.css" rel="stylesheet" />
     <link href="~/lib/alertify/alertify.bootstrap.css" rel="stylesheet" />
@@ -27,15 +26,13 @@
     <link href="~/assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
     <link href="~/assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" />
     <link href="~/assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" />
-    <link href="~/assets/global/plugins/animsition/animsition.min.css" rel="stylesheet" />
     <link href="~/assets/global/plugins/validationengine/validation.css" rel="stylesheet" />
-
     <link href="~/assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css" />
     <link href="~/assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color" />
     <link href="~/assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/site.css" rel="stylesheet" />
 </head>
 <body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white" style="overflow-x: hidden;">
-    <div class="animsition">
 
         <div class="page-wrapper">
             <div class="page-header navbar navbar-fixed-top">
@@ -45,6 +42,9 @@
             <div class="page-container">
                 <div class="page-sidebar-wrapper">
                     @await Component.InvokeAsync("Menu")
+                </div>
+                <div class="big-loader">
+                    <i class="fa fa-spinner fa-spin"></i>  Yükleniyor...
                 </div>
                 <div class="page-content-wrapper">
                     <div class="page-content">
@@ -60,7 +60,7 @@
             </div>
             <div class="page-footer">
                 <div class="page-footer-inner">
-                    @DateTime.Now.Year &copy;
+                    @DateTime.Now.Year
                 </div>
                 <div class="scroll-to-top">
                     <i class="icon-arrow-up"></i>
@@ -87,11 +87,6 @@
         <script src="~/assets/global/plugins/fullcalendar/fullcalendar.min.js" type="text/javascript"></script>
         <script src="~/assets/global/plugins/horizontal-timeline/horizontal-timeline.js" type="text/javascript"></script>
 
-        <script src="~/assets/global/plugins/jquery-easypiechart/jquery.easypiechart.min.js" type="text/javascript"></script>
-        <script src="~/assets/global/plugins/jquery.sparkline.min.js" type="text/javascript"></script>
-
-        <script src="~/assets/global/plugins/animsition/animsition.js"></script>
-
         <script src="~/assets/global/plugins/colorbox/jquery.colorbox-min.js"></script>
         <script src="~/assets/global/plugins/select2/js/select2.full.min.js"></script>
         <script src="~/assets/global/plugins/select2/js/i18n/tr.js"></script>
@@ -109,7 +104,6 @@
         <script src="~/js/general.js"></script>
         <script src="~/js/datatablehelper.js"></script>
         <script src="~/js/alert.js"></script>
-        <script src="~/js/config.js"></script>
 
         <script src="~/assets/global/scripts/app.min.js" type="text/javascript"></script>
         <script src="~/assets/pages/scripts/dashboard.js" type="text/javascript"></script>
@@ -122,6 +116,6 @@
         <div class="row">
             @await Component.InvokeAsync("Alert")
         </div>
-    </div>
+    
 </body>
 </html>

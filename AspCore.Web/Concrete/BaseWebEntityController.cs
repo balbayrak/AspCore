@@ -12,6 +12,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
+using AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder;
 
 namespace AspCore.Web.Concrete
 {
@@ -27,7 +28,7 @@ namespace AspCore.Web.Concrete
         }
 
         [HttpPost]
-        public JsonResult LoadTable(JQueryDataTablesModel jQueryDataTablesModel)
+        public JsonResult LoadTable([JQueryDataTablesModelBinder] JQueryDataTablesModel jQueryDataTablesModel)
         {
             JQueryDataTablesResponse response = BffLayer.GetAll(jQueryDataTablesModel);
 

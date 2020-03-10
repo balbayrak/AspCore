@@ -40,11 +40,11 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
 
             if (this.subActions != null && this.subActions.Count > 0)
             {
-               
+
                 divBtnGroup.AddCssClass("btn-group");
 
                 var mainBtn = base.CreateTagBuilder("button");
-                
+
                 var dropdownBtn = new TagBuilder("button");
                 dropdownBtn.Attributes.Add("type", "button");
                 dropdownBtn.Attributes.Add("data-toggle", "dropdown");

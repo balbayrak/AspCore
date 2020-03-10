@@ -1,9 +1,11 @@
 ﻿using AspCore.WebComponents.HtmlHelpers.Button.Abstract;
 using AspCore.WebComponents.HtmlHelpers.DataTable.Abstract;
+using AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons;
 
 namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
 {
-    public class ActionBuilder
+    public class ActionBuilder<TModel>
+          where TModel : class
     {
         private ITableActionColumnInternal actionColumn { get; set; }
 
@@ -12,30 +14,30 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
             this.actionColumn = actioncolumn;
         }
 
-        public IModalActionButton ModalButton(string id)
+        public ITableActionButton<IModalActionButton, TModel> ModalButton()
         {
-            ModalActionButton act = new ModalActionButton(id);
+            TableModalActionButton<TModel> act = new TableModalActionButton<TModel>();
             actionColumn.AddAction(act);
             return act;
         }
 
-        public IDefaultActionButton ActionButton(string id)
+        public ITableActionButton<IDefaultActionButton, TModel> ActionButton()
         {
-            DefaultActionButton act = new DefaultActionButton(id);
+            TableDefaultActionButton<TModel> act = new TableDefaultActionButton<TModel>();
             actionColumn.AddAction(act);
             return act;
         }
 
-        public IConfirmActionButton ConfirmButton(string id)
+        public ITableActionButton<IConfirmActionButton, TModel> ConfirmButton()
         {
-            ConfirmActionButton act = new ConfirmActionButton(id);
+            TableConfirmActionButton<TModel> act = new TableConfirmActionButton<TModel>();
             actionColumn.AddAction(act);
             return act;
         }
 
-        public IDefaultActionButton DownloadButton(string id)
+        public ITableActionButton<IDefaultActionButton, TModel> DownloadButton()
         {
-            DownloadActionButton act = new DownloadActionButton(id);
+            TableDownloadActionButton<TModel> act = new TableDownloadActionButton<TModel>();
             actionColumn.AddAction(act);
             return act;
         }

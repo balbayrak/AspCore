@@ -5,7 +5,7 @@ using AspCore.WebComponents.HtmlHelpers.General.Enums;
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Toolbar.Buttons
 {
-    public class ToolBarDefaultActionButton : DefaultActionButton, ITableActionButton<IDefaultActionButton>, IToolbarModalActionButtonInternal
+    public class ToolBarDefaultActionButton : DefaultActionButton, IToolbarActionButton<IDefaultActionButton>, IToolbarModalActionButtonInternal
     {
         public EnumFormSide formSide { get; set; }
 

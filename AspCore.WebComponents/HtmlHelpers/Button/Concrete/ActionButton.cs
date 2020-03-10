@@ -6,10 +6,14 @@ using AspCore.WebComponents.HtmlHelpers.General.Enums;
 using AspCore.Utilities;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel;
+using System.IO;
+using System.Text.Encodings.Web;
+using AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons;
 
 namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
 {
-    public abstract class ActionButton<T> : IActionButtonInternal
+    public abstract class ActionButton<T> : IHtmlContent, IActionButtonInternal
         where T : IActionButton<T>
     {
         protected abstract T _instance { get; }
@@ -19,6 +23,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
         public string iclass { get; set; }
         public string id { get; set; }
         public string text { get; set; }
+        public Condition condition { get; set; }
 
         public T ActionInfo(ActionInfo action)
         {
@@ -47,18 +52,18 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
             this.text = text;
             return _instance;
         }
-
         public ActionButton(string id)
         {
             this.id = id;
             this.block = new BlockInfo { blockTarget = null, isEnabled = false };
+            this.condition = null;
         }
-
-        public ActionButton(string id, string text, string iClass, string cssClass,bool blockui, string blockTarget, string actionUrl, EnumHttpMethod httpMethod = EnumHttpMethod.GET) : this(id)
+        public ActionButton(string id, string text, string iClass, string cssClass, bool blockui, string blockTarget, string actionUrl, EnumHttpMethod httpMethod = EnumHttpMethod.GET) : this(id)
         {
             this.text = text;
             this.iclass = iClass;
             this.cssClass = cssClass;
+            this.condition = null;
 
             if (blockui)
             {
@@ -73,7 +78,6 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
                 this.action.methodType = httpMethod;
             }
         }
-
         protected TagBuilder CreateTagBuilder(string tagName)
         {
             var link = new TagBuilder(tagName);
@@ -108,7 +112,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
             if (!string.IsNullOrEmpty(this.action.actionUrl))
             {
                 link.Attributes.Add(HelperConstant.General.DATA_TARGET_URL, this.action.actionUrl);
-                link.Attributes.Add(HelperConstant.General.DATA_EVENT_HTTPMETHOD, this.action.methodType.GetDescriptionFromEnumValue());
+                link.Attributes.Add(HelperConstant.General.DATA_EVENT_HTTPMETHOD, this.action.methodType.ToString());
             }
 
             var iClassTag = new TagBuilder("i");
@@ -129,13 +133,20 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
         {
             TagBuilder link = BuildActionButton();
 
-            return link.ConvertHtmlString();
+            var linkStr = link.ConvertHtmlString();
+
+            return linkStr;
 
         }
-
         public virtual IHtmlContent ToHtml()
         {
             return new HtmlString(string.Empty);
+        }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void WriteTo(TextWriter writer, HtmlEncoder encoder)
+        {
+            writer.Write(this.ToHtml());
+
         }
     }
 }
