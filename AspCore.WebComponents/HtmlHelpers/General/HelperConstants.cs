@@ -8,6 +8,14 @@ namespace AspCore.WebComponents.HtmlHelpers.General
     {
         public struct General
         {
+            public static char SPLIT_CHAR = 'é';
+
+            public static char SPLIT_CHAR1 = '|';
+
+            public static char SPLIT_CHAR2 = '€';
+
+            public static char SPLIT_CHAR3 = '£';
+
             public static readonly string DATA_COMPONENT_UNIQUE_ID = "data-uid";
 
             public static readonly string LINK_ONCLICK = "onclick";
@@ -97,7 +105,11 @@ namespace AspCore.WebComponents.HtmlHelpers.General
 
             public static readonly string DATA_SSEARCH_ENABLED = "data-ssearch-enabled";
 
-            public static readonly string DATA_TABLE_COOKIE_KEY = "DTC";
+            public static readonly string DATA_COLUMN_INFO = "data-columninfo";
+
+            public static readonly string DATA_PAGING_TYPE = "data-paging-type";
+
+            public static readonly string DATA_STATE_SAVE = "data-state-save";
         }
         public struct TreeView
         {

@@ -4,38 +4,39 @@
 
 <div class="row">
     <div class="col-md-12">
-        @(Html.DataTableHelper<Person>()
+        @(Html.DataTableHelper<Person>("persontable")
+             .LoadAction("/Home/LoadTable")
               .Columns(column =>
               {
-                  column.CheckColumn(p => p.Id).CheckAllEnabled();
-                  column.BoundColumn(p => p.Id).Title("ID").IsPrimaryKey(true);
+                  column.CheckColumn(p => p.EncryptedId).CheckAllEnabled();
+                  column.BoundColumn(p => p.EncryptedId).Title("ID").IsPrimaryKey(true);
                   column.BoundColumn(p => p.Name).Title("Name").Searchable(Operation.StartsWith);
                   column.BoundColumn(p => p.Surname).Title("Surname").Searchable(Operation.StartsWith);
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
-                      action.ModalButton(string.Empty)
+                      action.ModalButton()
+                            .Visible(true)
                             .Text("Edit")
                             .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
                             .IClass("fa fa-edit")
                             .ActionInfo(new ActionInfo { actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET })
                             .BlockUI()
                             .Modal(EnumModalSize.Large)
-                            .BackDropStatic()
-                            .ToHtml();
-                      action.ConfirmButton(string.Empty)
+                            .BackDropStatic();
+                      action.ConfirmButton()
+                            .Visible(true)
                             .Text("Delete")
                             .CssClass("btn btn-sm red btn-outline filter-submit margin-bottom red-haze")
                             .IClass("fa fa-trash-o")
                             .ActionInfo(new ActionInfo { actionUrl = "/Home/Delete", methodType = EnumHttpMethod.POST })
                             .BlockUI()
-                            .ConfirmOption(new ConfirmOption("test", "Sil", ""))
-                            .ToHtml();
+                            .ConfirmOption(new ConfirmOption("test", "Sil", ""));
 
                   });
               })
              .ToolBarActions(action =>
              {
-                 action.ModalActionButton(string.Empty)
+                 action.ModalActionButton()
                        .FormSide(EnumFormSide.LetfSide)
                        .Text("Add New Person")
                        .Modal(EnumModalSize.Default)
@@ -43,12 +44,14 @@
                        .CssClass("btn btn-sm red btn-outline filter-submit margin-bottom red-haze")
                        .IClass("fa fa-plus")
                        .ActionInfo(new ActionInfo { actionUrl = "/Home/AddOrEdit/-1", methodType = EnumHttpMethod.GET })
-                       .BlockUI()
-                       .ToHtml();
+                       .BlockUI();
              },
             new TableExportSetting("Tools", "btn red btn-outline", false, true, true, true, EnumFormSide.RightSide))
-             .Portlet("Person Table", System.Drawing.Color.Red, "fa fa-cogs")
-             .ToHtml("persontable", "/Home/LoadTable", "table table-striped table-hover table-bordered  dataTable no-footer", true))
+            .Portlet("Person Table", System.Drawing.Color.Red, "fa fa-cogs")
+            .CssClass("table table-striped table-hover table-bordered  dataTable no-footer")
+            .StateSave(true)
+            .PagingType(EnumPagingType.bootstrap_number)
+            )
 
     </div>
 </div>

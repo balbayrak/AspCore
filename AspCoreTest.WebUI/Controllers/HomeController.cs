@@ -17,7 +17,6 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult Index()
         {
-         
             return View();
         }
 

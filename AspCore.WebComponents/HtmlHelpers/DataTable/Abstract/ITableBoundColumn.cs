@@ -2,12 +2,13 @@
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Abstract
 {
-    public interface ITableBoundColumn : ITableColumn<ITableBoundColumn>
+    public interface ITableBoundColumn<TModel, TProperty> : ITableColumn<ITableBoundColumn<TModel, TProperty>>
     {
-        ITableBoundColumn IsPrimaryKey(bool value);
+        ITableBoundColumn<TModel, TProperty> IsPrimaryKey(bool value);
 
-        ITableBoundColumn OrderBy(EnumSortingDirection direciton);
+        ITableBoundColumn<TModel, TProperty> OrderBy(EnumSortingDirection direciton);
 
-        ITableBoundColumn Searchable(Operation operation);
+        ITableBoundColumn<TModel, TProperty> Searchable(Operation operation);
+
     }
 }

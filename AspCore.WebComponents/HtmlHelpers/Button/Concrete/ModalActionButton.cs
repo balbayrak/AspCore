@@ -21,15 +21,15 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
             backDropStatic = false;
         }
 
-        public ModalActionButton(string id, string text, string iClass, string cssClass,bool blockui, string blockTarget, string actionUrl, EnumHttpMethod httpMethod, EnumModalSize modalSize, bool backDropStatic = false)
-            : base(id, text, iClass, cssClass, blockui,blockTarget, actionUrl, httpMethod)
+        public ModalActionButton(string id, string text, string iClass, string cssClass, bool blockui, string blockTarget, string actionUrl, EnumHttpMethod httpMethod, EnumModalSize modalSize, bool backDropStatic = false)
+            : base(id, text, iClass, cssClass, blockui, blockTarget, actionUrl, httpMethod)
         {
             this.modalui = new ModalUI();
             this.modalui.id = this.id + HelperConstant.DataTable.LINK_MODAL_ID;
             this.modalui.modalSize = modalSize;
             this.backDropStatic = backDropStatic;
         }
-      
+
         public IModalActionButton Modal(string modalid, EnumModalSize modalSize)
         {
             this.id = modalid;

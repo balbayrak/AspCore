@@ -17,12 +17,18 @@ namespace AspCore.Web.Concrete
         {
             try
             {
-                ServiceResult<List<TViewModel>> result = GetAllAsync(jQueryDataTablesModel.ToEntityFilter<TEntity>()).Result;
-                if (result.IsSucceeded && result.Result != null)
+                var storageObject = jQueryDataTablesModel.columnInfos.DeSerialize<TEntity>();
+                if (storageObject != null)
                 {
-                    var sessionObject = _storage.GetDatatableProperties<TEntity>(jQueryDataTablesModel.datatableId);
-                    var parser = new DatatableParser<TEntity>(result.Result.Select(t => t.dataEntity).ToList(), sessionObject);
-                    return parser.Parse(jQueryDataTablesModel, result.TotalResultCount, result.SearchResultCount);
+                    ServiceResult<List<TViewModel>> result = GetAllAsync(jQueryDataTablesModel.ToEntityFilter<TEntity>(storageObject.GetSearchableColumnString())).Result;
+                    if (result.IsSucceeded && result.Result != null)
+                    {
+                        using (var parser = new DatatableParser<TEntity>(result.Result.Select(t => t.dataEntity).ToList(), storageObject))
+                        {
+                            return parser.Parse(jQueryDataTablesModel, result.TotalResultCount, result.SearchResultCount);
+                        }
+
+                    }
                 }
             }
             catch

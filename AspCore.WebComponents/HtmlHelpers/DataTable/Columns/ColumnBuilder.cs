@@ -6,24 +6,20 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
 {
     public class ColumnBuilder<TModel> where TModel : class
     {
-        private TableBuilder<TModel> TableBuilder
-        {
-            get;
-            set;
-        }
+        private TableBuilder<TModel> TableBuilder { get; set; }
         public ColumnBuilder(TableBuilder<TModel> tableBuilder)
         {
             TableBuilder = tableBuilder;
         }
-        public ITableBoundColumn BoundColumn<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        public ITableBoundColumn<TModel, TProperty> BoundColumn<TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
-            TableBoundColumn<TModel, TProperty> column = new TableBoundColumn<TModel, TProperty>(expression,TableBuilder.GetColumnCount());
+            TableBoundColumn<TModel, TProperty> column = new TableBoundColumn<TModel, TProperty>(expression, TableBuilder.GetColumnCount());
             TableBuilder.AddColumn(column);
             return column;
         }
-        public ITableActionColumn ActionColumn()
+        public ITableActionColumn<TModel> ActionColumn()
         {
-            TableActionColumn column = new TableActionColumn();
+            TableActionColumn<TModel> column = new TableActionColumn<TModel>();
             TableBuilder.AddActionColumn(column);
             return column;
         }

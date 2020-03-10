@@ -11,6 +11,7 @@ namespace AspCore.Entities.DataTable
     /// </summary>
     public class JQueryDataTablesModel
     {
+        public string columnInfos { get; set; }
         public string datatableId { get; set; }
 
         /// <summary>
@@ -102,6 +103,6 @@ namespace AspCore.Entities.DataTable
             return sortedColumns.AsReadOnly();
         }
 
-       
+
     }
 }

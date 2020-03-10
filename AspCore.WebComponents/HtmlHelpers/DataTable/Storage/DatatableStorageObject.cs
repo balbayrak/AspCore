@@ -1,4 +1,5 @@
 ﻿using AspCore.WebComponents.HtmlHelpers.DataTable.Columns;
+using AspCore.WebComponents.HtmlHelpers.DataTable.Rows;
 using System.Collections.Generic;
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
@@ -11,6 +12,8 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
         public List<DatatableBoundColumn<TEntity>> DatatableProperties { get; set; }
 
         public List<DatatableActionColumn> DatatableActions { get; set; }
+
+        public List<RowCondition> RowConditions { get; set; }
 
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿using AspCore.WebComponents.HtmlHelpers.Block;
 using AspCore.WebComponents.HtmlHelpers.Button.Concrete;
+using AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons;
 
 namespace AspCore.WebComponents.HtmlHelpers.Button.Abstract
 {
@@ -12,6 +13,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Abstract
         string iclass { get; set; }
         BlockInfo block { get; set; }
         string CreateLink();
+        Condition condition { get; set; }
 
     }
 }

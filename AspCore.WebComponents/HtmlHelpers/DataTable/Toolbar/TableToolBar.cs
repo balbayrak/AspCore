@@ -25,7 +25,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Toolbar
             string actionRight = string.Empty;
             string actionLeft = string.Empty;
             string modal = string.Empty;
-            
+
             if (this.ToolBarActions != null)
             {
                 string customActions = string.Empty;
@@ -38,7 +38,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Toolbar
                         item.id = string.IsNullOrEmpty(item.id) ? tableId + HelperConstant.DataTable.TABLE_TOOLBAR + (indexCounter++).ToString() : item.id;
 
                         var link = item.CreateLink();
-                       
+
                         if (item is ModalActionButton)
                         {
                             string modalId = item.id + HelperConstant.DataTable.LINK_MODAL_ID;

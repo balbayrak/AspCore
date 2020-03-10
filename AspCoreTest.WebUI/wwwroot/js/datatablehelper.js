@@ -1,4 +1,28 @@
-﻿var DataTableFunc = {
+﻿var DataTableConstant =
+{
+    EmptyMessage: "Tabloda herhangi bir veri mevcut değil",
+    SInfo: "_MAX_ kayıttan _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+    LoadingRecords: "Yükleniyor...",
+    SSearch: "Ara",
+    PaginateFirst: "İlk",
+    PaginateLast: "Son",
+    PaginateNext: "Sonraki",
+    PaginatePrevious: "Önceki"
+};
+
+var DataTableConstantEn =
+{
+    EmptyMessage: "No data available in table",
+    SInfo: "Showing _START_ to _END_ of _TOTAL_ entries",
+    LoadingRecords: "Loading...",
+    SSearch: "Search",
+    PaginateFirst: "First",
+    PaginateLast: "Last",
+    PaginateNext: "Next",
+    PaginatePrevious: "Previous"
+};
+
+var DataTableFunc = {
 
     initDataTable: function (tableid) {
         var item = $("#" + tableid);
@@ -8,6 +32,7 @@
         var orderColumns = new Array();
         var headers = $(item).find('th');
 
+        var autowidth = false;
         for (var j = 0; j < headers.length; j++) {
             var prop = $(headers[j]).data('property');
 
@@ -18,7 +43,7 @@
                 sortable = true;
             }
             var widthstr = $(item).data('width');
-            var autowidth = false;
+            autowidth = false;
             if (typeof widthstr !== 'undefined' && widthstr !== '' && widthstr !== null) {
                 widthstr = 'auto';
                 autowidth = true;
@@ -27,20 +52,18 @@
             aoColumns.push({ 'mDataProp': prop, "bSortable": sortable, "sWidth": widthstr });
         }
 
-        var semptytable = $(item).data('semptytable');
-        var sInfo = $(item).data('sinfo');
-        var sInfoEmpty = $(item).data('sinfoempty');
-        var sLoadingRecords = $(item).data('sloadingrecords');
-        var sProcessing = $(item).data('sprocessing');
-        var sSearch = $(item).data('ssearch');
-        var sFirst = $(item).data('sfirst');
-        var sLast = $(item).data('slast');
-        var sNext = $(item).data('snext');
-        var sPrevious = $(item).data('sprevious');
+
         var ssearchenabled = false;
         var ssearchenabledstr = $(item).data('ssearch-enabled');
+
+        var pagingtype = $(item).data('paging-type');
+
+        var stateSave = $(item).data('state-save');
+
+        var columnInfo = $(item).data('columninfo');
+
         if (typeof ssearchenabledstr !== 'undefined') {
-            if (ssearchenabledstr.toLowerCase() === "true")
+            if (ssearchenabledstr !== null && ssearchenabledstr.toLowerCase() === "true")
                 ssearchenabled = true;
         }
         var tablebuttons = DataTableFunc.tableToolbarInit($(item));
@@ -49,6 +72,8 @@
             "lengthMenu": [[5, 10, 15], [5, 10, 15]],
             "pageLength": 5,
             "searching": ssearchenabled,
+            "stateSave": stateSave,
+            "pagingType": pagingtype,
             "retrieve": true,
             "bProcessing": true,
             "bServerSide": true,
@@ -56,34 +81,44 @@
             "sServerMethod": "POST",
             "bAutoWidth": autowidth,
             "bPaginate": true,
-            //"bSort": false,
             "order": orderColumns,
             "oLanguage": {
                 "sDecimal": ",",
-                "sEmptyTable": semptytable,
-                "sInfo": sInfo,
-                "sInfoEmpty": sInfoEmpty,
-                "sLoadingRecords": sLoadingRecords,
-                "sProcessing": sProcessing,
-                "sSearch": sSearch,
+                "sEmptyTable": DataTableConstant.EmptyMessage,
+                "sInfo": DataTableConstant.SInfo,
+                "sInfoEmpty": "",
+                "sLoadingRecords": DataTableConstant.LoadingRecords,
+                "sProcessing": DataTableConstant.LoadingRecords,
+                "sSearch": DataTableConstant.SSearch,
                 "oPaginate": {
-                    "sFirst": sFirst,
-                    "sLast": sLast,
-                    "sNext": sNext,
-                    "sPrevious": sPrevious
+                    "sFirst": DataTableConstant.PaginateFirst,
+                    "sLast": DataTableConstant.PaginateLast,
+                    "sNext": DataTableConstant.PaginateNext,
+                    "sPrevious": DataTableConstant.PaginatePrevious
                 }
             },
             buttons: tablebuttons,
             "aoColumns": aoColumns,
+
             fnServerParams: function (aoData) {
                 aoData.push({ name: "datatableId", value: uniqueid });
-            }
-
-            //fnRowCallback: function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-
-            //    $(nRow).attr('data-blah', "modal");
-
+                aoData.push({ name: "columnInfo", value: columnInfo });
+            },
+            //initComplete: function (settings, json) {
+            //    var api = new $.fn.dataTable.Api(settings);
+            //    var tableColumns = api.rows().eq(0).columns();
+            //    tableColumns.every(function (index) {
+            //        var data = this.data();
+            //        if (data[0] == "-") {
+            //            api.columns([index]).visible(false);
+            //        }
+            //    });
             //}
+            "fnRowCallback": function (nRow, aData) {
+                if (aData[nRow._DT_RowIndex] != null && aData[nRow._DT_RowIndex] != 'undefined') {
+                    $('td', nRow).addClass(aData[nRow._DT_RowIndex]);
+                }
+            }
         });
 
 
