@@ -62,7 +62,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = Entities.AsQueryable();
+                var query = TableNoTracking.AsQueryable();
 
                 var countTask = query.Count();
                 if (filter != null)
@@ -96,7 +96,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = Entities.AsQueryable();
+                var query = TableNoTracking.AsQueryable();
                 var countTask = query.CountAsync();
 
                 if (filter != null)

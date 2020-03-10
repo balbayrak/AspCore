@@ -80,7 +80,7 @@ namespace AspCore.Web.Concrete
                 ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
                 if (entityResult.IsSucceededAndDataIncluded())
                 {
-                    addorUpdateResult = BffLayer.Update(new List<TViewModel> { viewModel }).Result;
+                    addorUpdateResult = BffLayer.Update(new List<TViewModel> { entityResult.Result }).Result;
                 }
                 else
                 {
