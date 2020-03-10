@@ -8,7 +8,7 @@
     @Html.ValidationSummary(false)
     @Html.AntiForgeryToken()
 
-    <input type="hidden" id="id" name="id" value="@if ( Model != null){ @Html.Raw(Model.dataEntity.EncryptedId) }" />
+    <input type="hidden" asp-for="dataEntity.EncryptedId" value="@if ( Model != null){ @Html.Raw(Model.dataEntity.EncryptedId) }" />
 
     <div class="form-horizontal">
         <div class="form-group">

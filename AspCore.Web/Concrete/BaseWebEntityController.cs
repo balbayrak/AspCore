@@ -13,6 +13,7 @@ using AspCore.Entities.General;
 using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
 using AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder;
+using Newtonsoft.Json;
 
 namespace AspCore.Web.Concrete
 {
@@ -67,6 +68,37 @@ namespace AspCore.Web.Concrete
         [HttpPost]
         public string AddOrEdit(TViewModel viewModel)
         {
+            if (viewModel != null)
+            {
+                AjaxResult result = new AjaxResult();
+
+                ServiceResult<TViewModel> entityResult = BffLayer.GetById(new EntityFilter<TEntity>
+                {
+                    id = new Guid(DataProtectorHelper.UnProtect(viewModel.dataEntity.EncryptedId))
+                }).Result;
+
+                ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
+                if (entityResult.IsSucceededAndDataIncluded())
+                {
+                    addorUpdateResult = BffLayer.Update(new List<TViewModel> { viewModel }).Result;
+                }
+                else
+                {
+                    addorUpdateResult = BffLayer.Add(new List<TViewModel> { viewModel }).Result;
+                }
+                if(addorUpdateResult.IsSucceeded)
+                {
+                    result.Result = AjaxResultTypeEnum.Succeed;
+                    result.ResultText = "Person Added / Updated";
+                }
+                else
+                {
+                    result.Result = AjaxResultTypeEnum.Error;
+                    result.ResultText = addorUpdateResult.ErrorMessage;
+                }
+           
+                return JsonConvert.SerializeObject(result);
+            }
             return null;
         }
 

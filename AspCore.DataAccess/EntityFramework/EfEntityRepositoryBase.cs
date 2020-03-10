@@ -45,7 +45,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
             try
             {
-                result.Result = _entities.FirstOrDefault(filter);
+                result.Result = Entities.FirstOrDefault(filter);
                 result.IsSucceeded = true;
 
             }
@@ -62,9 +62,12 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = _entities.AsQueryable();
-                //IsDeletedFilter(ref query, filter);
+                var query = Entities.AsQueryable();
+
                 var countTask = query.Count();
+                if (filter != null)
+                    query = query.Where(filter);
+               
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
                     var skip = page.Value * pageSize.Value;
@@ -93,11 +96,12 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = _entities.AsQueryable();
-
-                //IsDeletedFilter(ref query, filter);
-
+                var query = Entities.AsQueryable();
                 var countTask = query.CountAsync();
+
+                if (filter != null)
+                    query = query.Where(filter);
+
                 Task<TEntity[]> resultsTask;
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
@@ -304,11 +308,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _entities;
-
-                //IsDeletedFilter(ref dbQuery, filter);
-
-                result.Result = dbQuery.AsNoTracking().Where(filter).FirstOrDefault();
+                result.Result = Entities.Where(filter).FirstOrDefault();
                 result.IsSucceeded = true;
 
             }
@@ -326,11 +326,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _entities;
-
-                //IsDeletedFilter(ref dbQuery, t => t.Id.Equals(id));
-
-                result.Result = dbQuery.AsNoTracking().FirstOrDefault();
+                result.Result = Entities.Where(t => t.Id.Equals(id)).FirstOrDefault();
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
@@ -347,9 +343,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _entities;
-
-                result.Result = dbQuery.Where(t => t.Id.Equals(id)).FirstOrDefault();
+                result.Result = Entities.Where(t => t.Id.Equals(id)).FirstOrDefault();
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
@@ -366,12 +360,14 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _entities;
+                IQueryable<TEntity> dbQuery = Entities;
 
                 var query = dbQuery.AsQueryable();
                 var countTask = query.Count();
 
-                //IsDeletedFilter(ref query, filter);
+                if (filter != null)
+                    query = query.Where(filter);
+
 
                 if (sorters != null && sorters.Count > 0)
                 {
@@ -407,12 +403,13 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                IQueryable<TEntity> dbQuery = _entities;
-
+                IQueryable<TEntity> dbQuery = Entities;
+              
                 var query = dbQuery.AsQueryable();
                 var countTask = query.CountAsync();
 
-                //IsDeletedFilter(ref query, filter);
+                if (filter != null)
+                    query = query.Where(filter);
 
 
                 if (sorters != null && sorters.Count > 0)

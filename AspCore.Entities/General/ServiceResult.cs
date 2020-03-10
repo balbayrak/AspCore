@@ -26,10 +26,6 @@ namespace AspCore.Entities.General
             set
             {
                 _Result = value;
-                if (value != null)
-                {
-                    _IsSucceeded = true;
-                }
             }
         }
 
