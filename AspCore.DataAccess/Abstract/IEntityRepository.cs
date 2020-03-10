@@ -29,8 +29,6 @@ namespace AspCore.DataAccess.Abstract
 
         ServiceResult<bool> Delete(params Guid[] entityIds);
 
-        ServiceResult<bool> DeleteWithTransaction(params TEntity[] entities);
-
         ServiceResult<bool> DeleteWithTransaction(params Guid[] entityIds);
 
         ServiceResult<TEntity> Find(Expression<Func<TEntity, bool>> filter);

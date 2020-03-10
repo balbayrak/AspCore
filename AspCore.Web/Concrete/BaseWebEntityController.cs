@@ -72,15 +72,11 @@ namespace AspCore.Web.Concrete
             {
                 AjaxResult result = new AjaxResult();
 
-                ServiceResult<TViewModel> entityResult = BffLayer.GetById(new EntityFilter<TEntity>
-                {
-                    id = new Guid(DataProtectorHelper.UnProtect(viewModel.dataEntity.EncryptedId))
-                }).Result;
-
                 ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
-                if (entityResult.IsSucceededAndDataIncluded())
+                if (!string.IsNullOrEmpty(viewModel.dataEntity.EncryptedId))
                 {
-                    addorUpdateResult = BffLayer.Update(new List<TViewModel> { entityResult.Result }).Result;
+                    viewModel.dataEntity.Id = new Guid(DataProtectorHelper.UnProtect(viewModel.dataEntity.EncryptedId));
+                    addorUpdateResult = BffLayer.Update(new List<TViewModel> { viewModel }).Result;
                 }
                 else
                 {

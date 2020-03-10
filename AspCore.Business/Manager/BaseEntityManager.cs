@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AspCore.Business.Abstract;
@@ -41,13 +42,6 @@ namespace AspCore.Business.Manager
                 return _dataAccess.Update(entities);
         }
 
-        public virtual ServiceResult<bool> Delete(params TEntity[] entities)
-        {
-            if (entities.Length > 1)
-                return _dataAccess.DeleteWithTransaction(entities);
-            else
-                return _dataAccess.Delete(entities);
-        }
 
         public virtual ServiceResult<bool> Delete(params Guid[] entityIds)
         {
@@ -141,7 +135,7 @@ namespace AspCore.Business.Manager
         public virtual ServiceResult<bool> DeleteList(List<TEntity> entityList)
         {
             if (entityList.Count > 1)
-                return _dataAccess.DeleteWithTransaction(entityList.ToArray());
+                return _dataAccess.DeleteWithTransaction(entityList.Select(t=>t.Id).ToArray());
             else
                 return _dataAccess.Delete(entityList[0]);
         }

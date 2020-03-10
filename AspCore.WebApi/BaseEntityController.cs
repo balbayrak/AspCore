@@ -122,24 +122,6 @@ namespace AspCore.WebApi
         }
 
 
-        [ActionName(ApiConstants.Urls.DELETE)]
-        [HttpPost]
-        [ProducesResponseType(typeof(ServiceResult<bool>), 200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        [Authorize()]
-        public IActionResult Delete([FromBody]TEntity[] entities)
-        {
-            if (entities == null)
-            {
-                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_NULL, nameof(entities)));
-            }
-
-            ServiceResult<bool> response = _service.Delete(entities);
-            return response.ToHttpResponse();
-
-        }
-
         [ActionName(ApiConstants.Urls.DELETE_WITH_IDs)]
         [HttpPost]
         [ProducesResponseType(typeof(ServiceResult<bool>), 200)]

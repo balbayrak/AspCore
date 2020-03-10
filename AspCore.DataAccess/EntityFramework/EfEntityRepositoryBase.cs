@@ -62,12 +62,12 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = TableNoTracking.AsQueryable();
+                var query = Entities.AsQueryable();
 
                 var countTask = query.Count();
                 if (filter != null)
                     query = query.Where(filter);
-               
+
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
                     var skip = page.Value * pageSize.Value;
@@ -96,7 +96,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = TableNoTracking.AsQueryable();
+                var query = Entities.AsQueryable();
                 var countTask = query.CountAsync();
 
                 if (filter != null)
@@ -181,15 +181,22 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                foreach (TEntity item in entities)
+                ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+                if (entitylist.IsSucceededAndDataIncluded())
                 {
-                    if (item is IBaseEntity)
+                    foreach (var item in entitylist.Result)
                     {
-                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                        if (item is IBaseEntity)
+                        {
+                            ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                        }
+
+                        var updatedEntity = _context.Entry(item);
+                        updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
+                        updatedEntity.State = EntityState.Modified;
                     }
-                    var updatedEntity = _context.Entry(item);
-                    updatedEntity.State = EntityState.Modified;
                 }
+
                 int value = _context.SaveChanges();
                 if (value > 0) result.IsSucceeded = true;
                 else
@@ -208,16 +215,24 @@ namespace AspCore.DataAccess.EntityFramework
 
         public ServiceResult<bool> UpdateWithTransaction(params TEntity[] entities)
         {
-            foreach (var item in entities)
+            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            if (entitylist.IsSucceededAndDataIncluded())
             {
-                if (item is IBaseEntity)
+                foreach (var item in entitylist.Result)
                 {
-                    ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                    if (item is IBaseEntity)
+                    {
+                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                    }
+
+                    var updatedEntity = _context.Entry(item);
+                    updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
+                    updatedEntity.State = EntityState.Modified;
                 }
-                item.entityState = CoreEntityState.Modified;
             }
 
-            return ProcessEntityWithState(entities);
+
+            return ProcessEntityWithState(entitylist.Result.ToArray());
         }
 
         public ServiceResult<bool> Delete(params TEntity[] entities)
@@ -254,14 +269,10 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                foreach (Guid item in entityIds)
+                ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entityIds.ToList());
+                if (entitylist.IsSucceededAndDataIncluded())
                 {
-                    ServiceResult<TEntity> serviceResult = GetByIdTracking(item);
-                    if (serviceResult.IsSucceededAndDataIncluded())
-                    {
-                        result = Delete(serviceResult.Result);
-                        if (result.IsSucceeded) break;
-                    }
+                    result = Delete(entitylist.Result.ToArray());
                 }
             }
             catch (Exception ex)
@@ -272,34 +283,15 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<bool> DeleteWithTransaction(params TEntity[] entities)
-        {
-            foreach (var item in entities)
-            {
-                if (item is IBaseEntity)
-                {
-                    ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                }
-                item.entityState = CoreEntityState.Deleted;
-            }
-
-            return ProcessEntityWithState(entities);
-        }
-
         public ServiceResult<bool> DeleteWithTransaction(params Guid[] entityIds)
         {
-            List<TEntity> entities = new List<TEntity>();
-            foreach (var item in entityIds)
+            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entityIds.ToList());
+            if (entitylist.IsSucceededAndDataIncluded())
             {
-                ServiceResult<TEntity> serviceResult = GetById(item);
-                if (serviceResult.IsSucceededAndDataIncluded())
-                {
-                    serviceResult.Result.entityState = CoreEntityState.Deleted;
-                    entities.Add(serviceResult.Result);
-                }
+                entitylist.Result.ForEach(t => t.entityState = CoreEntityState.Deleted);
             }
 
-            return ProcessEntityWithState(entities.ToArray());
+            return ProcessEntityWithState(entitylist.Result.ToArray());
         }
 
         public ServiceResult<TEntity> Find(Expression<Func<TEntity, bool>> filter)
@@ -326,7 +318,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                result.Result = Entities.Where(t => t.Id.Equals(id)).FirstOrDefault();
+                result.Result = TableNoTracking.Where(t => t.Id.Equals(id)).FirstOrDefault();
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
@@ -337,13 +329,13 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        private ServiceResult<TEntity> GetByIdTracking(Guid id)
+        private ServiceResult<List<TEntity>> GetByIdListTracking(List<Guid> idList)
         {
-            ServiceResult<TEntity> result = new ServiceResult<TEntity>();
+            ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
 
             try
             {
-                result.Result = Entities.Where(t => t.Id.Equals(id)).FirstOrDefault();
+                result.Result = Entities.Where(t => idList.Any(p => p == t.Id)).ToList();
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
@@ -404,7 +396,7 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 IQueryable<TEntity> dbQuery = Entities;
-              
+
                 var query = dbQuery.AsQueryable();
                 var countTask = query.CountAsync();
 
@@ -501,42 +493,46 @@ namespace AspCore.DataAccess.EntityFramework
         public virtual ServiceResult<bool> ProcessEntityWithState(params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
-            IDbContextTransaction dbContextTransaction = null;
-            try
+
+            if (entities != null)
             {
-                using (dbContextTransaction = _context.Database.BeginTransaction())
+                IDbContextTransaction dbContextTransaction = null;
+                try
                 {
-                    foreach (var item in entities)
+                    using (dbContextTransaction = _context.Database.BeginTransaction())
                     {
-                        _context.Set<TEntity>().Add(item);
-                        foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
+                        foreach (var item in entities)
                         {
-                            IEntity entity = entry.Entity;
-                            if (!entity.entityState.HasValue)
-                                entity.entityState = CoreEntityState.Unchanged;
-                            entry.State = GetEntityState(entity.entityState.Value);
+                            _context.Set<TEntity>().Add(item);
+                            foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
+                            {
+                                IEntity entity = entry.Entity;
+                                if (!entity.entityState.HasValue)
+                                    entity.entityState = CoreEntityState.Unchanged;
+                                entry.State = GetEntityState(entity.entityState.Value);
+                            }
+                        }
+
+                        int value = _context.SaveChanges();
+                        if (value > 0)
+                        {
+                            dbContextTransaction.Commit();
+                            result.IsSucceeded = true;
+                            result.Result = true;
+                        }
+                        else
+                        {
+                            dbContextTransaction.Rollback();
+                            result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
                         }
                     }
 
-                    int value = _context.SaveChanges();
-                    if (value > 0)
-                    {
-                        dbContextTransaction.Commit();
-                        result.IsSucceeded = true;
-                        result.Result = true;
-                    }
-                    else
-                    {
-                        dbContextTransaction.Rollback();
-                        result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                    }
                 }
-
-            }
-            catch (Exception ex)
-            {
-                if (dbContextTransaction != null) dbContextTransaction.Rollback();
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+                catch (Exception ex)
+                {
+                    if (dbContextTransaction != null) dbContextTransaction.Rollback();
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+                }
             }
 
             return result;

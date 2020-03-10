@@ -15,8 +15,6 @@ namespace AspCore.Business.Abstract
 
         ServiceResult<bool> Update(params TEntity[] entities);
 
-        ServiceResult<bool> Delete(params TEntity[] entities);
-
         ServiceResult<bool> Delete(params Guid[] entityIds);
 
         ServiceResult<TEntity> GetById(EntityFilter<TEntity> setting);
