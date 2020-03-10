@@ -8,15 +8,18 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace AspCore.WebComponents.TagHelpers.SelectList
 {
+    [HtmlTargetElement("select",Attributes = "selected-enum-value")]
+    [HtmlTargetElement("select",Attributes = "enum-type")]
     public class SelectEnumTagHelper:TagHelper
     {
+        [HtmlAttributeName("selected-enum-value")]
 
         public int SelectedValue { get; set; }
+        [HtmlAttributeName("enum-type")]
         public Type EnumType { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            output.TagName = "select";
             foreach (int e in Enum.GetValues(EnumType))
             {
                 var op = new TagBuilder("option");
@@ -35,4 +38,6 @@ namespace AspCore.WebComponents.TagHelpers.SelectList
             return displayName ?? fieldName;
         }
     }
+
+
 }
