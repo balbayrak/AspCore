@@ -15,6 +15,7 @@ using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities;
 using AspCore.Utilities.Mapper;
+using AspCore.Utilities.Mapper.Abstract;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -25,6 +26,7 @@ namespace AspCore.DataAccess.EntityFramework
         private TDbContext _context { get; }
         private readonly IHttpContextAccessor _httpContextAccessor;
         private DbSet<TEntity> _entities;
+        private readonly ICustomMapper _mapper;
         private Guid activeUserId
         {
             get
@@ -36,8 +38,10 @@ namespace AspCore.DataAccess.EntityFramework
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
         public EfEntityRepositoryBase()
         {
+           
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
             _context = DependencyResolver.Current.GetService<TDbContext>();
+            _mapper = DependencyResolver.Current.GetService<ICustomMapper>();
             _entities = _context.Set<TEntity>();
         }
 
@@ -97,7 +101,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = Entities.AsQueryable();
+                var query = TableNoTracking.AsQueryable();
                 var countTask =await query.CountAsync();
 
                 if (filter != null)
@@ -170,21 +174,20 @@ namespace AspCore.DataAccess.EntityFramework
 
         public ServiceResult<bool> Update(params TEntity[] entities)
         {
+            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            var updatedEntityList = entitylist.Result;
+            updatedEntityList = _mapper.MapToList(entities.ToList(),updatedEntityList);
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                foreach (var updatedInput in entities)
+                foreach (var updatedInput in updatedEntityList)
                 {
                     if (updatedInput is IBaseEntity)
                     {
                         ((IBaseEntity)updatedInput).LastUpdatedUserId = activeUserId;
                     }
-                    var entity = GetById(updatedInput.Id).Result;
-                    var mapper=new CustomMapper();
-                    entity = mapper.MapProperties(entity,updatedInput);
-                    _context.Attach(entity);
-                     entity=  _context.Update(entity).Entity;
-
+                    _context.Attach(updatedInput); 
+                    _context.Update(updatedInput);
                 }
                 int value = _context.SaveChanges();
                 if (value > 0) result.IsSucceeded = true;
@@ -205,21 +208,22 @@ namespace AspCore.DataAccess.EntityFramework
         public ServiceResult<bool> UpdateWithTransaction(params TEntity[] entities)
         {
             ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            List<TEntity> updatedEntityList = null;
             if (entitylist.IsSucceededAndDataIncluded())
             {
-                foreach (var item in entitylist.Result)
+                updatedEntityList = entitylist.Result;
+                updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
+                foreach (var item in updatedEntityList)
                 {
                     if (item is IBaseEntity)
                     {
                         ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
                     }
-
-                    var updatedEntity = _context.Entry(item);
-                    updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
-                    updatedEntity.State = EntityState.Modified;
+                    _context.Attach(item);
+                    _context.Update(item);
                 }
             }
-            return ProcessEntityWithState(entitylist.Result.ToArray());
+            return ProcessEntityWithState(updatedEntityList?.ToArray());
         }
 
         public ServiceResult<bool> Delete(params TEntity[] entities)
