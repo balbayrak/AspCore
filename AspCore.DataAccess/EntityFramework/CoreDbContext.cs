@@ -5,6 +5,7 @@ using System.Linq;
 using AspCore.DataAccess.EntityFramework.Mapping;
 using AspCore.Entities.EntityType;
 using AspCore.Extension;
+using Microsoft.Extensions.Logging;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -29,10 +30,21 @@ namespace AspCore.DataAccess.EntityFramework
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseLazyLoadingProxies();
-
+                optionsBuilder.EnableSensitiveDataLogging();
+                base.OnConfiguring(optionsBuilder.UseLoggerFactory(ContextLoggerFactory));
                 OnConfiguringDbContext(optionsBuilder);
             }
         }
+
+        public static readonly ILoggerFactory ContextLoggerFactory
+            = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter((category, level) =>
+                        category == DbLoggerCategory.Database.Command.Name
+                        && level == LogLevel.Information)
+                    .AddDebug();
+            });
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             IEnumerable<Type> types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(asm => asm.DefinedTypes).Select(x => x.AsType());

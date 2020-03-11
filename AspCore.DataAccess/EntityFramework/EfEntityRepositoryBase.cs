@@ -62,7 +62,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = Entities.AsQueryable();
+                var query = TableNoTracking.AsQueryable();
 
                 var countTask = query.Count();
                 if (filter != null)
@@ -96,7 +96,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = Entities.AsQueryable();
+                var query = TableNoTracking.AsQueryable();
                 var countTask = query.CountAsync();
 
                 if (filter != null)
@@ -113,7 +113,7 @@ namespace AspCore.DataAccess.EntityFramework
                     resultsTask = query.ToArrayAsync();
                 }
 
-                await Task.WhenAll(resultsTask, countTask);
+                await Task.WhenAll(resultsTask, countTask).ConfigureAwait(false);
 
                 if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
                 {
@@ -181,22 +181,15 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
-                if (entitylist.IsSucceededAndDataIncluded())
+
+                foreach (var item in entities)
                 {
-                    foreach (var item in entitylist.Result)
+                    if (item is IBaseEntity)
                     {
-                        if (item is IBaseEntity)
-                        {
-                            ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                        }
-
-                        var updatedEntity = _context.Entry(item);
-                        updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
-                        updatedEntity.State = EntityState.Modified;
+                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
                     }
+                    _context.Entry(item).State = EntityState.Modified;
                 }
-
                 int value = _context.SaveChanges();
                 if (value > 0) result.IsSucceeded = true;
                 else
@@ -230,8 +223,6 @@ namespace AspCore.DataAccess.EntityFramework
                     updatedEntity.State = EntityState.Modified;
                 }
             }
-
-
             return ProcessEntityWithState(entitylist.Result.ToArray());
         }
 
