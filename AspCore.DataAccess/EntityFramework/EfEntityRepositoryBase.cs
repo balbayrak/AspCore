@@ -45,7 +45,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
             try
             {
-                result.Result = Entities.FirstOrDefault(filter);
+                result.Result = TableNoTracking.FirstOrDefault(filter);
                 result.IsSucceeded = true;
 
             }
@@ -102,30 +102,30 @@ namespace AspCore.DataAccess.EntityFramework
                 if (filter != null)
                     query = query.Where(filter);
 
-                Task<TEntity[]> resultsTask;
+                TEntity[] resultsTask;
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
                     var skip = page.Value * pageSize.Value;
-                    resultsTask = query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
+                    resultsTask = await query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
                 }
                 else
                 {
-                    resultsTask = query.ToArrayAsync();
+                    resultsTask = await query.ToArrayAsync();
                 }
 
                 await Task.WhenAll(resultsTask, countTask).ConfigureAwait(false);
 
-                if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
-                {
-                    result.IsSucceeded = true;
-                    result.TotalResultCount = countTask.Result;
-                    result.Result = resultsTask.Result;
-                    result.SearchResultCount = result.Result.Count();
-                }
-                else
-                {
-                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                }
+                //if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
+                //{
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.Result = resultsTask;
+                result.SearchResultCount = result.Result.Count();
+                //}
+                //else
+                //{
+                //    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                //}
 
             }
             catch (Exception ex)
