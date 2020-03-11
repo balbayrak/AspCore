@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>AspCore.DocumentAccess</Company>
   </PropertyGroup>
 
   <ItemGroup>
