@@ -5,18 +5,27 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using AspCore.Utilities.Mapper.Abstract;
 using AspCore.Utilities.Mapper.Concrete;
 
 namespace AspCore.Utilities.Mapper
 {
 
-    public class CustomMapper : IDisposable
+    public class CustomMapper: ICustomMapper
     {
         public TDestination MapProperties<TSource, TDestination>(TSource source)
             where TSource : class, new()
             where TDestination : class, new()
         {
             TDestination destination = Activator.CreateInstance<TDestination>();
+            destination = SetProperties(source, destination);
+            return destination;
+        }
+
+        public TDestination MapProperties<TSource, TDestination>(TSource source, TDestination destination)
+            where TSource : class, new()
+            where TDestination : class, new()
+        {
             destination = SetProperties(source, destination);
             return destination;
         }
@@ -69,6 +78,22 @@ namespace AspCore.Utilities.Mapper
                 list.Add(newItem);
             }
             return list;
+        }
+
+        public List<TDestination> MapToList<TSource, TDestination>(List<TSource> source, List<TDestination> destination)
+            where TSource : class, new()
+            where TDestination : class, new()
+        {
+            if ((source == null || source.Count <= 0) || (destination==null || destination.Count<=0) ) return null;
+            if (destination.Count!=source.Count)
+            {
+                return null;
+            }
+            for (int i = 0; i < source.Count; i++)
+            {
+                destination[i] = MapProperties(source[i],destination[i]);
+            }
+            return destination;
         }
         public TDestination[] MapToArray<TSource, TDestination>(TSource[] source)
             where TSource : class, new()
@@ -253,19 +278,19 @@ namespace AspCore.Utilities.Mapper
 
         }
 
-        public List<TU> MapDbRowList<TU, TRow>(List<TRow> rowList)
-          where TU : class, new()
+        public List<TDestination> MapDbRowList<TDestination, TRow>(List<TRow> rowList)
+          where TDestination : class, new()
             where TRow : DataRow
         {
             if (rowList == null || rowList.Count <= 0) return null;
 
-            PropertyDescriptorCollection fields = TypeDescriptor.GetProperties(typeof(TU));
+            PropertyDescriptorCollection fields = TypeDescriptor.GetProperties(typeof(TDestination));
 
-            List<TU> lst = new List<TU>();
+            List<TDestination> lst = new List<TDestination>();
 
             foreach (TRow dr in rowList)
             {
-                var ob = Activator.CreateInstance<TU>();
+                var ob = Activator.CreateInstance<TDestination>();
 
                 foreach (PropertyDescriptor fieldInfo in fields)
                 {
@@ -295,15 +320,15 @@ namespace AspCore.Utilities.Mapper
             return lst;
         }
 
-        public TU MapDbRow<TU, TRow>(TRow row)
-         where TU : class, new()
+        public TDestination MapDbRow<TDestination, TRow>(TRow row)
+         where TDestination : class, new()
            where TRow : DataRow
         {
             if (row == null) return null;
 
-            PropertyDescriptorCollection fields = TypeDescriptor.GetProperties(typeof(TU));
+            PropertyDescriptorCollection fields = TypeDescriptor.GetProperties(typeof(TDestination));
 
-            var ob = Activator.CreateInstance<TU>();
+            var ob = Activator.CreateInstance<TDestination>();
 
             foreach (PropertyDescriptor fieldInfo in fields)
             {
@@ -378,7 +403,7 @@ namespace AspCore.Utilities.Mapper
             return lst;
         }
 
-        public TDataSet MapList<TDataSet, TDataTable, TSource>(List<TSource> list)
+        public TDataSet MapListToDataSet<TDataSet, TDataTable, TSource>(List<TSource> list)
             where TDataSet : DataSet, new()
             where TSource : class, new()
             where TDataTable : DataTable, new()
@@ -391,7 +416,7 @@ namespace AspCore.Utilities.Mapper
             return ds;
         }
 
-        public DataSet MapList<TSource>(List<TSource> list)
+        public DataSet MapListToDataSet<TSource>(List<TSource> list)
            where TSource : class, new()
         {
             if (list == null || list.Count <= 0) return null;

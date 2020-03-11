@@ -14,6 +14,8 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities;
+using AspCore.Utilities.Mapper;
+using AspCore.Utilities.Mapper.Abstract;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -24,6 +26,7 @@ namespace AspCore.DataAccess.EntityFramework
         private TDbContext _context { get; }
         private readonly IHttpContextAccessor _httpContextAccessor;
         private DbSet<TEntity> _entities;
+        private readonly ICustomMapper _mapper;
         private Guid activeUserId
         {
             get
@@ -35,8 +38,10 @@ namespace AspCore.DataAccess.EntityFramework
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
         public EfEntityRepositoryBase()
         {
+           
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
             _context = DependencyResolver.Current.GetService<TDbContext>();
+            _mapper = DependencyResolver.Current.GetService<ICustomMapper>();
             _entities = _context.Set<TEntity>();
         }
 
@@ -45,7 +50,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
             try
             {
-                result.Result = TableNoTracking.FirstOrDefault(filter);
+                result.Result = Entities.FirstOrDefault(filter);
                 result.IsSucceeded = true;
 
             }
@@ -62,7 +67,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = TableNoTracking.AsQueryable();
+                var query = Entities.AsQueryable();
 
                 var countTask = query.Count();
                 if (filter != null)
@@ -97,7 +102,7 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 var query = TableNoTracking.AsQueryable();
-                var countTask = await query.CountAsync();
+                var countTask =await query.CountAsync();
 
                 if (filter != null)
                     query = query.Where(filter);
@@ -112,20 +117,11 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     resultsTask = await query.ToArrayAsync();
                 }
-
-                //   await Task.WhenAll(resultsTask, countTask).ConfigureAwait(false);
-
-                //if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
-                //{
                 result.IsSucceeded = true;
                 result.TotalResultCount = countTask;
                 result.Result = resultsTask;
                 result.SearchResultCount = result.Result.Count();
-                //}
-                //else
-                //{
-                //    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                //}
+             
 
             }
             catch (Exception ex)
@@ -178,25 +174,21 @@ namespace AspCore.DataAccess.EntityFramework
 
         public ServiceResult<bool> Update(params TEntity[] entities)
         {
+            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            var updatedEntityList = entitylist.Result;
+            updatedEntityList = _mapper.MapToList(entities.ToList(),updatedEntityList);
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
-                if (entitylist.IsSucceededAndDataIncluded())
+                foreach (var updatedInput in updatedEntityList)
                 {
-                    foreach (var item in entitylist.Result)
+                    if (updatedInput is IBaseEntity)
                     {
-                        if (item is IBaseEntity)
-                        {
-                            ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                        }
-
-                        var updatedEntity = _context.Entry(item);
-                        updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
-                        updatedEntity.State = EntityState.Modified;
+                        ((IBaseEntity)updatedInput).LastUpdatedUserId = activeUserId;
                     }
+                    _context.Attach(updatedInput); 
+                    _context.Update(updatedInput);
                 }
-
                 int value = _context.SaveChanges();
                 if (value > 0) result.IsSucceeded = true;
                 else
@@ -216,23 +208,22 @@ namespace AspCore.DataAccess.EntityFramework
         public ServiceResult<bool> UpdateWithTransaction(params TEntity[] entities)
         {
             ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            List<TEntity> updatedEntityList = null;
             if (entitylist.IsSucceededAndDataIncluded())
             {
-                foreach (var item in entitylist.Result)
+                updatedEntityList = entitylist.Result;
+                updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
+                foreach (var item in updatedEntityList)
                 {
                     if (item is IBaseEntity)
                     {
                         ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
                     }
-
-                    var updatedEntity = _context.Entry(item);
-                    updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
-                    updatedEntity.State = EntityState.Modified;
+                    _context.Attach(item);
+                    _context.Update(item);
                 }
             }
-
-
-            return ProcessEntityWithState(entitylist.Result.ToArray());
+            return ProcessEntityWithState(updatedEntityList?.ToArray());
         }
 
         public ServiceResult<bool> Delete(params TEntity[] entities)
@@ -318,7 +309,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                result.Result = TableNoTracking.Where(t => t.Id.Equals(id)).FirstOrDefault();
+                result.Result = Entities.Find(id);
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
