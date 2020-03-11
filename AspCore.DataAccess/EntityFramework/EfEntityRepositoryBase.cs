@@ -97,35 +97,35 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 var query = TableNoTracking.AsQueryable();
-                var countTask = query.CountAsync();
+                var countTask = await query.CountAsync();
 
                 if (filter != null)
                     query = query.Where(filter);
 
-                Task<TEntity[]> resultsTask;
+                TEntity[] resultsTask;
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
                     var skip = page.Value * pageSize.Value;
-                    resultsTask = query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
+                    resultsTask = await query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
                 }
                 else
                 {
-                    resultsTask = query.ToArrayAsync();
+                    resultsTask = await query.ToArrayAsync();
                 }
 
-                await Task.WhenAll(resultsTask, countTask).ConfigureAwait(false);
+                //   await Task.WhenAll(resultsTask, countTask).ConfigureAwait(false);
 
-                if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
-                {
-                    result.IsSucceeded = true;
-                    result.TotalResultCount = countTask.Result;
-                    result.Result = resultsTask.Result;
-                    result.SearchResultCount = result.Result.Count();
-                }
-                else
-                {
-                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                }
+                //if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
+                //{
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.Result = resultsTask;
+                result.SearchResultCount = result.Result.Count();
+                //}
+                //else
+                //{
+                //    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                //}
 
             }
             catch (Exception ex)
@@ -181,15 +181,22 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-
-                foreach (var item in entities)
+                ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+                if (entitylist.IsSucceededAndDataIncluded())
                 {
-                    if (item is IBaseEntity)
+                    foreach (var item in entitylist.Result)
                     {
-                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                        if (item is IBaseEntity)
+                        {
+                            ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                        }
+
+                        var updatedEntity = _context.Entry(item);
+                        updatedEntity.CurrentValues.SetValues(entities.FirstOrDefault(t => t.Id == item.Id));
+                        updatedEntity.State = EntityState.Modified;
                     }
-                    _context.Entry(item).State = EntityState.Modified;
                 }
+
                 int value = _context.SaveChanges();
                 if (value > 0) result.IsSucceeded = true;
                 else
@@ -223,6 +230,8 @@ namespace AspCore.DataAccess.EntityFramework
                     updatedEntity.State = EntityState.Modified;
                 }
             }
+
+
             return ProcessEntityWithState(entitylist.Result.ToArray());
         }
 
