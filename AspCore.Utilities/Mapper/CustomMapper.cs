@@ -21,6 +21,14 @@ namespace AspCore.Utilities.Mapper
             return destination;
         }
 
+        public TDestination MapProperties<TSource, TDestination>(TDestination destination,TSource source)
+            where TSource : class, new()
+            where TDestination : class, new()
+        {
+            destination = SetProperties(source, destination);
+            return destination;
+        }
+
         private static TDestination SetProperties<TSource, TDestination>(TSource source, TDestination destination)
             where TSource : class, new()
             where TDestination : class, new()

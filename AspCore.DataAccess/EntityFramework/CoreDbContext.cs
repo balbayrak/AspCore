@@ -31,7 +31,9 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 optionsBuilder.UseLazyLoadingProxies();
                 optionsBuilder.EnableSensitiveDataLogging();
+#if DEBUG
                 base.OnConfiguring(optionsBuilder.UseLoggerFactory(ContextLoggerFactory));
+#endif
                 OnConfiguringDbContext(optionsBuilder);
             }
         }

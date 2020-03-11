@@ -14,6 +14,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities;
+using AspCore.Utilities.Mapper;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -45,7 +46,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
             try
             {
-                result.Result = TableNoTracking.FirstOrDefault(filter);
+                result.Result = Entities.FirstOrDefault(filter);
                 result.IsSucceeded = true;
 
             }
@@ -62,7 +63,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = TableNoTracking.AsQueryable();
+                var query = Entities.AsQueryable();
 
                 var countTask = query.Count();
                 if (filter != null)
@@ -96,36 +97,27 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = TableNoTracking.AsQueryable();
-                var countTask = query.CountAsync();
+                var query = Entities.AsQueryable();
+                var countTask =await query.CountAsync();
 
                 if (filter != null)
                     query = query.Where(filter);
 
-                Task<TEntity[]> resultsTask;
+                TEntity[] resultsTask;
                 if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
                 {
                     var skip = page.Value * pageSize.Value;
-                    resultsTask = query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
+                    resultsTask = await query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
                 }
                 else
                 {
-                    resultsTask = query.ToArrayAsync();
+                    resultsTask = await query.ToArrayAsync();
                 }
-
-                await Task.WhenAll(resultsTask, countTask).ConfigureAwait(false);
-
-                if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully)
-                {
-                    result.IsSucceeded = true;
-                    result.TotalResultCount = countTask.Result;
-                    result.Result = resultsTask.Result;
-                    result.SearchResultCount = result.Result.Count();
-                }
-                else
-                {
-                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                }
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.Result = resultsTask;
+                result.SearchResultCount = result.Result.Count();
+             
 
             }
             catch (Exception ex)
@@ -181,14 +173,18 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-
-                foreach (var item in entities)
+                foreach (var updatedInput in entities)
                 {
-                    if (item is IBaseEntity)
+                    if (updatedInput is IBaseEntity)
                     {
-                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
+                        ((IBaseEntity)updatedInput).LastUpdatedUserId = activeUserId;
                     }
-                    _context.Entry(item).State = EntityState.Modified;
+                    var entity = GetById(updatedInput.Id).Result;
+                    var mapper=new CustomMapper();
+                    entity = mapper.MapProperties(entity,updatedInput);
+                    _context.Attach(entity);
+                     entity=  _context.Update(entity).Entity;
+
                 }
                 int value = _context.SaveChanges();
                 if (value > 0) result.IsSucceeded = true;
@@ -309,7 +305,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             try
             {
-                result.Result = TableNoTracking.Where(t => t.Id.Equals(id)).FirstOrDefault();
+                result.Result = Entities.Find(id);
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
