@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <RepositoryType></RepositoryType>
+    <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>AspCore.Storage</Company>
   </PropertyGroup>
 
   <ItemGroup>
