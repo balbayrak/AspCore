@@ -4,6 +4,7 @@ using AspCore.Business.Abstract;
 using AspCore.Business.General;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using AspCore.ConnectedApi.Abstract;
 
 namespace AspCore.WebApi
 {

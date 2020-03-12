@@ -6,9 +6,9 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <Company>AspCore.DataAccess</Company>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.1</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

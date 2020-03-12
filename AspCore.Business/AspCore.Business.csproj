@@ -5,7 +5,8 @@
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

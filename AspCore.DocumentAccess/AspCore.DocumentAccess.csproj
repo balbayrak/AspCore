@@ -6,8 +6,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Company>AspCore.DocumentAccess</Company>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

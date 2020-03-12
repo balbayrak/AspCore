@@ -41,17 +41,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{968AC7B7-17F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.Entities", "AspCoreTest.Entities\AspCoreTest.Entities.csproj", "{C72D684C-5455-40FB-BFC4-55A47C37DFEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCoreTest.Entities", "AspCoreTest.Entities\AspCoreTest.Entities.csproj", "{C72D684C-5455-40FB-BFC4-55A47C37DFEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.DataAccess", "AspCoreTest.DataAccess\AspCoreTest.DataAccess.csproj", "{45AD9BF8-7F17-4E98-BE61-43ACC57DAF13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCoreTest.DataAccess", "AspCoreTest.DataAccess\AspCoreTest.DataAccess.csproj", "{45AD9BF8-7F17-4E98-BE61-43ACC57DAF13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.Business", "AspCoreTest.Business\AspCoreTest.Business.csproj", "{C69ADFCA-38BD-4540-989D-9B64F6AD365B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCoreTest.Business", "AspCoreTest.Business\AspCoreTest.Business.csproj", "{C69ADFCA-38BD-4540-989D-9B64F6AD365B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.WebApi", "AspCoreTest.WebApi\AspCoreTest.WebApi.csproj", "{CFA3049E-C0B0-4FF4-BFF6-086494D0F945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCoreTest.WebApi", "AspCoreTest.WebApi\AspCoreTest.WebApi.csproj", "{CFA3049E-C0B0-4FF4-BFF6-086494D0F945}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.WebUI", "AspCoreTest.WebUI\AspCoreTest.WebUI.csproj", "{EE29991C-FB3E-4BD0-997F-8E2B482F4118}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCoreTest.WebUI", "AspCoreTest.WebUI\AspCoreTest.WebUI.csproj", "{EE29991C-FB3E-4BD0-997F-8E2B482F4118}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.Authentication", "AspCoreTest.Authentication\AspCoreTest.Authentication.csproj", "{AFE25AF9-9B2A-4940-B1C6-3562F90B2535}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCoreTest.Authentication", "AspCoreTest.Authentication\AspCoreTest.Authentication.csproj", "{AFE25AF9-9B2A-4940-B1C6-3562F90B2535}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCore.ConnectedApi", "AspCore.ConnectedApi\AspCore.ConnectedApi.csproj", "{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +153,10 @@ Global
 		{AFE25AF9-9B2A-4940-B1C6-3562F90B2535}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFE25AF9-9B2A-4940-B1C6-3562F90B2535}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE25AF9-9B2A-4940-B1C6-3562F90B2535}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,6 +185,7 @@ Global
 		{CFA3049E-C0B0-4FF4-BFF6-086494D0F945} = {B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}
 		{EE29991C-FB3E-4BD0-997F-8E2B482F4118} = {B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}
 		{AFE25AF9-9B2A-4940-B1C6-3562F90B2535} = {B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}
+		{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091} = {968AC7B7-17FA-41A4-A643-9C4D03AC9525}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E4B24D4-6FE9-4271-B972-1395D3515740}

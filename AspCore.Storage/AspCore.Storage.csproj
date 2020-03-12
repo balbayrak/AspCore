@@ -6,8 +6,9 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Company>AspCore.Storage</Company>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

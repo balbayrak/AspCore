@@ -1,7 +1,10 @@
 ﻿using AspCore.ApiClient.Abstract;
 using AspCore.Dependency.Concrete;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace AspCore.Business.Manager
+namespace AspCore.ConnectedApi.Concrete
 {
     public abstract class BaseConnectedApiManager
     {
