@@ -12,6 +12,21 @@ namespace AspCore.Extension
 {
     public static class ServiceResultExt
     {
+        public static void StatusMessage<TResult, TEntity>(this ServiceResult<TResult> result,string message, CoreEntityState entityState)
+        {
+            if (entityState == CoreEntityState.Added)
+            {
+                result.StatusMessage = string.Format(message, typeof(TEntity).Name);
+            }
+            else if (entityState == CoreEntityState.Deleted)
+            {
+                result.StatusMessage = string.Format(message, typeof(TEntity).Name);
+            }
+            else
+            {
+                result.StatusMessage = string.Format(message, typeof(TEntity).Name);
+            }
+        }
         public static void ErrorMessage<TResult>(this ServiceResult<TResult> result, string errorMessage, Exception ex)
         {
             result.IsSucceeded = false;

@@ -11,7 +11,7 @@ using AspCore.Web.Filters;
 
 namespace AspCore.Web.Concrete
 {
-    public class BaseWebDocumentEntityController<TEntity, TViewModel, TBffLayer> : BaseWebEntityController<TEntity, TViewModel, TBffLayer>
+    public abstract class BaseWebDocumentEntityController<TEntity, TViewModel, TBffLayer> : BaseWebEntityController<TEntity, TViewModel, TBffLayer>
         where TEntity : class, IDocumentEntity, new()
         where TViewModel : BaseViewModel<TEntity>, new()
         where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>

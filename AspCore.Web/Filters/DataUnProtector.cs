@@ -22,9 +22,12 @@ namespace AspCore.Web.Filters
         {
             if (context.ActionArguments.ContainsKey(_parameterName))
             {
-                context.ActionArguments[_parameterName] = _protectorHelper.UnProtect(context.ActionArguments[_parameterName].ToString());
+                var value = context.ActionArguments[_parameterName].ToString();
+                if (!string.IsNullOrEmpty(value) && value != "-1")
+                {
+                    context.ActionArguments[_parameterName] = _protectorHelper.UnProtect(context.ActionArguments[_parameterName].ToString());
+                }
             }
         }
     }
-
 }

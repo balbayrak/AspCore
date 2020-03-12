@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace AspCore.Web.Concrete
 {
-    public class BaseWebEntityController<TEntity, TViewModel, TBffLayer> : BaseWebController<Document, DocumentRequest>
+    public abstract class BaseWebEntityController<TEntity, TViewModel, TBffLayer> : BaseWebController<Document, DocumentRequest>
         where TEntity : class, IEntity, new()
         where TViewModel : BaseViewModel<TEntity>, new()
         where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>
@@ -50,15 +50,22 @@ namespace AspCore.Web.Concrete
             TViewModel viewModel = null;
             if (!string.IsNullOrEmpty(id))
             {
-                ServiceResult<TViewModel> entityResult = BffLayer.GetById(new EntityFilter<TEntity>
+                if (id != "-1")
                 {
-                    id = new Guid(id)
-                }).Result;
+                    ServiceResult<TViewModel> entityResult = BffLayer.GetById(new EntityFilter<TEntity>
+                    {
+                        id = new Guid(id)
+                    }).Result;
 
-                if (entityResult.IsSucceededAndDataIncluded())
+                    if (entityResult.IsSucceededAndDataIncluded())
+                    {
+                        viewModel = entityResult.Result;
+                        return PartialView("AddOrEdit", viewModel);
+                    }
+                }
+                else
                 {
-                    viewModel = entityResult.Result;
-                    return PartialView("AddOrEdit", viewModel);
+                    return PartialView("AddOrEdit");
                 }
             }
 
@@ -82,17 +89,17 @@ namespace AspCore.Web.Concrete
                 {
                     addorUpdateResult = BffLayer.Add(new List<TViewModel> { viewModel }).Result;
                 }
-                if(addorUpdateResult.IsSucceeded)
+                if (addorUpdateResult.IsSucceeded)
                 {
                     result.Result = AjaxResultTypeEnum.Succeed;
-                    result.ResultText = "Person Added / Updated";
+                    result.ResultText = addorUpdateResult.StatusMessage;
                 }
                 else
                 {
                     result.Result = AjaxResultTypeEnum.Error;
                     result.ResultText = addorUpdateResult.ErrorMessage;
                 }
-           
+
                 return JsonConvert.SerializeObject(result);
             }
             return null;

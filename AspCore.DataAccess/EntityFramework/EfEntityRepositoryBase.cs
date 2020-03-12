@@ -146,7 +146,12 @@ namespace AspCore.DataAccess.EntityFramework
                     _context.Entry(item).State = EntityState.Added;
                 }
                 int value = _context.SaveChanges();
-                if (value > 0) result.IsSucceeded = true;
+                if (value > 0)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
+                    result.Result = true;
+                    result.IsSucceeded = true;
+                }
                 else
                 {
                     result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
@@ -169,7 +174,13 @@ namespace AspCore.DataAccess.EntityFramework
                 item.entityState = CoreEntityState.Added;
             }
 
-            return ProcessEntityWithState(entities);
+            ServiceResult<bool> result = ProcessEntityWithState(entities);
+            if(result.IsSucceeded)
+            {
+                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
+            }
+
+            return result;
         }
 
         public ServiceResult<bool> Update(params TEntity[] entities)
@@ -190,7 +201,12 @@ namespace AspCore.DataAccess.EntityFramework
                     _context.Update(updatedInput);
                 }
                 int value = _context.SaveChanges();
-                if (value > 0) result.IsSucceeded = true;
+                if (value > 0)
+                {
+                    result.StatusMessage<bool,TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                    result.Result = true;
+                    result.IsSucceeded = true;
+                }
                 else
                 {
                     result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
@@ -223,7 +239,13 @@ namespace AspCore.DataAccess.EntityFramework
                     _context.Update(item);
                 }
             }
-            return ProcessEntityWithState(updatedEntityList?.ToArray());
+            ServiceResult<bool> result = ProcessEntityWithState(updatedEntityList?.ToArray());
+            if (result.IsSucceeded)
+            {
+               result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+            }
+
+            return result;
         }
 
         public ServiceResult<bool> Delete(params TEntity[] entities)
@@ -241,7 +263,12 @@ namespace AspCore.DataAccess.EntityFramework
                     updatedEntity.State = EntityState.Deleted;
                 }
                 int value = _context.SaveChanges();
-                if (value > 0) result.IsSucceeded = true;
+                if (value > 0)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
+                    result.Result = true;
+                    result.IsSucceeded = true;
+                }
                 else
                 {
                     result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
@@ -282,7 +309,12 @@ namespace AspCore.DataAccess.EntityFramework
                 entitylist.Result.ForEach(t => t.entityState = CoreEntityState.Deleted);
             }
 
-            return ProcessEntityWithState(entitylist.Result.ToArray());
+            ServiceResult<bool> result = ProcessEntityWithState(entitylist.Result.ToArray());
+            if (result.IsSucceeded)
+            {
+                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
+            }
+            return result;
         }
 
         public ServiceResult<TEntity> Find(Expression<Func<TEntity, bool>> filter)
