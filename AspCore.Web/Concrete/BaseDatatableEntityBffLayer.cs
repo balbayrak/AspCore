@@ -1,4 +1,5 @@
-﻿using AspCore.BackendForFrontend.Concrete;
+﻿using System;
+using AspCore.BackendForFrontend.Concrete;
 using AspCore.Entities.DataTable;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
@@ -31,8 +32,9 @@ namespace AspCore.Web.Concrete
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
+                return null;
                 // ignored
             }
 

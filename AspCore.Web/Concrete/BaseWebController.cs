@@ -67,6 +67,10 @@ namespace AspCore.Web.Concrete
                     }
                 }
             }
+            else
+            {
+                
+            }
             
             base.OnActionExecuting(context);
         }
