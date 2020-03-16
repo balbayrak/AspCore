@@ -31,7 +31,7 @@ namespace AspCore.Web.Concrete
         {
             ServiceResult<AuthenticationInfo> serviceResult = null;
 
-            if (authenticationInfo != null)
+            if (authenticationInfo != null && !string.IsNullOrEmpty(authenticationInfo.UserName) && !string.IsNullOrEmpty(authenticationInfo.Password))
             {
                 serviceResult = ((IInboundWebAuthenticationProvider<AuthenticationInfo>)_authenticationProvider).GetAuthenticationFormInfo(authenticationInfo);
             }
