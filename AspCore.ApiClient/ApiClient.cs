@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -263,6 +264,8 @@ namespace AspCore.ApiClient
                     //if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
                     //{
                     string responseString = await response.Content.ReadAsStringAsync();
+                 
+                    Debug.WriteLine(responseString);
                     result = JsonConvert.DeserializeObject<TResult>(responseString);
                     //}
                 }
@@ -296,6 +299,7 @@ namespace AspCore.ApiClient
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
+                  
                     result = JsonConvert.DeserializeObject<TResult>(responseString);
                 }
             }
