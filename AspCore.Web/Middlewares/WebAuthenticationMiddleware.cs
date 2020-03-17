@@ -5,7 +5,7 @@ using AspCore.Dependency.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Storage.Abstract;
 
-namespace AspCore.Middlewares
+namespace AspCore.Web.Middlewares
 {
     public class WebAuthenticationMiddleware
     {

@@ -2,8 +2,8 @@
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Json;
-using AspCore.Middlewares.WebApi;
 using AspCore.WebApi.Configuration.Options;
+using AspCore.WebApi.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;

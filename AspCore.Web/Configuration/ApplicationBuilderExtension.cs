@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AspCore.Web.Middlewares;
+using Microsoft.AspNetCore.Builder;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using AspCore.Middlewares;
 
 namespace AspCore.Web.Configuration
 {

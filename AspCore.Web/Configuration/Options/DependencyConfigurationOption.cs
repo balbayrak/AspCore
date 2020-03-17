@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using AspCore.Dependency.Configuration;
+﻿using AspCore.AOP.Configuration;
 using AspCore.Entities.Configuration;
-using AspCore.AOP.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.Web.Configuration.Options
 {

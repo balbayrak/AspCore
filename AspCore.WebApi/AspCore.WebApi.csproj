@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <Company>AspCore.WebApi</Company>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
     <ProjectReference Include="..\AspCore.ConnectedApi\AspCore.ConnectedApi.csproj" />
-    <ProjectReference Include="..\AspCore.Middlewares\AspCore.Middlewares.csproj" />
   </ItemGroup>
 
 </Project>

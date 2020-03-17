@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.Middlewares;
-using AspCore.Middlewares.WebApi;
+﻿using AspCore.WebApi.Middlewares;
+using Microsoft.AspNetCore.Builder;
 
 namespace AspCore.WebApi.Configuration
 {

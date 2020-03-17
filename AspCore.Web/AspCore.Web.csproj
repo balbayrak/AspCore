@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
     <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
     <ProjectReference Include="..\AspCore.BackendForFrontend\AspCore.BackendForFrontend.csproj" />
-    <ProjectReference Include="..\AspCore.Middlewares\AspCore.Middlewares.csproj" />
     <ProjectReference Include="..\AspCore.WebComponents\AspCore.WebComponents.csproj" />
   </ItemGroup>
 

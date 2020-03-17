@@ -14,4 +14,8 @@
     <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Web\" />
+  </ItemGroup>
+
 </Project>
