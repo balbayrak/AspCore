@@ -140,7 +140,7 @@ namespace AspCore.DataAccess.Configuration
                 //This is done for every request/response
                 _services.AddScoped<DbConnection>((serviceProvider) =>
                 {
-                    var dbConnection = new SqlConnection(connectionString);
+                    var dbConnection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                     dbConnection.Open();
                     return dbConnection;
                 });
