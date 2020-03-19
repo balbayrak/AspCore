@@ -1,0 +1,13 @@
+﻿using AspCore.Entities.EntityType;
+using AspCore.Entities.General;
+using System.Collections.Generic;
+
+namespace AspCore.CacheClient.QueryResult
+{
+    public class CacheResult<T>
+    {
+        public IEnumerable<T> cacheItems { get; set; }
+        public decimal MinValue { get; set; }
+        public decimal MaxValue { get; set; }
+    }
+}
