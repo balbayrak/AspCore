@@ -33,11 +33,7 @@ namespace AspCore.Business.General
             public const string DOCUMENT_DELETE_AFTER_DATAACCESS_METHOD_ERROR = "DataAccess kodlarında hata oluştu, Oluşturulan dokuman silinemedi! Sistem yöneticisine haber veriniz!";
         }
 
-        public struct JWT_Error_Messages
-        {
-            public const string BEARER_TOKEN_NOT_FOUND = "Request header içerisinde bearer token bilgisi bulunamadı!";
-            public const string BEARER_TOKEN_GET_ERROR = "Request header içerisinde bearer token bilgisi alınırken hata oluştu!";
-        }
+
 
     }
 }

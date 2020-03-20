@@ -1,19 +1,20 @@
-﻿using AspCore.Authentication.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Entities.Authentication;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using AspCore.WebAuthentication.Abstract;
 using AspCoreTest.Authentication.Abstract;
-using Microsoft.AspNetCore.Http;
 using System;
 
 namespace AspCoreTest.Authentication.Concrete
 {
-    public class CustomWebAuthenticationProvider : WebAuthenticationProvider<CustomApiAuthenticationProvider>, ICustomWebAuthenticationProvider
+    public class CustomWebAuthenticationProvider : ICustomWebAuthenticationProvider
     {
 
         public string loginPageUrl => "Account/UserLogin";
 
         public string mainPageUrl => "/Home/Index";
+
+        public string apiAuthenticationType => "CustomApiAuthenticationProvider";
 
         public CustomWebAuthenticationProvider()
         {

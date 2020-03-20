@@ -1,5 +1,5 @@
-﻿using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
+﻿using AspCore.Entities.Authentication;
+using AspCore.WebAuthentication.Abstract;
 
 namespace AspCoreTest.Authentication.Abstract
 {

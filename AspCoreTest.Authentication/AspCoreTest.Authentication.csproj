@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AspCore.ApiAuthentication\AspCore.ApiAuthentication.csproj" />
     <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
     <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
+    <ProjectReference Include="..\AspCore.WebAuthentication\AspCore.WebAuthentication.csproj" />
   </ItemGroup>
 
 </Project>

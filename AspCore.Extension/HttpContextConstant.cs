@@ -8,6 +8,8 @@
             public const string CORRELATION_ID = "CorrelationId";
 
             public const string ACTIVE_USER_ID = "ActiveUserID";
+
+            public const string ACTIVE_USER = "ActiveUser";
         }
     }
 }

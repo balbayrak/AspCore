@@ -38,7 +38,6 @@ namespace AspCore.DataAccess.EntityFramework
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
         public EfEntityRepositoryBase()
         {
-           
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
             _context = DependencyResolver.Current.GetService<TDbContext>();
             _mapper = DependencyResolver.Current.GetService<ICustomMapper>();

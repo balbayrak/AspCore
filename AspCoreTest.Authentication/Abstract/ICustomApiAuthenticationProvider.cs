@@ -1,7 +1,4 @@
-﻿using AspCore.Authentication.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using AspCore.ApiAuthentication.Providers.Abstract;
 
 namespace AspCoreTest.Authentication.Abstract
 {

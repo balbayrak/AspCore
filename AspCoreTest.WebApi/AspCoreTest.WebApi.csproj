@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspCore.WebApi\AspCore.WebApi.csproj" />
-    <ProjectReference Include="..\AspCoreTest.Authentication\AspCoreTest.Authentication.csproj" />
     <ProjectReference Include="..\AspCoreTest.Business\AspCoreTest.Business.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
   </ItemGroup>

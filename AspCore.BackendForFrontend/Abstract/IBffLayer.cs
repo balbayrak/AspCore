@@ -1,6 +1,7 @@
 ﻿using System;
 using AspCore.ApiClient.Entities.Concrete;
 using AspCore.Dependency.Abstract;
+using AspCore.Entities.Authentication;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
@@ -12,6 +13,6 @@ namespace AspCore.BackendForFrontend.Abstract
 
         void SetApiClientTokenStorageExpireTime(DateTime expireTime);
 
-        void SetAuthenticationToken(string key, AuthenticationTokenResponse authenticationToken);
+        void SetAuthenticationToken(string key, AuthenticationToken authenticationToken);
     }
 }

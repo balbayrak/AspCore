@@ -1,6 +1,6 @@
-﻿using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
+﻿using AspCore.Entities.Authentication;
 using AspCore.Entities.User;
+using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Security.Abstract;
 
 namespace AspCore.WebApi

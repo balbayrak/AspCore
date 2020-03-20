@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Configuration;
+using AspCore.Web.Authentication.Abstract;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.Web.Configuration.Options
 {

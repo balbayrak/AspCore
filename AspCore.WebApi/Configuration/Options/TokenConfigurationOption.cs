@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.WebApi.Security.General;
+﻿using AspCore.WebApi.Authentication.JWT.Concrete;
 
 namespace AspCore.WebApi.Configuration.Options
 {

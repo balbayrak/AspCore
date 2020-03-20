@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using AspCore.Business.Abstract;
+﻿using AspCore.Business.Abstract;
 using AspCore.Business.General;
-using AspCore.Business.Security.Extension;
 using AspCore.Business.Task.Abstract;
 using AspCore.Business.Task.Concrete;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
+using AspCore.Extension;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
 
 namespace AspCore.Business.Manager
 {
@@ -30,10 +30,10 @@ namespace AspCore.Business.Manager
             _taskBuilder = DependencyResolver.Current.GetService<TTaskBuilder>();
             _taskFlowBuilder = DependencyResolver.Current.GetService<ITaskFlowBuilder>();
 
-            ServiceResult<TActiveUser> serviceResult = _httpContextAccessor.HttpContext.GetJWTToken<TActiveUser>();
-            if (serviceResult.IsSucceededAndDataIncluded())
+            ServiceResult<TActiveUser> activeUserResult = _httpContextAccessor.HttpContext.GetActiveUserInfo<TActiveUser>();
+            if (activeUserResult.IsSucceededAndDataIncluded())
             {
-                activeUser = serviceResult.Result;
+                activeUser = activeUserResult.Result;
             }
             else
             {

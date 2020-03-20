@@ -1,4 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AspCore.ConfigurationAccess.Abstract;
+using AspCore.ConfigurationAccess.Concrete;
+using AspCore.Entities.Configuration;
+using AspCore.Entities.Constants;
+using AspCore.Entities.EntityType;
+using AspCore.Entities.User;
+using AspCore.WebApi.Authentication.Abstract;
+using AspCore.WebApi.Authentication.JWT.Concrete;
+using AspCore.WebApi.Security.Abstract;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,16 +16,6 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AspCore.Business.Security.Abstract;
-using AspCore.ConfigurationAccess.Abstract;
-using AspCore.ConfigurationAccess.Concrete;
-using AspCore.Entities.Configuration;
-using AspCore.Entities.Constants;
-using AspCore.Entities.EntityType;
-using AspCore.Entities.User;
-using AspCore.WebApi.Security.Abstract;
-using AspCore.WebApi.Security.Concrete;
-using AspCore.WebApi.Security.General;
 
 namespace AspCore.WebApi.Configuration.Options
 {

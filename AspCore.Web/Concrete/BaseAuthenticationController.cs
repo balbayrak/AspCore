@@ -1,12 +1,12 @@
 ﻿using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
 using AspCore.BackendForFrontend.Abstract;
 using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Storage.Abstract;
+using AspCore.Web.Authentication.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -46,7 +46,7 @@ namespace AspCore.Web.Concrete
 
                 Storage.SetObject(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY, tokenKey, DateTime.Now.AddHours(1), false);
 
-                ServiceResult<AuthenticationTokenResponse> authenticationResult = _userBffLayer.AuthenticateClient(serviceResult.Result).Result;
+                ServiceResult<AuthenticationToken> authenticationResult = _userBffLayer.AuthenticateClient(serviceResult.Result).Result;
                 if (authenticationResult.IsSucceededAndDataIncluded())
                 {
                     _userBffLayer.SetAuthenticationToken(tokenKey, authenticationResult.Result);
@@ -76,7 +76,7 @@ namespace AspCore.Web.Concrete
         {
             string tokenKey = Storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
 
-            if (string.IsNullOrEmpty(tokenKey) || (!string.IsNullOrEmpty(tokenKey) && Storage.GetObject<AuthenticationTokenResponse>(tokenKey) == null))
+            if (string.IsNullOrEmpty(tokenKey) || (!string.IsNullOrEmpty(tokenKey) && Storage.GetObject<AuthenticationToken>(tokenKey) == null))
             {
                 ClearStorage();
                 Authenticate(authenticationInfo);

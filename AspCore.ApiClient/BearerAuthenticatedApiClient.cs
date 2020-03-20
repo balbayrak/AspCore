@@ -1,14 +1,14 @@
-﻿using System;
+﻿using AspCore.ApiClient.Entities.Abstract;
+using AspCore.ApiClient.Entities.Concrete;
+using AspCore.Entities.Authentication;
+using AspCore.Entities.Constants;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using AspCore.ApiClient.Entities.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Concrete;
-using AspCore.Entities.Constants;
 
 namespace AspCore.ApiClient
 {
-    public class BearerAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationTokenResponse, TOption>
+    public class BearerAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
                  where TOption : class, IApiClientConfiguration, new()
     {
         public BearerAuthenticatedApiClient(string apiKey) : base(apiKey)
@@ -21,7 +21,7 @@ namespace AspCore.ApiClient
 
         public override string AuthenticationRefreshController { get; set; }
 
-        public override AuthenticationTokenResponse AuthenticateClient(AuthenticationInfo input, Func<AuthenticationTokenResponse, AuthenticationTokenResponse> func, bool forceAuthentication, bool refreshToken)
+        public override AuthenticationToken AuthenticateClient(AuthenticationInfo input, Func<AuthenticationToken, AuthenticationToken> func, bool forceAuthentication, bool refreshToken)
         {
 
             string oldApiBaseAddress = this.baseAddress;
@@ -39,7 +39,7 @@ namespace AspCore.ApiClient
             var content = new FormUrlEncodedContent(pairs);
 
 
-            AuthenticationTokenResponse response = this.PostRequest<AuthenticationTokenResponse>(content).Result;
+            AuthenticationToken response = this.PostRequest<AuthenticationToken>(content).Result;
 
             this.baseAddress = oldApiBaseAddress;
             this.apiUrl = oldApiUrl;
@@ -48,9 +48,9 @@ namespace AspCore.ApiClient
 
         }
 
-        public override AuthenticationTokenResponse Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public override AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
-            AuthenticationTokenResponse tokenResponse = base.Authenticate(client, forceAuthentication, refreshToken);
+            AuthenticationToken tokenResponse = base.Authenticate(client, forceAuthentication, refreshToken);
 
             if (tokenResponse != null && !string.IsNullOrEmpty(tokenResponse.access_token))
             {
@@ -64,7 +64,7 @@ namespace AspCore.ApiClient
             return null;
         }
 
-        public override AuthenticationTokenResponse GetTokenResponse(AuthenticationTokenResponse outputObj)
+        public override AuthenticationToken GetTokenResponse(AuthenticationToken outputObj)
         {
             return outputObj;
         }

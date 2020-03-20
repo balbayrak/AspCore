@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using AspCore.Business.Security.Abstract;
-using AspCore.Business.Security.Concrete;
+﻿using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Entities.User;
 using AspCore.Extension;
+using AspCore.WebApi.Authentication.Abstract;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace AspCore.WebApi.Middlewares
 {
@@ -37,8 +39,14 @@ namespace AspCore.WebApi.Middlewares
                             access_token = token
                         });
 
+
                         if (jwtInfoResult.IsSucceededAndDataIncluded())
                         {
+                            if (typeof(IActiveUser).IsAssignableFrom(typeof(TJWTInfo)))
+                            {
+                                httpContext.Request.Headers.Add(HttpContextConstant.HEADER_KEY.ACTIVE_USER, JsonConvert.SerializeObject(jwtInfoResult.Result));
+                            }
+
                             httpContext.Request.Headers.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, jwtInfoResult.Result.correlationId);
 
 
@@ -48,8 +56,6 @@ namespace AspCore.WebApi.Middlewares
                             }
 
                             httpContext.Request.Headers.Add(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID, jwtInfoResult.Result.activeUserId.ToString());
-
-
                         }
                     }
                 }

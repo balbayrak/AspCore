@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Concrete;
+using AspCore.Entities.Authentication;
 
 namespace AspCore.ApiClient.Abstract
 {
@@ -23,7 +23,7 @@ namespace AspCore.ApiClient.Abstract
 
         Task<TResult> PostRequest<TResult>(HttpContent content) where TResult : class, new();
 
-        Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null, AuthenticationTokenResponse authenticationInfo = null) where TResult : class, new();
+        Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null, AuthenticationToken authenticationInfo = null) where TResult : class, new();
 
 
     }

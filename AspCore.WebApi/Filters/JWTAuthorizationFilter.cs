@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.WebApi.Authentication.JWT.Concrete;
+using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Configuration.Options;
-using AspCore.WebApi.Security.General;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System;
 
 namespace AspCore.WebApi.Filters
 {

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Concrete;
+﻿using AspCore.ApiClient.Entities.Concrete;
 using AspCore.BackendForFrontend.Abstract;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Extension;
+using System;
+using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
@@ -17,7 +17,7 @@ namespace AspCore.BackendForFrontend.Concrete
             apiControllerRoute = "api/AuthenticationToken";
         }
 
-        public async Task<ServiceResult<ActiveUser>> GetClientInfo(AuthenticationTokenResponse authenticationToken)
+        public async Task<ServiceResult<ActiveUser>> GetClientInfo(AuthenticationToken authenticationToken)
         {
             ServiceResult<ActiveUser> result = new ServiceResult<ActiveUser>();
             try
@@ -33,14 +33,14 @@ namespace AspCore.BackendForFrontend.Concrete
             return result;
         }
 
-        public async Task<ServiceResult<AuthenticationTokenResponse>> AuthenticateClient(AuthenticationInfo authenticationInfo)
+        public async Task<ServiceResult<AuthenticationToken>> AuthenticateClient(AuthenticationInfo authenticationInfo)
         {
-            ServiceResult<AuthenticationTokenResponse> result = new ServiceResult<AuthenticationTokenResponse>();
+            ServiceResult<AuthenticationToken> result = new ServiceResult<AuthenticationToken>();
             try
             {
                 apiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.AUTHENTICATE_CLIENT;
 
-                result = await apiClient.PostRequest<ServiceResult<AuthenticationTokenResponse>>(authenticationInfo);
+                result = await apiClient.PostRequest<ServiceResult<AuthenticationToken>>(authenticationInfo);
 
             }
             catch (Exception ex)

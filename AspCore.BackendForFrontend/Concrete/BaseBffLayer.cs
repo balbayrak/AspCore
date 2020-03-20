@@ -2,6 +2,7 @@
 using AspCore.ApiClient.Entities.Concrete;
 using AspCore.BackendForFrontend.Abstract;
 using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Storage.Abstract;
 
@@ -62,7 +63,7 @@ namespace AspCore.BackendForFrontend.Concrete
             apiClient.tokenStrorageExpireTime = expireTime;
         }
 
-        public void SetAuthenticationToken(string key, AuthenticationTokenResponse authenticationToken)
+        public void SetAuthenticationToken(string key, AuthenticationToken authenticationToken)
         {
             DateTime? expire = null;
             if (apiClient.tokenStrorageExpireTime == null || (apiClient.tokenStrorageExpireTime != null && (apiClient.tokenStrorageExpireTime == DateTime.MinValue || apiClient.tokenStrorageExpireTime == DateTime.MaxValue)))

@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Configuration;
-using AspCore.WebApi.Authentication.Concrete;
+using AspCore.WebApi.Authentication.Providers.Abstract;
+using AspCore.WebApi.Authentication.Providers.Concrete;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.WebApi.Configuration.Options
 {
