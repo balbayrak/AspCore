@@ -4,11 +4,11 @@ namespace AspCore.Entities.Configuration
 {
     public class ConfigurationOption
     {
-        protected IServiceCollection _services { get; private set; }
+        public IServiceCollection services { get; private set; }
 
         public ConfigurationOption(IServiceCollection services)
         {
-            _services = services;
+            this.services = services;
         }
     }
 }

@@ -8,7 +8,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 
-namespace AspCore.WebApi
+namespace AspCore.BusinessApi.DocumentEntity
 {
     public class BaseDocumentEntityController<TEntityService, TEntity, TDocument, TDocumentRequest, TDocumentEntityRequest> : BaseEntityController<TEntityService, TEntity>
         where TEntityService : IDocumentEntityService<TDocument, TEntity>

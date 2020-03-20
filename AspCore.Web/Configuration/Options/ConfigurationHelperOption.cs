@@ -13,10 +13,10 @@ namespace AspCore.Web.Configuration.Options
         }
         public AuthenticationProviderBuilder AddConfigurationManager(Action<ConfigurationManagerOptionBuilder> option)
         {
-            ConfigurationManagerOptionBuilder configurationManagerOption = new ConfigurationManagerOptionBuilder(_services);
+            ConfigurationManagerOptionBuilder configurationManagerOption = new ConfigurationManagerOptionBuilder(services);
             option(configurationManagerOption);
 
-            return new AuthenticationProviderBuilder(_services);
+            return new AuthenticationProviderBuilder(services);
         }
     }
 }

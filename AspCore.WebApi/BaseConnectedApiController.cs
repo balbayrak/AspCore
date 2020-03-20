@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using AspCore.Business.Abstract;
-using AspCore.Business.General;
+﻿using AspCore.ConnectedApi.Abstract;
 using AspCore.Entities.General;
 using AspCore.Extension;
-using AspCore.ConnectedApi.Abstract;
+using AspCore.WebApi.General;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AspCore.WebApi
 {
@@ -16,7 +15,6 @@ namespace AspCore.WebApi
         {
             _service = service;
         }
-
 
         [NonAction]
         protected virtual ServiceResult<bool> ReadinessInternal(Guid id)
@@ -48,7 +46,7 @@ namespace AspCore.WebApi
         {
             if (id == Guid.Empty)
             {
-                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(id)));
+                return base.BadRequest(string.Format(WebApiConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(id)));
             }
             ServiceResult<bool> response = ReadinessInternal(id);
 

@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.ConnectedApi", "Asp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.CacheAccess", "AspCore.CacheAccess\AspCore.CacheAccess.csproj", "{D3983BAB-04E8-49BF-ABF2-AD2475E9CDF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCore.BusinessApi", "AspCore.BusinessApi\AspCore.BusinessApi.csproj", "{0276BADC-F16F-48B2-834E-373436629485}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,10 @@ Global
 		{D3983BAB-04E8-49BF-ABF2-AD2475E9CDF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3983BAB-04E8-49BF-ABF2-AD2475E9CDF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3983BAB-04E8-49BF-ABF2-AD2475E9CDF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0276BADC-F16F-48B2-834E-373436629485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0276BADC-F16F-48B2-834E-373436629485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0276BADC-F16F-48B2-834E-373436629485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0276BADC-F16F-48B2-834E-373436629485}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,6 +178,7 @@ Global
 		{EE29991C-FB3E-4BD0-997F-8E2B482F4118} = {B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}
 		{D93F7C39-FBC9-42A2-97BF-ADAE02FAA091} = {968AC7B7-17FA-41A4-A643-9C4D03AC9525}
 		{D3983BAB-04E8-49BF-ABF2-AD2475E9CDF2} = {968AC7B7-17FA-41A4-A643-9C4D03AC9525}
+		{0276BADC-F16F-48B2-834E-373436629485} = {968AC7B7-17FA-41A4-A643-9C4D03AC9525}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E4B24D4-6FE9-4271-B972-1395D3515740}

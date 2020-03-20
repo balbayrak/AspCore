@@ -17,18 +17,18 @@ namespace AspCore.Web.Configuration.Options
         where TAuthenticationProvider : IWebAuthenticationProvider<TInput>
         where TInput : AuthenticationInfo
         {
-            ServicesByNameBuilder<TAuthenticationProvider> servicesByNameBuilder = new ServicesByNameBuilder<TAuthenticationProvider>(_services, ServiceLifetime.Transient);
+            ServicesByNameBuilder<TAuthenticationProvider> servicesByNameBuilder = new ServicesByNameBuilder<TAuthenticationProvider>(services, ServiceLifetime.Transient);
             builder(servicesByNameBuilder);
 
-            return new StorageOptionConfiguration(_services);
+            return new StorageOptionConfiguration(services);
         }
 
         public StorageOptionConfiguration AddAuthenticationProvider(Action<ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>>> builder)
         {
-            ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>> servicesByNameBuilder = new ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>>(_services, ServiceLifetime.Transient);
+            ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>> servicesByNameBuilder = new ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>>(services, ServiceLifetime.Transient);
             builder(servicesByNameBuilder);
 
-            return new StorageOptionConfiguration(_services);
+            return new StorageOptionConfiguration(services);
         }
     }
 }

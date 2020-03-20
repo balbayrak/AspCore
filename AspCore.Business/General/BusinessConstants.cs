@@ -32,8 +32,5 @@ namespace AspCore.Business.General
             public const string DOCUMENT_UPDATE_METHOD_ERROR = "Document güncelleme kodlarında hata oluştu! Sistem yöneticisine haber veriniz!";
             public const string DOCUMENT_DELETE_AFTER_DATAACCESS_METHOD_ERROR = "DataAccess kodlarında hata oluştu, Oluşturulan dokuman silinemedi! Sistem yöneticisine haber veriniz!";
         }
-
-
-
     }
 }

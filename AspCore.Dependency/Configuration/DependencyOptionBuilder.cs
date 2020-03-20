@@ -44,19 +44,19 @@ namespace AspCore.Dependency.Configuration
 
             var descriptor = new ServiceDescriptor(typeof(TInterface), typeof(TConcrete), dependencyOption.serviceLifetime);
 
-            var oldDescription = _services.FirstOrDefault(t => t.ServiceType.Equals(typeof(TInterface)));
+            var oldDescription = services.FirstOrDefault(t => t.ServiceType.Equals(typeof(TInterface)));
             if (oldDescription != null)
             {
-                _services.Remove(oldDescription);
+                services.Remove(oldDescription);
             }
 
-            var oldDescriptionImp = _services.FirstOrDefault(t => t.ImplementationType.Equals(typeof(TConcrete)));
+            var oldDescriptionImp = services.FirstOrDefault(t => t.ImplementationType.Equals(typeof(TConcrete)));
             if (oldDescriptionImp != null)
             {
-                _services.Remove(oldDescriptionImp);
+                services.Remove(oldDescriptionImp);
             }
 
-            _services.Add(descriptor);
+            services.Add(descriptor);
         }
 
         private void BindType<TInterface>(ServiceLifetime lifeTime = ServiceLifetime.Scoped, string namespaceStr = null)
@@ -76,19 +76,19 @@ namespace AspCore.Dependency.Configuration
 
                     var descriptor = new ServiceDescriptor(serviceType, implementationType, lifeTime);
 
-                    var oldDescription = _services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
+                    var oldDescription = services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
                     if (oldDescription != null)
                     {
-                        _services.Remove(oldDescription);
+                        services.Remove(oldDescription);
                     }
 
-                    var oldDescriptionImp = _services.FirstOrDefault(t => t.ServiceType == implementationType);
+                    var oldDescriptionImp = services.FirstOrDefault(t => t.ServiceType == implementationType);
                     if (oldDescriptionImp != null)
                     {
-                        _services.Remove(oldDescriptionImp);
+                        services.Remove(oldDescriptionImp);
                     }
 
-                    _services.Add(descriptor);
+                    services.Add(descriptor);
                 }
             }
         }

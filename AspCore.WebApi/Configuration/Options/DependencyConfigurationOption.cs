@@ -12,10 +12,10 @@ namespace AspCore.WebApi.Configuration.Options
         }
         public ConfigurationHelperOption AddDependencyResolver(Action<InterceptorOptionBuilder> option)
         {
-            var dependencyOptionBuilder = new InterceptorOptionBuilder(_services);
+            var dependencyOptionBuilder = new InterceptorOptionBuilder(services);
             option(dependencyOptionBuilder);
 
-            return new ConfigurationHelperOption(_services);
+            return new ConfigurationHelperOption(services);
         }
     }
 }

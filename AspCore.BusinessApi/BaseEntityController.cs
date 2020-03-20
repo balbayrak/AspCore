@@ -12,8 +12,9 @@ using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using AspCore.WebApi;
 
-namespace AspCore.WebApi
+namespace AspCore.BusinessApi
 {
     public class BaseEntityController<TEntityService, TEntity> : BaseController
         where TEntityService : IEntityService<TEntity>

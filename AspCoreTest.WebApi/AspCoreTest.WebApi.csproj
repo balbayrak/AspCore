@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspCore.WebApi\AspCore.WebApi.csproj" />
+    <ProjectReference Include="..\AspCore.BusinessApi\AspCore.BusinessApi.csproj" />
     <ProjectReference Include="..\AspCoreTest.Business\AspCoreTest.Business.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
   </ItemGroup>

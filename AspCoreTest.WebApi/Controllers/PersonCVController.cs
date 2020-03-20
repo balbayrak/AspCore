@@ -1,5 +1,5 @@
-﻿using AspCore.Entities.DocumentType;
-using AspCore.WebApi;
+﻿using AspCore.BusinessApi.DocumentEntity;
+using AspCore.Entities.DocumentType;
 using AspCoreTest.Business.Abstract;
 using AspCoreTest.Entities.Models;
 

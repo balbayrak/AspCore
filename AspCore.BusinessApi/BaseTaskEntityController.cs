@@ -10,7 +10,7 @@ using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Extension;
 
-namespace AspCore.WebApi
+namespace AspCore.BusinessApi
 {
     public class BaseTaskEntityController<TActiveUser, TEntity, TEntityService> : BaseTaskController<TActiveUser, TEntity, TEntityService>
         where TEntityService : ITaskEntityService<TActiveUser, TEntity>

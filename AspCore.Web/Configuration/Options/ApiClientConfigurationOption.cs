@@ -19,12 +19,12 @@ namespace AspCore.Web.Configuration.Options
             BffClientOption bffClientOption = new BffClientOption();
             option(bffClientOption);
 
-            _services.AddTransient(typeof(IBffApiClient), sp =>
+            services.AddTransient(typeof(IBffApiClient), sp =>
             {
                 return new BffApiClient(bffClientOption.apiConfigurationKey);
             });
 
-            return new ConfigurationBuilderOption(_services);
+            return new ConfigurationBuilderOption(services);
         }
     }
 }

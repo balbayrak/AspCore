@@ -1,9 +1,8 @@
 ﻿using AspCore.Entities.DocumentType;
 
-namespace AspCore.WebApi
+namespace AspCore.BusinessApi.DocumentEntity
 {
     public class DocumentViewerController : BaseDocumentViewerController<Document,DocumentApiViewRequest>
     {
-
     }
 }

@@ -13,10 +13,10 @@ namespace AspCore.Web.Configuration.Options
 
         public ApiClientConfigurationOption AddStorageService(Action<StorageOptionBuilder> option)
         {
-            var cacheStorageOptionBuilder = new StorageOptionBuilder(_services);
+            var cacheStorageOptionBuilder = new StorageOptionBuilder(services);
             option(cacheStorageOptionBuilder);
 
-            return new ApiClientConfigurationOption(_services);
+            return new ApiClientConfigurationOption(services);
         }
     }
 }

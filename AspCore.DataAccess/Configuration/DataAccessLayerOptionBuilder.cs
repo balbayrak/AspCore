@@ -39,14 +39,14 @@ namespace AspCore.DataAccess.Configuration
             {
                 string connectionString = string.Empty;
                 DatabaseType databaseType = DatabaseType.MSSQL;
-                ServiceProvider serviceProvider = _services.BuildServiceProvider();
+                ServiceProvider serviceProvider = services.BuildServiceProvider();
 
                 if (!string.IsNullOrEmpty(configurationKey))
                 {
-                    var httpContextAccessor = _services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
+                    var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
                     if (httpContextAccessor == null)
                     {
-                        _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                     }
                     //configuration helper ile setting
 
@@ -93,12 +93,12 @@ namespace AspCore.DataAccess.Configuration
                     ConfigureDataContextWithTransaction<TDbContext>(connectionString, databaseType, dataAccessLayerOption.DatabaseSetting.DataBaseTransaction.isolationLevel);
                 }
 
-                var transactionBuilder = _services.FirstOrDefault(d => d.ServiceType == typeof(ITransactionBuilder));
+                var transactionBuilder = services.FirstOrDefault(d => d.ServiceType == typeof(ITransactionBuilder));
                 if (transactionBuilder == null)
                 {
                     if (dataAccessLayerOption.DataLayerType == EnumDataLayerType.EntityFramework)
                     {
-                        _services.AddScoped(typeof(ITransactionBuilder), typeof(EfTransactionBuilder<TDbContext>));
+                        services.AddScoped(typeof(ITransactionBuilder), typeof(EfTransactionBuilder<TDbContext>));
                     }
                 }
 
@@ -120,7 +120,7 @@ namespace AspCore.DataAccess.Configuration
         {
             if (dataBaseType == DatabaseType.MSSQL)
             {
-                _services.AddDbContext<TDbContext>(options => options.UseSqlServer(connectionString));
+                services.AddDbContext<TDbContext>(options => options.UseSqlServer(connectionString));
             }
             else if (dataBaseType == DatabaseType.MySQL)
             {
@@ -138,7 +138,7 @@ namespace AspCore.DataAccess.Configuration
 
                 //First, configure the SqlConnection and open it
                 //This is done for every request/response
-                _services.AddScoped<DbConnection>((serviceProvider) =>
+                services.AddScoped<DbConnection>((serviceProvider) =>
                 {
                     var dbConnection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                     dbConnection.Open();
@@ -147,7 +147,7 @@ namespace AspCore.DataAccess.Configuration
 
                 //Start a new transaction based on the SqlConnection
                 //This is done for every request/response
-                _services.AddScoped<DbTransaction>((serviceProvider) =>
+                services.AddScoped<DbTransaction>((serviceProvider) =>
                 {
                     var dbConnection = serviceProvider
                         .GetService<DbConnection>();
@@ -157,7 +157,7 @@ namespace AspCore.DataAccess.Configuration
 
                 //Create DbOptions for the DbContext, use the DbConnection
                 //This is done for every request/response
-                _services.AddScoped<DbContextOptions>((serviceProvider) =>
+                services.AddScoped<DbContextOptions>((serviceProvider) =>
                 {
                     var dbConnection = serviceProvider.GetService<DbConnection>();
                     return new DbContextOptionsBuilder<TDbContext>()
@@ -169,7 +169,7 @@ namespace AspCore.DataAccess.Configuration
 
                 //Finally, create the DbContext, using the transaction
                 //This is done for every request/response
-                _services.AddScoped<TDbContext>((serviceProvider) =>
+                services.AddScoped<TDbContext>((serviceProvider) =>
                 {
                     var transaction = serviceProvider.GetService<DbTransaction>();
                     var options = serviceProvider.GetService<DbContextOptions>();

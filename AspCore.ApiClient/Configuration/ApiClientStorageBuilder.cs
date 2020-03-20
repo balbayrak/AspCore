@@ -20,43 +20,43 @@ namespace AspCore.ApiClient.Configuration
             ApiClientOption apiClientOption = new ApiClientOption();
             option.Invoke(apiClientOption);
 
-            var httpContextAccessor = _services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
+            var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
             if (httpContextAccessor == null)
             {
-                _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
             if (apiClientOption.tokenStorage == EnumStorage.Cookie)
             {
-                _services.AddSingleton<IStorage, CookieStorage>();
+                services.AddSingleton<IStorage, CookieStorage>();
             }
             else if (apiClientOption.tokenStorage == EnumStorage.MemoryCache)
             {
-                _services.AddMemoryCache();
-                _services.AddSingleton<IStorage, MemCacheStorage>();
+                services.AddMemoryCache();
+                services.AddSingleton<IStorage, MemCacheStorage>();
             }
 
-            return new ApiClientOptionBuilder(_services);
+            return new ApiClientOptionBuilder(services);
         }
 
         public ApiClientOptionBuilder AddApiClientStorage<T>(Action<ApiClientOption> option)
         where T : class, IStorage, new()
         {
-            var httpContextAccessor = _services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
+            var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
             if (httpContextAccessor == null)
             {
-                _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
-            var accessTokenService = _services.FirstOrDefault(d => d.ServiceType == typeof(IStorage));
+            var accessTokenService = services.FirstOrDefault(d => d.ServiceType == typeof(IStorage));
             if (accessTokenService == null)
             {
-                _services.Remove(accessTokenService);
+                services.Remove(accessTokenService);
             }
 
-            _services.AddSingleton<IStorage, T>();
+            services.AddSingleton<IStorage, T>();
 
-            return new ApiClientOptionBuilder(_services);
+            return new ApiClientOptionBuilder(services);
         }
 
         public void Dispose()

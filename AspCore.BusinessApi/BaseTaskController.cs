@@ -8,8 +8,9 @@ using AspCore.Dependency.Concrete;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Extension;
+using AspCore.WebApi;
 
-namespace AspCore.WebApi
+namespace AspCore.BusinessApi
 {
     public class BaseTaskController<TActiveUser, TEntity, TEntityService> : BaseController
         where TEntityService : ITaskService<TActiveUser, TEntity>

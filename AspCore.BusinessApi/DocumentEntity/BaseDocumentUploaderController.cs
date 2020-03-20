@@ -7,8 +7,9 @@ using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using AspCore.WebApi;
 
-namespace AspCore.WebApi
+namespace AspCore.BusinessApi.DocumentEntity
 {
     public abstract class BaseDocumentUploaderController<TDocument, TDocumentRequest> : BaseController
         where TDocument : class, IDocument, new()
