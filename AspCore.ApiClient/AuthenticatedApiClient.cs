@@ -86,7 +86,7 @@ namespace AspCore.ApiClient
             return tokenResponse;
 
         }
-
+        
         public override void ChangeApiSettingsKey(string apiKey)
         {
             base.ChangeApiSettingsKey(apiKey);
@@ -115,6 +115,19 @@ namespace AspCore.ApiClient
                 this.AuthenticationController = apiConfiguration.Authentication.TokenPath;
                 this.AuthenticationBaseUrl = apiConfiguration.Authentication.BaseAddress;
                 this.AuthenticationRefreshController = apiConfiguration.Authentication.RefreshTokenPath;
+            }
+        }
+
+        public override void AddAuthenticationRoute(string route)
+        {
+            if ((!route.StartsWith("/") && AuthenticationBaseUrl.EndsWith("/")) || (route.StartsWith("/") && !AuthenticationBaseUrl.EndsWith("/")))
+            {
+                AuthenticationBaseUrl += route;
+            }
+            else
+            {
+                route = "/" + route;
+                AuthenticationBaseUrl += route;
             }
         }
     }

@@ -17,6 +17,8 @@ namespace AspCore.ApiClient.Abstract
 
         void ChangeApiSettingsKey(string apiKey);
 
+        void AddAuthenticationRoute(string apiKey);
+
         Task<TResult> GetRequest<TPostObject, TResult>(Dictionary<string, string> headerValues = null)
             where TResult : class, new()
               where TPostObject : class;

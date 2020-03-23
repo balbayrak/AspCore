@@ -78,6 +78,8 @@ namespace AspCore.ApiClient
 
         }
 
+        public virtual void AddAuthenticationRoute(string route) { }
+
         public virtual async Task<TResult> GetRequest<TPostObject, TResult>(Dictionary<string, string> headerValues = null)
               where TResult : class, new()
               where TPostObject : class
