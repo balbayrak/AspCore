@@ -52,6 +52,7 @@ namespace AspCore.Storage.Concrete.Storage
                 Remove(cookie);
             }
         }
+
         public bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
         {
             Remove(key);
