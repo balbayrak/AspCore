@@ -4,6 +4,7 @@ using AspCore.ApiClient.Entities.Concrete;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Storage.Abstract;
+using AspCore.Entities.Authentication;
 
 namespace AspCore.Web.Middlewares
 {
@@ -24,12 +25,11 @@ namespace AspCore.Web.Middlewares
 
             if (!string.IsNullOrEmpty(tokenKey))
             {
-                if (_storage.GetObject<AuthenticationTokenResponse>(tokenKey) == null)
+                if (_storage.GetObject<AuthenticationToken>(tokenKey) == null)
                 {
                     httpContext.Response.Redirect($"/{_authenticationControllerName}/LogOut");
                 }
             }
-
 
             await _next(httpContext);
         }

@@ -47,7 +47,7 @@ namespace AspCore.Utilities.MimeMapping
                 }
             }
 
-            _services.AddSingleton<IMimeMappingService>(new MimeMappingManager(provider));
+            services.AddSingleton<IMimeMappingService>(new MimeMappingManager(provider));
         }
     }
 }

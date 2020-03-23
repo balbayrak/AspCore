@@ -22,7 +22,7 @@ namespace AspCore.ConfigurationAccess.Configuration
 
             if (managerOption.type == EnumConfigurationAccessorType.AppSettingJson)
             {
-                _services.AddSingleton<IConfigurationAccessor, ConfigurationAccessor>();
+                services.AddSingleton<IConfigurationAccessor, ConfigurationAccessor>();
             }
             else if (managerOption.type == EnumConfigurationAccessorType.DataBaseRemoteProvider)
             {
@@ -37,13 +37,13 @@ namespace AspCore.ConfigurationAccess.Configuration
         public void AddConfigurationHelper<T>(Action<ConfigurationManagerOption> option)
            where T : class, IConfigurationAccessor, new()
         {
-            var configurationHelper = _services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationAccessor));
+            var configurationHelper = services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationAccessor));
             if (configurationHelper == null)
             {
-                _services.Remove(configurationHelper);
+                services.Remove(configurationHelper);
             }
 
-            _services.AddSingleton<IConfigurationAccessor, T>();
+            services.AddSingleton<IConfigurationAccessor, T>();
         }
 
         public void Dispose()

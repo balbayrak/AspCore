@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using AspCore.Entities.Authentication;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
-using AspCore.Authentication.Concrete;
 
 namespace AspCore.WebApi.Filters
 {

@@ -1,5 +1,5 @@
-﻿using System;
-using AspCore.Authentication.Concrete;
+﻿using AspCore.Entities.Authentication;
+using System;
 
 namespace AspCore.WebApi.Configuration.Options
 {

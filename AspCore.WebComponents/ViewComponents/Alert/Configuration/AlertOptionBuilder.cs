@@ -30,35 +30,35 @@ namespace AspCore.WebComponents.ViewComponents.Alert.Configuration
                 namespaceStr
             );
 
-            _services.AddControllersWithViews().AddRazorRuntimeCompilation(options => options.FileProviders.Add(embeddedFileProvider));
+            services.AddControllersWithViews().AddRazorRuntimeCompilation(options => options.FileProviders.Add(embeddedFileProvider));
 
 
             if (alertOption.alertStorage == EnumAlertStorage.TempData)
             {
-                HttpContextWrapper.Configure(_services.BuildServiceProvider().GetRequiredService<IHttpContextAccessor>());
+                HttpContextWrapper.Configure(services.BuildServiceProvider().GetRequiredService<IHttpContextAccessor>());
 
-                _services.AddSingleton<IAlertStorage, TempDataStorage>();
+                services.AddSingleton<IAlertStorage, TempDataStorage>();
             }
 
             if (alertOption.alertType == AlertType.Alertify)
             {
-                _services.AddSingleton<IAlertService, AlertifyAlertManager>();
+                services.AddSingleton<IAlertService, AlertifyAlertManager>();
             }
             else if (alertOption.alertType == AlertType.Toast)
             {
-                _services.AddSingleton<IAlertService, ToastAlertManager>();
+                services.AddSingleton<IAlertService, ToastAlertManager>();
             }
             else if (alertOption.alertType == AlertType.BootBox)
             {
-                _services.AddSingleton<IAlertService, BootBoxAlertManager>();
+                services.AddSingleton<IAlertService, BootBoxAlertManager>();
             }
             else if (alertOption.alertType == AlertType.Default)
             {
-                _services.AddSingleton<IAlertService, DefaultAlertManager>();
+                services.AddSingleton<IAlertService, DefaultAlertManager>();
             }
             else if (alertOption.alertType == AlertType.Sweet)
             {
-                _services.AddSingleton<IAlertService, SweetAlertManager>();
+                services.AddSingleton<IAlertService, SweetAlertManager>();
             }
 
             return this;
@@ -70,19 +70,19 @@ namespace AspCore.WebComponents.ViewComponents.Alert.Configuration
 
             if (confirmActionOption.confirmType == ConfirmType.Alertify)
             {
-                _services.AddSingleton<IConfirmService, AlertifyConfirmManager>();
+                services.AddSingleton<IConfirmService, AlertifyConfirmManager>();
             }
             else if (confirmActionOption.confirmType == ConfirmType.BootBox)
             {
-                _services.AddSingleton<IConfirmService, BootBoxConfirmManager>();
+                services.AddSingleton<IConfirmService, BootBoxConfirmManager>();
             }
             else if (confirmActionOption.confirmType == ConfirmType.Default)
             {
-                _services.AddSingleton<IConfirmService, DefaultConfirmManager>();
+                services.AddSingleton<IConfirmService, DefaultConfirmManager>();
             }
             else if (confirmActionOption.confirmType == ConfirmType.Sweet)
             {
-                _services.AddSingleton<IConfirmService, SweetConfirmManager>();
+                services.AddSingleton<IConfirmService, SweetConfirmManager>();
             }
             return this;
         }

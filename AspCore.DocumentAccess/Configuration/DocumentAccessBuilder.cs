@@ -26,7 +26,7 @@ namespace AspCore.DocumentAccess.Configuration
             option(documentHelperOption);
 
             TOption uploaderOption = null;
-            using (ServiceProvider serviceProvider = _services.BuildServiceProvider())
+            using (ServiceProvider serviceProvider = services.BuildServiceProvider())
             {
                 //configuration helper ile setting
 
@@ -41,13 +41,13 @@ namespace AspCore.DocumentAccess.Configuration
 
             if (uploaderOption != null)
             {
-                _services.AddTransient(typeof(IDocumentValidator<TDocument, TOption>), sp =>
+                services.AddTransient(typeof(IDocumentValidator<TDocument, TOption>), sp =>
                 {
                     IDocumentValidator<TDocument, TOption> implementation = (IDocumentValidator<TDocument, TOption>)Activator.CreateInstance(typeof(TValidator), uploaderOption);
                     return implementation;
                 });
 
-                _services.AddTransient(typeof(IDocumentUploader<TDocument>), sp =>
+                services.AddTransient(typeof(IDocumentUploader<TDocument>), sp =>
                 {
                     IDocumentUploader<TDocument> implementation = (IDocumentUploader<TDocument>)Activator.CreateInstance(typeof(TUploder), documentHelperOption.apiKey, documentHelperOption.apiControllerRoute);
                     return implementation;
@@ -64,7 +64,7 @@ namespace AspCore.DocumentAccess.Configuration
             DocumentAccessOption documentHelperOption = new DocumentAccessOption();
             option(documentHelperOption);
 
-            _services.AddTransient(typeof(IDocumentViewer<TDocument>), sp =>
+            services.AddTransient(typeof(IDocumentViewer<TDocument>), sp =>
             {
                 IDocumentViewer<TDocument> implementation = (IDocumentViewer<TDocument>)Activator.CreateInstance(typeof(TViewer), documentHelperOption.apiKey, documentHelperOption.apiControllerRoute);
                 return implementation;

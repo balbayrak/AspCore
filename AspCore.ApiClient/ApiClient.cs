@@ -1,4 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AspCore.ApiClient.Abstract;
+using AspCore.ApiClient.Entities.Abstract;
+using AspCore.ApiClient.Entities.Concrete;
+using AspCore.ConfigurationAccess.Abstract;
+using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
+using AspCore.Entities.Constants;
+using AspCore.Extension;
+using AspCore.Storage.Abstract;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,15 +16,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Concrete;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.Constants;
-using AspCore.Extension;
-using AspCore.Storage.Abstract;
-using AspCore.ConfigurationAccess.Abstract;
 
 namespace AspCore.ApiClient
 {
@@ -133,7 +133,7 @@ namespace AspCore.ApiClient
             return result;
         }
 
-        public virtual async Task<TResult> PostRequest<TPostObject, TResult>(TPostObject postObject, Dictionary<string, string> headerValues = null, AuthenticationTokenResponse authenticationInfo = null)
+        public virtual async Task<TResult> PostRequest<TPostObject, TResult>(TPostObject postObject, Dictionary<string, string> headerValues = null, AuthenticationToken authenticationInfo = null)
               where TResult : class, new()
               where TPostObject : class
         {
@@ -201,7 +201,7 @@ namespace AspCore.ApiClient
             return result;
         }
 
-        public virtual async Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null, AuthenticationTokenResponse authenticationInfo = null)
+        public virtual async Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null, AuthenticationToken authenticationInfo = null)
             where TResult : class, new()
         {
             TResult result = null;
@@ -308,7 +308,7 @@ namespace AspCore.ApiClient
             return result;
         }
 
-        public virtual AuthenticationTokenResponse Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public virtual AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
             return null;
         }

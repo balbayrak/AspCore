@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
+    <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
     <ProjectReference Include="..\AspCore.ConnectedApi\AspCore.ConnectedApi.csproj" />
   </ItemGroup>
 

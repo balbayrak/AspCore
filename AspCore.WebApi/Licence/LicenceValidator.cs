@@ -2,7 +2,7 @@
 using AspCore.Entities.General;
 using AspCore.Entities.Licence;
 using AspCore.Extension;
-using AspCore.WebApi.Security.General;
+using AspCore.WebApi.Authentication.JWT.Concrete;
 using Microsoft.AspNetCore.Http;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Security;

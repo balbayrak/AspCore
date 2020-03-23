@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
-using AspCore.Business.Security.Abstract;
-using AspCore.Business.Security.Concrete;
+﻿using AspCore.ApiClient.Entities.Concrete;
 using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
-using AspCore.WebApi.Security.General;
+using AspCore.WebApi.Authentication.Abstract;
+using AspCore.WebApi.Authentication.JWT.Concrete;
+using AspCore.WebApi.Authentication.Providers.Abstract;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AspCore.WebApi
 {
@@ -34,13 +33,13 @@ namespace AspCore.WebApi
         [AllowAnonymous]
         [HttpPost]
         [ActionName(ApiConstants.Urls.AUTHENTICATE_CLIENT)]
-        [ProducesResponseType(typeof(ServiceResult<AuthenticationTokenResponse>), 200)]
+        [ProducesResponseType(typeof(ServiceResult<AuthenticationToken>), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public IActionResult AuthenticateClient([FromBody]TInput authenticationInput)
         {
 
-            ServiceResult<AuthenticationTokenResponse> serviceResult = new ServiceResult<AuthenticationTokenResponse>();
+            ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
 
             if (authenticationProvider == null)
             {
@@ -65,7 +64,7 @@ namespace AspCore.WebApi
                         if (authenticationTokenResult.IsSucceededAndDataIncluded())
                         {
                             serviceResult.IsSucceeded = true;
-                            serviceResult.Result = new AuthenticationTokenResponse();
+                            serviceResult.Result = new AuthenticationToken();
                             serviceResult.Result.access_token = authenticationTokenResult.Result.access_token;
                             serviceResult.Result.refresh_token = authenticationTokenResult.Result.refresh_token;
                             serviceResult.Result.expires = authenticationTokenResult.Result.expires;
@@ -99,12 +98,12 @@ namespace AspCore.WebApi
         [AllowAnonymous]
         [HttpPost]
         [ActionName(ApiConstants.Urls.REFRESH_TOKEN)]
-        [ProducesResponseType(typeof(ServiceResult<AuthenticationTokenResponse>), 200)]
+        [ProducesResponseType(typeof(ServiceResult<AuthenticationToken>), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public IActionResult RefreshToken([FromBody]AuthenticationTokenResponse authenticationToken)
+        public IActionResult RefreshToken([FromBody]AuthenticationToken authenticationToken)
         {
-            ServiceResult<AuthenticationTokenResponse> serviceResult = new ServiceResult<AuthenticationTokenResponse>();
+            ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
             try
             {
                 ServiceResult<AuthenticationToken> newAuthenticationTokenResult = _tokenGenerator.RefreshToken(new AuthenticationToken
@@ -117,7 +116,7 @@ namespace AspCore.WebApi
                 if (newAuthenticationTokenResult.IsSucceededAndDataIncluded())
                 {
                     serviceResult.IsSucceeded = true;
-                    serviceResult.Result = new AuthenticationTokenResponse();
+                    serviceResult.Result = new AuthenticationToken();
                     serviceResult.Result.access_token = newAuthenticationTokenResult.Result.access_token;
                     serviceResult.Result.refresh_token = newAuthenticationTokenResult.Result.refresh_token;
                     serviceResult.Result.expires = newAuthenticationTokenResult.Result.expires;
@@ -141,7 +140,7 @@ namespace AspCore.WebApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize]
-        public IActionResult GetClientInfo([FromBody]AuthenticationTokenResponse authenticationToken)
+        public IActionResult GetClientInfo([FromBody]AuthenticationToken authenticationToken)
         {
             ServiceResult<TOutput> serviceResult = new ServiceResult<TOutput>();
 

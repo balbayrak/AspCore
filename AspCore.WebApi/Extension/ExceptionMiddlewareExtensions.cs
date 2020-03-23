@@ -1,5 +1,5 @@
-﻿using AspCore.Business.General;
-using AspCore.Entities.General;
+﻿using AspCore.Entities.General;
+using AspCore.WebApi.General;
 using AspCore.WebApi.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -27,7 +27,7 @@ namespace AspCore.WebApi.Extension
                         await context.Response.WriteAsync(new BaseServiceResult()
                         {
                             StatusCode = context.Response.StatusCode,
-                            ErrorMessage = BusinessConstants.MiddlewareErrorMessages.INTERNAL_SERVER_ERROR_OCCURRED,
+                            ErrorMessage = WebApiConstants.BaseExceptionMessages.INTERNAL_SERVER_ERROR_OCCURRED,
                             ExceptionMessage = contextFeature.Error.Message + "---> stacktrace:" + contextFeature.Error.StackTrace,
 
                         }.ToString());

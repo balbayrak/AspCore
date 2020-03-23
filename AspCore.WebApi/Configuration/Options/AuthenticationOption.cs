@@ -1,4 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AspCore.ConfigurationAccess.Abstract;
+using AspCore.ConfigurationAccess.Concrete;
+using AspCore.Entities.Configuration;
+using AspCore.Entities.Constants;
+using AspCore.Entities.EntityType;
+using AspCore.Entities.User;
+using AspCore.WebApi.Authentication.Abstract;
+using AspCore.WebApi.Authentication.JWT.Concrete;
+using AspCore.WebApi.Security.Abstract;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,16 +16,6 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AspCore.Business.Security.Abstract;
-using AspCore.ConfigurationAccess.Abstract;
-using AspCore.ConfigurationAccess.Concrete;
-using AspCore.Entities.Configuration;
-using AspCore.Entities.Constants;
-using AspCore.Entities.EntityType;
-using AspCore.Entities.User;
-using AspCore.WebApi.Security.Abstract;
-using AspCore.WebApi.Security.Concrete;
-using AspCore.WebApi.Security.General;
 
 namespace AspCore.WebApi.Configuration.Options
 {
@@ -33,21 +32,21 @@ namespace AspCore.WebApi.Configuration.Options
             TokenConfigurationOption tokenConfigurationOption = new TokenConfigurationOption();
             option(tokenConfigurationOption);
 
-            var httpContextAccessor = _services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
+            var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
             if (httpContextAccessor == null)
             {
-                _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
             if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
             {
-                _services.AddSingleton(typeof(ITokenGenerator<TJWTInfo>), sp =>
+                services.AddSingleton(typeof(ITokenGenerator<TJWTInfo>), sp =>
                 {
                     ITokenGenerator<TJWTInfo> implementation = (ITokenGenerator<TJWTInfo>)Activator.CreateInstance(typeof(TTokenGenerator), tokenConfigurationOption.configurationKey, null);
                     return implementation;
                 });
 
-                using (ServiceProvider serviceProvider = _services.BuildServiceProvider())
+                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
                 {
                     //configuration helper ile setting
 
@@ -62,7 +61,7 @@ namespace AspCore.WebApi.Configuration.Options
             }
             else
             {
-                _services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+                services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
                 {
                     TTokenGenerator implementation = (TTokenGenerator)Activator.CreateInstance(typeof(TTokenGenerator), null, tokenConfigurationOption.tokenSettingOption);
 
@@ -82,23 +81,23 @@ namespace AspCore.WebApi.Configuration.Options
             TokenConfigurationOption tokenConfigurationOption = new TokenConfigurationOption();
             option(tokenConfigurationOption);
 
-            var httpContextAccessor = _services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
+            var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
             if (httpContextAccessor == null)
             {
-                _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
 
             if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
             {
-                _services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+                services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
                 {
                     TImplementation implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), tokenConfigurationOption.configurationKey, null);
 
                     return implementation;
                 });
 
-                using (ServiceProvider serviceProvider = _services.BuildServiceProvider())
+                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
                 {
                     //configuration helper ile setting
 
@@ -113,7 +112,7 @@ namespace AspCore.WebApi.Configuration.Options
             }
             else
             {
-                _services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+                services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
                 {
                     TImplementation implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), null, tokenConfigurationOption.tokenSettingOption);
 
@@ -129,14 +128,14 @@ namespace AspCore.WebApi.Configuration.Options
 
         private void AddAuthenticationSetting(TokenSettingOption tokenSettingOption)
         {
-            _services.AddAuthorization(auth =>
+            services.AddAuthorization(auth =>
             {
                 auth.AddPolicy(JwtBearerDefaults.AuthenticationScheme, new AuthorizationPolicyBuilder()
                     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
                     .Build());
             });
-            _services.AddAuthentication(options =>
+            services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

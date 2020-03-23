@@ -32,7 +32,7 @@ namespace AspCore.Web.Concrete
                     }
                 }
             }
-            catch(Exception e)
+            catch
             {
                 return null;
                 // ignored

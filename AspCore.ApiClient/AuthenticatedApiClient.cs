@@ -3,7 +3,7 @@ using System.Net.Http;
 using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Entities.Abstract;
 using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Authentication.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 
 namespace AspCore.ApiClient
@@ -37,18 +37,18 @@ namespace AspCore.ApiClient
             InitializeAuthenticatedClient(apiKey);
         }
 
-        public abstract AuthenticationTokenResponse GetTokenResponse(TOutput outputObj);
+        public abstract AuthenticationToken GetTokenResponse(TOutput outputObj);
 
-        public abstract AuthenticationTokenResponse AuthenticateClient(AuthenticationInfo input, Func<TOutput, AuthenticationTokenResponse> func, bool forceAuthentication, bool refreshToken);
+        public abstract AuthenticationToken AuthenticateClient(AuthenticationInfo input, Func<TOutput, AuthenticationToken> func, bool forceAuthentication, bool refreshToken);
 
-        public override AuthenticationTokenResponse Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public override AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
-            AuthenticationTokenResponse tokenResponse = null;
+            AuthenticationToken tokenResponse = null;
 
 
             if (!forceAuthentication)
             {
-                tokenResponse = _accessTokenService.GetObject<AuthenticationTokenResponse>(tokenStorageKey);
+                tokenResponse = _accessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
             }
             else
             {

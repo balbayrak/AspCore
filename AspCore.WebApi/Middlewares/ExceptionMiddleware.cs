@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AspCore.Entities.General;
+using AspCore.WebApi.General;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using AspCore.Business.General;
-using AspCore.Entities.General;
 
 namespace AspCore.WebApi.Middlewares
 {
@@ -40,7 +40,7 @@ namespace AspCore.WebApi.Middlewares
             return context.Response.WriteAsync(new BaseServiceResult()
             {
                 StatusCode = context.Response.StatusCode,
-                ErrorMessage = BusinessConstants.MiddlewareErrorMessages.INTERNAL_SERVER_ERROR_OCCURRED,
+                ErrorMessage = WebApiConstants.BaseExceptionMessages.INTERNAL_SERVER_ERROR_OCCURRED,
                 ExceptionMessage = exception.Message + "---> stacktrace:" + exception.StackTrace,
 
             }.ToString());

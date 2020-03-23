@@ -18,7 +18,7 @@ namespace AspCore.Web.Configuration.Options
 
         public ConfigurationBuilderOption AddNotifierSetting(Action<AlertOptionBuilder> option)
         {
-            var alertOptionBuilder = new AlertOptionBuilder(_services);
+            var alertOptionBuilder = new AlertOptionBuilder(services);
             option(alertOptionBuilder);
 
             return this;
@@ -32,7 +32,7 @@ namespace AspCore.Web.Configuration.Options
             var documentHelperOption = new DocumentHelperOption();
             option(documentHelperOption);
 
-            _services.AddTransient(typeof(IDocumentBffLayer<TDocument>), sp =>
+            services.AddTransient(typeof(IDocumentBffLayer<TDocument>), sp =>
             {
                 IDocumentBffLayer<TDocument> implementation = (IDocumentBffLayer<TDocument>)Activator.CreateInstance(typeof(TDocumentHelper), documentHelperOption.uploaderRoute, documentHelperOption.viewerRoute, documentHelperOption.signerRoute);
                 return implementation;
@@ -48,9 +48,9 @@ namespace AspCore.Web.Configuration.Options
 
             if (!string.IsNullOrEmpty(dataProtectorOption.dataProtectorKey))
             {
-                _services.AddDataProtection();
+                services.AddDataProtection();
 
-                _services.AddTransient(typeof(IDataProtectorHelper), sp =>
+                services.AddTransient(typeof(IDataProtectorHelper), sp =>
                 {
                     return new DataProtectorHelper(dataProtectorOption.dataProtectorKey);
                 });
@@ -61,7 +61,7 @@ namespace AspCore.Web.Configuration.Options
 
         public ConfigurationBuilderOption AddMimeTypeService(Action<MimeTypeBuilder> builder)
         {
-            var mimeTypeBuilder = new MimeTypeBuilder(_services);
+            var mimeTypeBuilder = new MimeTypeBuilder(services);
             builder(mimeTypeBuilder);
 
             return this;

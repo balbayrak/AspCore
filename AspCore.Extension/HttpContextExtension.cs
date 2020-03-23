@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using AspCore.Entities.Constants;
 using AspCore.Entities.User;
+using AspCore.Entities.General;
+using System;
 
 namespace AspCore.Extension
 {
@@ -16,19 +18,22 @@ namespace AspCore.Extension
 
             return null;
         }
-        public static ActiveUser GetActiveUserInfo(this HttpContext httpContext)
+        public static ServiceResult<TActiveUser> GetActiveUserInfo<TActiveUser>(this HttpContext httpContext)
+                  where TActiveUser : class, IActiveUser, new()
         {
+            ServiceResult<TActiveUser> result = new ServiceResult<TActiveUser>();
             try
             {
-                if (httpContext.Request.Headers.ContainsKey(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID))
+                if (httpContext.Request.Headers.ContainsKey(HttpContextConstant.HEADER_KEY.ACTIVE_USER))
                 {
-                    string userInfoJson = httpContext.Request.Headers[HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID];
-                    return JsonConvert.DeserializeObject<ActiveUser>(userInfoJson);
+                    string userInfoJson = httpContext.Request.Headers[HttpContextConstant.HEADER_KEY.ACTIVE_USER];
+                    result.Result =  JsonConvert.DeserializeObject<TActiveUser>(userInfoJson);
+                    result.IsSucceeded = true;
                 }
             }
-            catch
+            catch(Exception ex)
             {
-
+                result.ErrorMessage("Active user info not found in headers", ex);
             }
 
             return null;

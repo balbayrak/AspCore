@@ -13,10 +13,10 @@ namespace AspCore.WebApi.Configuration.Options
 
         public ConfigurationBuilderOption AddConfigurationManager(Action<ConfigurationManagerOptionBuilder> option)
         {
-            ConfigurationManagerOptionBuilder configurationManagerOptionBuilder = new ConfigurationManagerOptionBuilder(_services);
+            ConfigurationManagerOptionBuilder configurationManagerOptionBuilder = new ConfigurationManagerOptionBuilder(services);
             option(configurationManagerOptionBuilder);
 
-            return new ConfigurationBuilderOption(_services);
+            return new ConfigurationBuilderOption(services);
         }
     }
 }

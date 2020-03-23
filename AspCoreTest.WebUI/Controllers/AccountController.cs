@@ -1,4 +1,4 @@
-﻿using AspCore.Authentication.Concrete;
+﻿using AspCore.Entities.Authentication;
 using AspCore.Web.Concrete;
 using Microsoft.AspNetCore.Mvc;
 

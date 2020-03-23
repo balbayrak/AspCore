@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspCore.Authentication\AspCore.Authentication.csproj" />
     <ProjectReference Include="..\AspCore.ConfigurationAccess\AspCore.ConfigurationAccess.csproj" />
     <ProjectReference Include="..\AspCore.Extension\AspCore.Extension.csproj" />
     <ProjectReference Include="..\AspCore.Storage\AspCore.Storage.csproj" />

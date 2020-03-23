@@ -1,17 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AspCore.ApiClient.Configuration;
-using AspCore.DataAccess.Configuration;
+﻿using AspCore.ApiClient.Configuration;
 using AspCore.Dependency.Configuration;
 using AspCore.Entities.Configuration;
 using AspCore.Extension;
 using AspCore.WebApi.Configuration.Swagger.Abstract;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Extension;
-using AspCore.DocumentAccess.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AspCore.WebApi.Configuration.Options
 {
@@ -21,17 +19,10 @@ namespace AspCore.WebApi.Configuration.Options
         {
         }
 
-        public ConfigurationBuilderOption AddDataAccessLayer(Action<DataAccessLayerOptionBuilder> option)
-        {
-            var dataAccessLayerOptionBuilder = new DataAccessLayerOptionBuilder(_services);
-            option(dataAccessLayerOptionBuilder);
-
-            return this;
-        }
-
         public ConfigurationBuilderOption AddApiClientSetting(Action<ApiClientStorageBuilder> option)
         {
-            var apiClientStorageBuilder = new ApiClientStorageBuilder(_services);
+            
+            var apiClientStorageBuilder = new ApiClientStorageBuilder(services);
             option(apiClientStorageBuilder);
 
             return this;
@@ -43,7 +34,7 @@ namespace AspCore.WebApi.Configuration.Options
             option(swaggerOption);
 
 
-            _services.AddSwaggerGen(g =>
+            services.AddSwaggerGen(g =>
             {
                 g.IgnoreObsoleteActions();
                 g.DescribeAllParametersInCamelCase();
@@ -97,7 +88,7 @@ namespace AspCore.WebApi.Configuration.Options
 
             });
 
-            _services.BindTransientByName<ISwaggerOperationDescriptor>()
+            services.BindTransientByName<ISwaggerOperationDescriptor>()
                 .Add<DocumentApiOperationDescriptor>("BaseDocumentController")
                 .Add<EntityApiOperationDescriptor>("BaseEntityController")
                 .Build();
@@ -107,17 +98,11 @@ namespace AspCore.WebApi.Configuration.Options
 
         public ConfigurationBuilderOption AddJWTAuthentication(Action<AuthenticationProviderBuilder> option)
         {
-            AuthenticationProviderBuilder authenticationProviderBuilder = new AuthenticationProviderBuilder(_services);
+            AuthenticationProviderBuilder authenticationProviderBuilder = new AuthenticationProviderBuilder(services);
             option(authenticationProviderBuilder);
             return this;
         }
 
-        public ConfigurationBuilderOption AddDocumentAccessLayer(Action<DocumentAccessBuilder> action)
-        {
-            DocumentAccessBuilder documentHelperBuilder = new DocumentAccessBuilder(_services);
-            action(documentHelperBuilder);
 
-            return this;
-        }
     }
 }

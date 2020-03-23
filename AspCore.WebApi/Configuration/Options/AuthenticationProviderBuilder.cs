@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Configuration;
-using AspCore.WebApi.Authentication.Concrete;
+using AspCore.WebApi.Authentication.Providers.Abstract;
+using AspCore.WebApi.Authentication.Providers.Concrete;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.WebApi.Configuration.Options
 {
@@ -19,8 +19,8 @@ namespace AspCore.WebApi.Configuration.Options
             where TInput : AuthenticationInfo
             where TOutput : class, new()
         {
-            _services.AddSingleton<IApiAuthenticationProvider<TInput, TOutput>, TAuthenticationProvider>();
-            return new AuthenticationOption(_services);
+            services.AddSingleton<IApiAuthenticationProvider<TInput, TOutput>, TAuthenticationProvider>();
+            return new AuthenticationOption(services);
         }
 
         public AuthenticationOption AddAppSettingAuthenticationProvider<TInput, TOutput, TOption, TAuthenticationProvider>(Action<AppSettingsAuthProviderOption<TOption>> option)
@@ -34,7 +34,7 @@ namespace AspCore.WebApi.Configuration.Options
 
             if (!string.IsNullOrEmpty(appSettingsAuthProviderOption.configurationKey))
             {
-                _services.AddSingleton(typeof(IApiAuthenticationProvider<TInput, TOutput>), sp =>
+                services.AddSingleton(typeof(IApiAuthenticationProvider<TInput, TOutput>), sp =>
                 {
                     IApiAuthenticationProvider<TInput, TOutput> implementation = (IApiAuthenticationProvider<TInput, TOutput>)Activator.CreateInstance(typeof(TAuthenticationProvider), appSettingsAuthProviderOption.configurationKey, null);
                     return implementation;
@@ -43,22 +43,22 @@ namespace AspCore.WebApi.Configuration.Options
             }
             else if (appSettingsAuthProviderOption.option != null)
             {
-                _services.AddSingleton(typeof(IApiAuthenticationProvider<TInput, TOutput>), sp =>
+                services.AddSingleton(typeof(IApiAuthenticationProvider<TInput, TOutput>), sp =>
                 {
                     IApiAuthenticationProvider<TInput, TOutput> implementation = (IApiAuthenticationProvider<TInput, TOutput>)Activator.CreateInstance(typeof(TAuthenticationProvider), null, appSettingsAuthProviderOption.option);
                     return implementation;
                 });
             }
 
-            return new AuthenticationOption(_services);
+            return new AuthenticationOption(services);
         }
 
         public AuthenticationOption AddAuthenticationProvider(Action<ServicesByNameBuilder<IActiveUserAuthenticationProvider>> builder)
         {
-            ServicesByNameBuilder<IActiveUserAuthenticationProvider> servicesByNameBuilder = new ServicesByNameBuilder<IActiveUserAuthenticationProvider>(_services, ServiceLifetime.Transient);
+            ServicesByNameBuilder<IActiveUserAuthenticationProvider> servicesByNameBuilder = new ServicesByNameBuilder<IActiveUserAuthenticationProvider>(services, ServiceLifetime.Transient);
             builder(servicesByNameBuilder);
 
-            return new AuthenticationOption(_services);
+            return new AuthenticationOption(services);
         }
 
     }

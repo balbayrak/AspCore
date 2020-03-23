@@ -2,6 +2,7 @@
 using AspCore.BackendForFrontend.Abstract;
 using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Dependency.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
@@ -13,8 +14,6 @@ using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using AspCore.Authentication.Abstract;
-using AspCore.Authentication.Concrete;
 
 namespace AspCore.Web.Concrete
 {
@@ -52,7 +51,7 @@ namespace AspCore.Web.Concrete
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             string tokenKey = Storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-            var token = Storage.GetObject<AuthenticationTokenResponse>(tokenKey);
+            var token = Storage.GetObject<AuthenticationToken>(tokenKey);
             if (token != null)
             {
                 string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;

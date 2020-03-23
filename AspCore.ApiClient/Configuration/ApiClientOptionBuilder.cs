@@ -14,7 +14,7 @@ namespace AspCore.ApiClient.Configuration
         }
         public void AddApiClients(Action<ApiClientByNameBuilder> builder)
         {
-            ApiClientByNameBuilder apiClientByNameBuilder = new ApiClientByNameBuilder(_services);
+            ApiClientByNameBuilder apiClientByNameBuilder = new ApiClientByNameBuilder(services);
             builder(apiClientByNameBuilder);
         }
 
