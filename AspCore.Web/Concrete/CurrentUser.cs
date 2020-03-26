@@ -1,24 +1,24 @@
-﻿using AspCore.Entities.Constants;
+﻿using AspCore.Caching.Abstract;
+using AspCore.Entities.Constants;
 using AspCore.Entities.User;
-using AspCore.Storage.Abstract;
 using AspCore.Web.Abstract;
 
 namespace AspCore.Web.Concrete
 {
     public class CurrentUser : ICurrentUser
     {
-        private IStorage _storage;
-        public CurrentUser(IStorage storage)
+        private ICacheService _cache;
+        public CurrentUser(ICacheService cache)
         {
-            _storage = storage;
+            _cache = cache;
         }
         public ActiveUser currentUser
         {
             get
             {
-                string tokenKey = _storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+                string tokenKey = _cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
                 string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                return _storage.GetObject<ActiveUser>(activeUserUId);
+                return _cache.GetObject<ActiveUser>(activeUserUId);
             }
         }
     }

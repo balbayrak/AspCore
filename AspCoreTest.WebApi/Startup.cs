@@ -1,7 +1,7 @@
 using AspCore.BusinessApi.Configuration;
+using AspCore.Caching.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.User;
-using AspCore.Storage.Concrete.Storage;
 using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Configuration;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
@@ -22,7 +22,6 @@ namespace AspCoreTest.WebApi
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -47,10 +46,7 @@ namespace AspCoreTest.WebApi
                 })
                 .AddApiClientSetting(option =>
                 {
-                    option.AddApiClientStorage(option =>
-                    {
-                        option.tokenStorage = EnumStorage.MemoryCache;
-                    })
+                    option.AddMemoryCache()
                     .AddApiClients(option =>
                     {
                         option.AddBearerAuthenticatedClient("YetkiApi")

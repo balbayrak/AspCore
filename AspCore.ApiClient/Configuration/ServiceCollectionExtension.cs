@@ -1,29 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using AspCore.ApiClient.Entities;
+﻿using AspCore.ApiClient.Entities;
 using AspCore.ApiClient.Entities.Abstract;
-using AspCore.Storage.Abstract;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.ApiClient.Configuration
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection ConfigureApiClientStorage(this IServiceCollection services, Action<ApiClientOption> option)
+        public static IServiceCollection ConfigureApiClientStorage(this IServiceCollection services, Action<ApiClientCacheBuilder> option)
         {
-            using (ApiClientStorageBuilder builder = new ApiClientStorageBuilder(services))
+            using (ApiClientCacheBuilder builder = new ApiClientCacheBuilder(services))
             {
-                builder.AddApiClientStorage(option);
-            }
-
-            return services;
-        }
-
-        public static IServiceCollection ConfigureApiClientWithCustomStorage<TStorageService>(this IServiceCollection services, Action<ApiClientOption> option)
-             where TStorageService : class, IStorage, new()
-        {
-            using (ApiClientStorageBuilder builder = new ApiClientStorageBuilder(services))
-            {
-                builder.AddApiClientStorage<TStorageService>(option);
+                option(builder);
             }
 
             return services;

@@ -1,8 +1,8 @@
-﻿using AspCore.Storage.Abstract;
+﻿using AspCore.Caching.Abstract;
 
 namespace AspCore.WebComponents.ViewComponents.Alert.Abstract
 {
-    public interface IAlertStorage : IStorage
+    public interface IAlertStorage : ICacheService
     {
         void Keep(string key);
     }

@@ -1,16 +1,15 @@
-﻿using System;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.BackendForFrontend.Abstract;
+﻿using AspCore.BackendForFrontend.Abstract;
+using AspCore.Caching.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
-using AspCore.Storage.Abstract;
+using System;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
     public abstract class BaseBffLayer : IBFFLayer
     {
-        protected IStorage _storage;
+        protected ICacheService _cache;
 
         public IBffApiClient apiClient { get; private set; }
 
@@ -46,9 +45,9 @@ namespace AspCore.BackendForFrontend.Concrete
         {
             apiClient = DependencyResolver.Current.GetService<IBffApiClient>();
 
-            _storage = DependencyResolver.Current.GetService<IStorage>();
+            _cache = DependencyResolver.Current.GetService<ICacheService>();
 
-            string tokenStorageKey = _storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            string tokenStorageKey = _cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
            
             apiClient.tokenStorageKey = tokenStorageKey;
         }
@@ -88,7 +87,7 @@ namespace AspCore.BackendForFrontend.Concrete
                 }
             }
 
-            _storage.SetObject(key, authenticationToken, expire, false);
+            _cache.SetObject(key, authenticationToken, expire, false);
 
         }
     }

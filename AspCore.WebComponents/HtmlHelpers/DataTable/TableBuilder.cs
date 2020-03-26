@@ -1,6 +1,4 @@
-﻿using AspCore.Dependency.Concrete;
-using AspCore.Storage.Abstract;
-using AspCore.WebComponents.HtmlHelpers.DataTable.Abstract;
+﻿using AspCore.WebComponents.HtmlHelpers.DataTable.Abstract;
 using AspCore.WebComponents.HtmlHelpers.DataTable.Columns;
 using AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons;
 using AspCore.WebComponents.HtmlHelpers.DataTable.Rows;

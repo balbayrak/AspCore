@@ -1,6 +1,6 @@
-﻿using AspCore.Entities.Constants;
+﻿using AspCore.Caching.Abstract;
+using AspCore.Entities.Constants;
 using AspCore.Entities.User;
-using AspCore.Storage.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -10,16 +10,16 @@ namespace AspCoreTest.WebUI.ViewComponents
 
     public class ProfileViewComponent : ViewComponent
     {
-        IStorage _storage;
+        ICacheService _cache;
 
-        public ProfileViewComponent(IStorage storage)
+        public ProfileViewComponent(ICacheService cache)
         {
-            _storage = storage;
+            _cache = cache;
         }
 
         public IViewComponentResult Invoke()
         {
-            var user = _storage.GetObject<ActiveUser>(FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER);
+            var user = _cache.GetObject<ActiveUser>(FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER);
             return View("Default");
         }
     }

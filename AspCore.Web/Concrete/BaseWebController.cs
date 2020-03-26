@@ -1,5 +1,5 @@
-﻿using AspCore.ApiClient.Entities.Concrete;
-using AspCore.BackendForFrontend.Abstract;
+﻿using AspCore.BackendForFrontend.Abstract;
+using AspCore.Caching.Abstract;
 using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
@@ -7,7 +7,6 @@ using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
-using AspCore.Storage.Abstract;
 using AspCore.Utilities.DataProtector;
 using AspCore.Utilities.MimeMapping;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
@@ -21,7 +20,7 @@ namespace AspCore.Web.Concrete
         where TDocument : class, IDocument, new()
         where TDocumentRequest : class, IDocumentRequest<TDocument>, new()
     {
-        protected readonly IStorage Storage;
+        protected readonly ICacheService Cache;
         protected IAlertService AlertService;
         private readonly IUserBffLayer _userBffLayer;
         protected IDataProtectorHelper DataProtectorHelper;
@@ -31,7 +30,7 @@ namespace AspCore.Web.Concrete
         protected BaseWebController()
         {
             _userBffLayer = DependencyResolver.Current.GetService<IUserBffLayer>();
-            Storage = DependencyResolver.Current.GetService<IStorage>();
+            Cache = DependencyResolver.Current.GetService<ICacheService>();
             AlertService = DependencyResolver.Current.GetService<IAlertService>();
             DataProtectorHelper = DependencyResolver.Current.GetService<IDataProtectorHelper>();
             DocumentHelper = DependencyResolver.Current.GetService<IDocumentBffLayer<TDocument>>();
@@ -42,27 +41,27 @@ namespace AspCore.Web.Concrete
         {
             get
             {
-                string tokenKey = Storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+                string tokenKey = Cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
                 string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                return Storage.GetObject<ActiveUser>(activeUserUId);
+                return Cache.GetObject<ActiveUser>(activeUserUId);
             }
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            string tokenKey = Storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-            var token = Storage.GetObject<AuthenticationToken>(tokenKey);
+            string tokenKey = Cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            var token = Cache.GetObject<AuthenticationToken>(tokenKey);
             if (token != null)
             {
                 string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                var activeUser = Storage.GetObject<ActiveUser>(activeUserUId);
+                var activeUser = Cache.GetObject<ActiveUser>(activeUserUId);
                 if (activeUser == null)
                 {
                     ServiceResult<ActiveUser> userResult = _userBffLayer.GetClientInfo(token).Result;
 
                     if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
                     {
-                        Storage.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
+                        Cache.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
                     }
                 }
             }

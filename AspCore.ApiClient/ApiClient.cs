@@ -1,12 +1,12 @@
 ﻿using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Entities.Abstract;
 using AspCore.ApiClient.Entities.Concrete;
+using AspCore.Caching.Abstract;
 using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Extension;
-using AspCore.Storage.Abstract;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -24,7 +24,7 @@ namespace AspCore.ApiClient
     {
         protected IHttpContextAccessor _httpContextAccessor;
         private readonly IConfigurationAccessor _configurationHelper;
-        protected IStorage _accessTokenService;
+        protected ICacheService _accessTokenService;
 
         protected TOption apiConfiguration { get; set; }
 
@@ -70,7 +70,7 @@ namespace AspCore.ApiClient
 
             _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
             _configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>();
-            _accessTokenService = DependencyResolver.Current.GetService<IStorage>();
+            _accessTokenService = DependencyResolver.Current.GetService<ICacheService>();
 
             _baseAddress = string.Empty;
 

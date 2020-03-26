@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.CacheEntityApi\AspCore.CacheEntityApi.csproj" />
+    <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
+  </ItemGroup>
+
+
+</Project>

@@ -1,11 +1,10 @@
-﻿using AspCore.ApiClient.Entities.Concrete;
-using AspCore.BackendForFrontend.Abstract;
+﻿using AspCore.BackendForFrontend.Abstract;
+using AspCore.Caching.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
-using AspCore.Storage.Abstract;
 using AspCore.Web.Authentication.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,14 +15,14 @@ namespace AspCore.Web.Concrete
          where TAuthenticationInfo : AuthenticationInfo
     {
         private readonly IUserBffLayer _userBffLayer;
-        protected readonly IStorage Storage;
+        protected readonly ICacheService Cache;
         public abstract string AuthenticationProviderName { get; }
         private readonly IWebAuthenticationProvider<TAuthenticationInfo> _authenticationProvider;
 
         public BaseAuthenticationController()
         {
             _userBffLayer = DependencyResolver.Current.GetService<IUserBffLayer>();
-            Storage = DependencyResolver.Current.GetService<IStorage>();
+            Cache = DependencyResolver.Current.GetService<ICacheService>();
             _authenticationProvider = DependencyResolver.Current.GetServiceByName<IWebAuthenticationProvider<TAuthenticationInfo>>(AuthenticationProviderName);
 
         }
@@ -44,7 +43,7 @@ namespace AspCore.Web.Concrete
             {
                 string tokenKey = Guid.NewGuid().ToString("N");
 
-                Storage.SetObject(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY, tokenKey, DateTime.Now.AddHours(1), false);
+                Cache.SetObject(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY, tokenKey, DateTime.Now.AddHours(1), false);
 
                 ServiceResult<AuthenticationToken> authenticationResult = _userBffLayer.AuthenticateClient(serviceResult.Result).Result;
                 if (authenticationResult.IsSucceededAndDataIncluded())
@@ -57,7 +56,7 @@ namespace AspCore.Web.Concrete
                     {
                         string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
 
-                        Storage.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
+                        Cache.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
 
                         Response.Redirect(_authenticationProvider.mainPageUrl);
                     }
@@ -74,9 +73,9 @@ namespace AspCore.Web.Concrete
         }
         public void Login(TAuthenticationInfo authenticationInfo = null)
         {
-            string tokenKey = Storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            string tokenKey = Cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
 
-            if (string.IsNullOrEmpty(tokenKey) || (!string.IsNullOrEmpty(tokenKey) && Storage.GetObject<AuthenticationToken>(tokenKey) == null))
+            if (string.IsNullOrEmpty(tokenKey) || (!string.IsNullOrEmpty(tokenKey) && Cache.GetObject<AuthenticationToken>(tokenKey) == null))
             {
                 ClearStorage();
                 Authenticate(authenticationInfo);
@@ -90,7 +89,7 @@ namespace AspCore.Web.Concrete
         {
             try
             {
-                Storage.RemoveAll();
+                Cache.RemoveAll();
             }
             catch
             {

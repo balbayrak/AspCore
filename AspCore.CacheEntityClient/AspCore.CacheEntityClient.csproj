@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
+    <ProjectReference Include="..\AspCore.Entities\AspCore.Entities.csproj" />
+  </ItemGroup>
+</Project>

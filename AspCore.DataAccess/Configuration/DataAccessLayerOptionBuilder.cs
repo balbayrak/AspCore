@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
-using AspCore.ConfigurationAccess.Abstract;
+﻿using AspCore.ConfigurationAccess.Abstract;
 using AspCore.ConfigurationAccess.Concrete;
 using AspCore.DataAccess.Abstract;
 using AspCore.DataAccess.EntityFramework;
 using AspCore.DataAccess.General;
 using AspCore.Entities.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Data;
+using System.Data.Common;
+using System.Linq;
 
 namespace AspCore.DataAccess.Configuration
 {
@@ -39,69 +38,70 @@ namespace AspCore.DataAccess.Configuration
             {
                 string connectionString = string.Empty;
                 DatabaseType databaseType = DatabaseType.MSSQL;
-                ServiceProvider serviceProvider = services.BuildServiceProvider();
-
-                if (!string.IsNullOrEmpty(configurationKey))
+                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
                 {
-                    var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
-                    if (httpContextAccessor == null)
+
+                    if (!string.IsNullOrEmpty(configurationKey))
                     {
-                        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                        var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
+                        if (httpContextAccessor == null)
+                        {
+                            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                        }
+                        //configuration helper ile setting
+
+                        IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
+                        if (configurationHelper == null)
+                        {
+                            throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
+                        }
+
+                        dataAccessLayerOption = configurationHelper.GetValueByKey<TOption>(configurationKey);
                     }
-                    //configuration helper ile setting
 
-                    IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
-                    if (configurationHelper == null)
+                    if (dataAccessLayerOption == null)
                     {
-                        throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
+                        throw new Exception(DALConstants.DALErrorMessages.DAL_CONFIGURATION_ERROR_OCCURRED);
                     }
 
-                    dataAccessLayerOption = configurationHelper.GetValueByKey<TOption>(configurationKey);
-                }
-
-                if (dataAccessLayerOption == null)
-                {
-                    throw new Exception(DALConstants.DALErrorMessages.DAL_CONFIGURATION_ERROR_OCCURRED);
-                }
-
-                if (dataAccessLayerOption.DatabaseSetting != null)
-                {
-                    databaseType = dataAccessLayerOption.DatabaseSetting.DatabaseType;
-
-                    if (databaseType == DatabaseType.MSSQL)
+                    if (dataAccessLayerOption.DatabaseSetting != null)
                     {
-                        connectionString = dataAccessLayerOption.DatabaseSetting.MSSQL_ConnectionString;
+                        databaseType = dataAccessLayerOption.DatabaseSetting.DatabaseType;
 
+                        if (databaseType == DatabaseType.MSSQL)
+                        {
+                            connectionString = dataAccessLayerOption.DatabaseSetting.MSSQL_ConnectionString;
+
+                        }
+                        else if (databaseType == DatabaseType.MySQL)
+                        {
+                            connectionString = dataAccessLayerOption.DatabaseSetting.MySQL_ConnectionString;
+                        }
+                        else
+                        {
+                            connectionString = dataAccessLayerOption.DatabaseSetting.Oracle_ConnectionString;
+                        }
                     }
-                    else if (databaseType == DatabaseType.MySQL)
+
+
+                    if (dataAccessLayerOption.DatabaseSetting.DataBaseTransaction == null)
                     {
-                        connectionString = dataAccessLayerOption.DatabaseSetting.MySQL_ConnectionString;
+                        ConfigureDataContext<TDbContext>(connectionString, databaseType);
                     }
                     else
                     {
-                        connectionString = dataAccessLayerOption.DatabaseSetting.Oracle_ConnectionString;
+                        ConfigureDataContextWithTransaction<TDbContext>(connectionString, databaseType, dataAccessLayerOption.DatabaseSetting.DataBaseTransaction.isolationLevel);
                     }
-                }
 
-
-                if (dataAccessLayerOption.DatabaseSetting.DataBaseTransaction == null)
-                {
-                    ConfigureDataContext<TDbContext>(connectionString, databaseType);
-                }
-                else
-                {
-                    ConfigureDataContextWithTransaction<TDbContext>(connectionString, databaseType, dataAccessLayerOption.DatabaseSetting.DataBaseTransaction.isolationLevel);
-                }
-
-                var transactionBuilder = services.FirstOrDefault(d => d.ServiceType == typeof(ITransactionBuilder));
-                if (transactionBuilder == null)
-                {
-                    if (dataAccessLayerOption.DataLayerType == EnumDataLayerType.EntityFramework)
+                    var transactionBuilder = services.FirstOrDefault(d => d.ServiceType == typeof(ITransactionBuilder));
+                    if (transactionBuilder == null)
                     {
-                        services.AddScoped(typeof(ITransactionBuilder), typeof(EfTransactionBuilder<TDbContext>));
+                        if (dataAccessLayerOption.DataLayerType == EnumDataLayerType.EntityFramework)
+                        {
+                            services.AddScoped(typeof(ITransactionBuilder), typeof(EfTransactionBuilder<TDbContext>));
+                        }
                     }
                 }
-
             }
             catch
             {

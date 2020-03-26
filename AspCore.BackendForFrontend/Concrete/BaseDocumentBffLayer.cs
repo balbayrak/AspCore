@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.BackendForFrontend.Abstract;
+﻿using AspCore.BackendForFrontend.Abstract;
+using AspCore.Caching.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
-using AspCore.Storage.Abstract;
 using AspCore.Utilities;
+using Microsoft.AspNetCore.Http;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
@@ -16,7 +14,7 @@ namespace AspCore.BackendForFrontend.Concrete
         where TViewRequest : class, IDocumentApiViewRequest<TDocument,ViewerToolbarSetting>, new()
     {
         private IBffApiClient apiClient { get; set; }
-        private IStorage _storage { get; set; }
+        private ICacheService _cache { get; set; }
         private string _uploaderRoute { get; set; }
         private string _viewerRoute { get; set; }
         private string _signerRoute { get; set; }
@@ -25,9 +23,9 @@ namespace AspCore.BackendForFrontend.Concrete
         {
             apiClient = DependencyResolver.Current.GetService<IBffApiClient>();
 
-            _storage = DependencyResolver.Current.GetService<IStorage>();
+            _cache = DependencyResolver.Current.GetService<ICacheService>();
 
-            string tokenStorageKey = _storage.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            string tokenStorageKey = _cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
             apiClient.tokenStorageKey = tokenStorageKey;
 
             _uploaderRoute = uploaderRoute;

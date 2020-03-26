@@ -19,10 +19,10 @@ namespace AspCore.WebApi.Configuration.Options
         {
         }
 
-        public ConfigurationBuilderOption AddApiClientSetting(Action<ApiClientStorageBuilder> option)
+        public ConfigurationBuilderOption AddApiClientSetting(Action<ApiClientCacheBuilder> option)
         {
             
-            var apiClientStorageBuilder = new ApiClientStorageBuilder(services);
+            var apiClientStorageBuilder = new ApiClientCacheBuilder(services);
             option(apiClientStorageBuilder);
 
             return this;
