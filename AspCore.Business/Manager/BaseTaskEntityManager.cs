@@ -18,7 +18,7 @@ namespace AspCore.Business.Manager
         where TDAL : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TActiveUser : class, IActiveUser, new()
-         where TTaskBuilder : TaskBuilder, ITaskBuilder
+        where TTaskBuilder : TaskBuilder, ITaskBuilder
     {
         private readonly TDAL _dataLayer;
 

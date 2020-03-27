@@ -1,12 +1,11 @@
-﻿using System;
+﻿using AspCore.Entities.Cache;
+using AspCore.Entities.EntityType;
+using AspCore.Entities.General;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Microsoft.AspNetCore.Mvc;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.EntityType;
-using AspCore.Entities.General;
-using AspCore.Utilities.DataProtector;
 
 namespace AspCore.Extension
 {
@@ -91,6 +90,45 @@ namespace AspCore.Extension
             var entityView = new TViewModel()
             {
                 dataEntity = result.Result
+            };
+            serviceResult.Result = entityView;
+        }
+
+        public static void ToViewModelResultFromCacheEntityList<TViewModel, TEntity>(this ServiceResult<List<TViewModel>> serviceResult, ServiceResult<CacheResult<TEntity>> result)
+where TViewModel : BaseViewModel<TEntity>, new()
+where TEntity : class, ICacheEntity, new()
+        {
+            serviceResult.IsSucceeded = result.IsSucceeded;
+            serviceResult.SearchResultCount = result.SearchResultCount;
+            serviceResult.TotalResultCount = result.TotalResultCount;
+            if (serviceResult.IsSucceededAndDataIncluded())
+            {
+                result.Result.cacheItems.ForEach(x => x.ProtectEntity());
+                var entityView = result.Result.cacheItems.Select(t => new TViewModel
+                {
+                    dataEntity = t
+                }).ToList();
+                serviceResult.Result = entityView;
+            }
+        }
+
+        public static void ToViewModelResultFromCacheEntity<TViewModel, TEntity>(this ServiceResult<TViewModel> serviceResult, ServiceResult<CacheResult<TEntity>> result)
+            where TViewModel : BaseViewModel<TEntity>, new()
+            where TEntity : class, ICacheEntity, new()
+        {
+
+            serviceResult.IsSucceeded = result.IsSucceeded;
+            serviceResult.SearchResultCount = result.SearchResultCount;
+            serviceResult.TotalResultCount = result.TotalResultCount;
+
+            if (result.IsSucceededAndDataIncluded())
+            {
+                result.Result.cacheItems[0].ProtectEntity();
+            }
+
+            var entityView = new TViewModel()
+            {
+                dataEntity = result.Result.cacheItems[0]
             };
             serviceResult.Result = entityView;
         }

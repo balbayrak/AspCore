@@ -42,7 +42,6 @@ namespace AspCore.Business.Manager
                 return _dataAccess.Update(entities);
         }
 
-
         public virtual ServiceResult<bool> Delete(params Guid[] entityIds)
         {
             if (entityIds.Length > 1)

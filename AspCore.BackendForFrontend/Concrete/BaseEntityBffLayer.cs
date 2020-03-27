@@ -85,7 +85,5 @@ namespace AspCore.BackendForFrontend.Concrete
             viewResult.ToViewModelResult(result);
             return viewResult;
         }
-
-
     }
 }

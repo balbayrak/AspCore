@@ -35,11 +35,11 @@ namespace AspCore.DataAccess.Abstract
 
         ServiceResult<TEntity> GetById(Guid Id);
 
+        ServiceResult<List<TEntity>> GetByIdList(params Guid[] entityIds);
+
         ServiceResult<IList<TEntity>> FindList(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null);
 
         Task<ServiceResult<IList<TEntity>>> FindListAsync(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null);
-
-        ServiceResult<bool> DeleteList(List<TEntity> entityList);
 
         ServiceResult<bool> ProcessEntityWithState(params TEntity[] entities);
 

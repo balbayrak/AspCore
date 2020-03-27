@@ -63,13 +63,16 @@ namespace AspCore.CacheEntityAccess.ElasticSearch.Configuration
                                         .EnableHttpCompression(true)
                                         .SniffOnConnectionFault(false)
                                         .SniffOnStartup(false)
-                                        .SniffLifeSpan(TimeSpan.FromMinutes(1));
+                                        .SniffLifeSpan(TimeSpan.FromMinutes(1))
+                                        .DefaultFieldNameInferrer(p => p);
+
                                 }
                                 else
                                 {
                                     _settings = new ConnectionSettings(new Uri(elasticOption.ElasticSearchProvider.Servers[0].Url))
                                                     .PrettyJson(true)
-                                                    .EnableHttpCompression(true);
+                                                    .EnableHttpCompression(true)
+                                                       .DefaultFieldNameInferrer(p => p);
                                 }
 
                                 if (_settings != null)
@@ -77,7 +80,7 @@ namespace AspCore.CacheEntityAccess.ElasticSearch.Configuration
                                     var client = new ElasticClient(_settings);
 
                                     services.AddSingleton<IElasticClient>(client);
-                                    services.AddSingleton<IESContext,ESContext>();
+                                    services.AddSingleton<IESContext, ESContext>();
                                 }
                             }
                         }

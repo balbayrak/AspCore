@@ -351,6 +351,23 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public ServiceResult<List<TEntity>> GetByIdList(params Guid[] entityIds)
+        {
+            ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
+
+            try
+            {
+                result.Result = Entities.Where(t => entityIds.Any(p => p == t.Id)).ToList();
+                result.IsSucceeded = true;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
         private ServiceResult<List<TEntity>> GetByIdListTracking(List<Guid> idList)
         {
             ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
@@ -466,46 +483,6 @@ namespace AspCore.DataAccess.EntityFramework
             }
             catch (Exception ex)
             {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-
-        public ServiceResult<bool> DeleteList(List<TEntity> entityList)
-        {
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            IDbContextTransaction dbContextTransaction = null;
-            try
-            {
-                using (dbContextTransaction = _context.Database.BeginTransaction())
-                {
-                    foreach (var item in entityList)
-                    {
-                        if (item is IBaseEntity)
-                        {
-                            ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                        }
-                        var deletedEntity = _context.Entry(item);
-                        deletedEntity.State = EntityState.Deleted;
-                    }
-                    int value = _context.SaveChanges();
-                    if (value > 0)
-                    {
-                        dbContextTransaction.Commit();
-                        result.IsSucceeded = true;
-                        result.Result = true;
-                    }
-                    else
-                    {
-                        dbContextTransaction.Rollback();
-                        result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (dbContextTransaction != null) dbContextTransaction.Rollback();
                 result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
             }
 

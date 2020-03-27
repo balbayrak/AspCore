@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
+    <ProjectReference Include="..\AspCore.CacheEntityClient\AspCore.CacheEntityClient.csproj" />
     <ProjectReference Include="..\AspCore.Dependency\AspCore.Dependency.csproj" />
   </ItemGroup>
 

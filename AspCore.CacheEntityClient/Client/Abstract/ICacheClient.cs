@@ -9,6 +9,7 @@ namespace AspCore.CacheEntityClient
     public interface ICacheClient<T>  
         where T : class, ICacheEntity,new()
     {
+        string cacheKey { get;}
         ServiceResult<bool> Create(params T[] cacheItems);
         ServiceResult<CacheResult<T>> Read(Func<CacheSearchBuilder<T>, CacheSearchBuilder<T>> builder);
         ServiceResult<CacheResult<T>> Read(T cacheItem);
