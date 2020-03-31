@@ -3,8 +3,10 @@ using AspCore.CacheEntityApi.Authentication;
 using AspCore.CacheEntityApi.Configuration;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.Authentication;
+using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
+using AspCore.WebApi.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -66,7 +68,14 @@ namespace AspCoreTest.CacheApi
                 {
                     option.AddElasticsearch<CacheApiOption>("CacheApiInfo");
                 });
-            });
+            }, mvcOption =>
+              {
+                  mvcOption.Filters.Add(new JWTAuthorizationFilter<AuthenticationInfo, CacheApiJWTInfo>(option =>
+                  {
+                      option.authenticationProviderType = typeof(CacheApiAppSettingAuthProvider);
+                      option.excludeControllerNames = new string[] { "Authentication" };
+                  }));
+              });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,13 +86,22 @@ namespace AspCoreTest.CacheApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
+            app.UseAspCoreServices<ITokenGenerator<CacheApiJWTInfo>, CacheApiJWTInfo>(option =>
             {
-                endpoints.MapControllers();
+                option.UseAuthentication(app).
+                ConfigureRoutes(app, endpoints =>
+                {
+                    endpoints.MapControllerRoute(
+                    name: "api",
+                    pattern: "api/{controller}/{action}",
+                    defaults: new { action = "Index" });
+                })
+                .UseSwagger(app, option =>
+                {
+                    option.SwaggerEndpoint("/swagger/v1/swagger.json", "AspCore Service API");
+                    option.RoutePrefix = "api";
+
+                });
             });
         }
     }

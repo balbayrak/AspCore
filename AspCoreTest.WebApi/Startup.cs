@@ -1,5 +1,4 @@
 using AspCore.BusinessApi.Configuration;
-using AspCore.Caching.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.User;
 using AspCore.WebApi.Authentication.JWT.Concrete;
@@ -8,6 +7,7 @@ using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Security.Abstract;
 using AspCoreTest.Authentication.Concrete;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
+using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -52,6 +52,7 @@ namespace AspCoreTest.WebApi
                         option.AddBearerAuthenticatedClient("YetkiApi")
                         .AddBearerAuthenticatedClient("DocumentApi")
                         .AddBearerAuthenticatedClient("ViewerApi")
+                        .AddJWTAuthenticatedClient("CacheApi")
                         .Build();
                     });
                 })
@@ -79,6 +80,10 @@ namespace AspCoreTest.WebApi
                         apiVersion = "v1",
                         contactEmail = "balbayrak87@gmail.com"
                     };
+                })
+                .AddCacheEntityAccessLayer("CacheApi",option =>
+                {
+                    option.AddCacheClient<Person>("person_cache", "api/PersonCache");
                 });
                 //.AddDocumentAccessLayer(option =>
                 //{

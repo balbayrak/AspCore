@@ -6,13 +6,10 @@ using System;
 
 namespace AspCore.CacheEntityClient
 {
-    public interface ICacheClient<T>  
+    public interface ICacheClient<T>  : IReadOnlyCacheClient<T>
         where T : class, ICacheEntity,new()
     {
-        string cacheKey { get;}
         ServiceResult<bool> Create(params T[] cacheItems);
-        ServiceResult<CacheResult<T>> Read(Func<CacheSearchBuilder<T>, CacheSearchBuilder<T>> builder);
-        ServiceResult<CacheResult<T>> Read(T cacheItem);
         ServiceResult<bool> Update(params T[] cacheItems);
         ServiceResult<bool> Delete(params T[] cacheItems);
         ServiceResult<MinMax> MinMax(T cacheItem);

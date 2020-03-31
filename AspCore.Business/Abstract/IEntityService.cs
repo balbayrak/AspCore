@@ -23,10 +23,5 @@ namespace AspCore.Business.Abstract
 
         Task<ServiceResult<IList<TEntity>>> GetAllAsync(EntityFilter<TEntity> setting);
 
-        ServiceResult<bool> AddList(List<TEntity> entityList);
-
-        ServiceResult<bool> UpdateList(List<TEntity> entityList);
-
-        ServiceResult<bool> DeleteList(List<TEntity> entityList);
     }
 }

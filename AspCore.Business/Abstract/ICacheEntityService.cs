@@ -1,7 +1,4 @@
 ﻿using AspCore.Entities.EntityType;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AspCore.Business.Abstract
 {

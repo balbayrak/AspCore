@@ -13,4 +13,8 @@
     <ProjectReference Include="..\AspCore.Entities\AspCore.Entities.csproj" />
     <ProjectReference Include="..\AspCore.WebApi\AspCore.WebApi.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CacheAdmin\Concrete\" />
+  </ItemGroup>
 </Project>

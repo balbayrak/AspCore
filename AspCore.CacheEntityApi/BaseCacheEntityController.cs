@@ -2,6 +2,7 @@
 using AspCore.CacheEntityClient.QueryBuilder.Concrete;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Cache;
+using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
@@ -9,8 +10,9 @@ using AspCore.WebApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace AspCore.CacheApi
+namespace AspCore.CacheEntityApi
 {
     public class BaseCacheEntityController<T, TCacheEntity> : BaseController
         where T : ICacheEntityProvider<TCacheEntity>
@@ -36,11 +38,20 @@ namespace AspCore.CacheApi
             return string.Empty;
         }
 
-
         [NonAction]
-        protected virtual IActionResult CreateCacheItem(TCacheEntity cacheItem)
+        protected virtual IActionResult CreateCacheItem(TCacheEntity[] cacheItems)
         {
-            ServiceResult<bool> response = _cacheProvider.CreateCacheItem(GetCacheAliasName(), cacheItem);
+            ServiceResult<bool> response = null;
+            
+            if(cacheItems.Length == 1)
+            {
+                response = _cacheProvider.CreateCacheItem(GetCacheAliasName(), cacheItems[0]);
+            }
+            else
+            {
+                response = _cacheProvider.CreateCacheItemList(GetCacheAliasName(), cacheItems.ToList());
+            }
+
             return response.ToHttpResponse();
         }
 
@@ -59,51 +70,50 @@ namespace AspCore.CacheApi
         }
 
         [NonAction]
-        protected virtual IActionResult UpdateCacheItem(TCacheEntity cacheItem)
+        protected virtual IActionResult UpdateCacheItem(TCacheEntity[] cacheItems)
         {
-            ServiceResult<bool> response = _cacheProvider.UpdateCacheItem(GetCacheAliasName(), cacheItem);
+            ServiceResult<bool> response = null;
+
+            if (cacheItems.Length == 1)
+            {
+                response = _cacheProvider.UpdateCacheItem(GetCacheAliasName(), cacheItems[0]);
+            }
+            else
+            {
+                response = _cacheProvider.UpdateCacheItemList(GetCacheAliasName(), cacheItems.ToList());
+            }
+
             return response.ToHttpResponse();
         }
 
         [NonAction]
-        protected virtual IActionResult UpdateCacheItemList(List<TCacheEntity> cacheItemList)
+        protected virtual IActionResult DeleteCacheItem(TCacheEntity[] cacheItems)
         {
-            ServiceResult<bool> response = _cacheProvider.UpdateCacheItemList(GetCacheAliasName(), cacheItemList);
-            return response.ToHttpResponse();
-        }
+            ServiceResult<bool> response = null;
 
-        [NonAction]
-        protected virtual IActionResult DeleteCacheItemList(List<TCacheEntity> cacheItemList)
-        {
-            ServiceResult<bool> response = _cacheProvider.DeleteCacheItemList(GetCacheAliasName(), cacheItemList);
-            return response.ToHttpResponse();
-        }
+            if (cacheItems.Length == 1)
+            {
+                response = _cacheProvider.DeleteCacheItem(GetCacheAliasName(), cacheItems[0]);
+            }
+            else
+            {
+                response = _cacheProvider.DeleteCacheItemList(GetCacheAliasName(), cacheItems.ToList());
+            }
 
-        [NonAction]
-        protected virtual IActionResult CreateCacheItemList(List<TCacheEntity> cacheItemList)
-        {
-            ServiceResult<bool> response = _cacheProvider.CreateCacheItemList(GetCacheAliasName(), cacheItemList);
-            return response.ToHttpResponse();
-        }
-
-        [NonAction]
-        protected virtual IActionResult DeleteCacheItem(TCacheEntity cacheItem)
-        {
-            ServiceResult<bool> response = _cacheProvider.DeleteCacheItem(GetCacheAliasName(), cacheItem);
             return response.ToHttpResponse();
         }
 
         [Authorize]
-        [ActionName("CreateCacheData")]
+        [ActionName(ApiConstants.CacheApi_Urls.CREATE_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult Create(TCacheEntity cacheItem)
+        public IActionResult Create(TCacheEntity[] cacheItems)
         {
-            return CreateCacheItem(cacheItem);
+            return CreateCacheItem(cacheItems);
         }
 
         [Authorize]
-        [ActionName("ReadCacheData")]
+        [ActionName(ApiConstants.CacheApi_Urls.READ_ACTION_NAME)]
         //[IndexNameSetter]
         [HttpPost]
         public IActionResult Read(SearchRequestItem searchItem)
@@ -112,52 +122,27 @@ namespace AspCore.CacheApi
         }
 
         [Authorize]
-        [ActionName("UpdateCacheData")]
+        [ActionName(ApiConstants.CacheApi_Urls.UPDATE_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult Update(TCacheEntity updateItem)
+        public IActionResult Update(TCacheEntity[] cacheItems)
         {
-            return UpdateCacheItem(updateItem);
+            return UpdateCacheItem(cacheItems);
         }
 
         [Authorize]
-        [ActionName("DeleteCacheData")]
+        [ActionName(ApiConstants.CacheApi_Urls.DELETE_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult Delete(TCacheEntity deleteItem)
+        public IActionResult Delete(TCacheEntity[] cacheItems)
         {
-            return DeleteCacheItem(deleteItem);
+            return DeleteCacheItem(cacheItems);
         }
 
+
+        [ActionName(ApiConstants.CacheApi_Urls.MIN_MAX_ACTION_NAME)]
         [Authorize]
-        [ActionName("UpdateListCacheData")]
-        [HttpPost]
-
-        public IActionResult UpdateList(List<TCacheEntity> updateItemList)
-        {
-            return UpdateCacheItemList(updateItemList);
-        }
-
-        [Authorize]
-        [ActionName("CreateListCacheData")]
-        [HttpPost]
-
-        public IActionResult CreateList(List<TCacheEntity> updateItemList)
-        {
-            return CreateCacheItemList(updateItemList);
-        }
-
-        [Authorize]
-        [ActionName("DeleteListCacheData")]
-        [HttpPost]
-
-        public IActionResult DeleteList(List<TCacheEntity> updateItemList)
-        {
-            return DeleteCacheItemList(updateItemList);
-        }
-
-        [Authorize]
-        [ActionName("MinMaxCacheData")]
+    
         //[IndexNameSetter]
         [HttpPost]
         public IActionResult MinMax(SearchRequestItem searchItem)

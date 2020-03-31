@@ -8,7 +8,7 @@ namespace AspCore.BackendForFrontend.Abstract
 {
     public interface ICacheEntityBffLayer<TViewModel, TCacheEntity> : IEntityBffLayer<TViewModel, TCacheEntity>
          where TViewModel : BaseViewModel<TCacheEntity>
-         where TCacheEntity : class, IEntity, new()
+         where TCacheEntity : class, ICacheEntity, new()
     {
         ServiceResult<List<TViewModel>> FindBy(bool isActiveOnly, int startIndex, int takeCount);
 

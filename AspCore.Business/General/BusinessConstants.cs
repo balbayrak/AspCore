@@ -17,6 +17,8 @@ namespace AspCore.Business.General
             public const string MODEL_INVALID = "Invalid model object";
             public const string TASK_ACTION_EXCEPTION = "Task içerisinde action bulunamadı!, Controller action ismi ile task içerisinde aynı isimde action bulunmalıdır!";
             public const string TASK_ACTION_RUN_EXCEPTION = "Task içerisinde action çalıştırılamadı!";
+
+            public const string CACHE_ENTITY_CONVERT_EXCEPTION = "Complex Cache entity convert error!";
         }
 
         public struct MiddlewareErrorMessages

@@ -7,6 +7,7 @@ using AspCore.Utilities.MimeMapping;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using AspCore.WebComponents.ViewComponents.Alert.Configuration;
+using AspCore.CacheEntityClient.Configuration;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -64,6 +65,13 @@ namespace AspCore.Web.Configuration.Options
             var mimeTypeBuilder = new MimeTypeBuilder(services);
             builder(mimeTypeBuilder);
 
+            return this;
+        }
+
+        public ConfigurationBuilderOption AddCacheEntityAccessLayer(Action<CacheApiClientBuilder> builder)
+        {
+            CacheApiClientBuilder cacheClientBuilder = new CacheApiClientBuilder(services);
+            builder(cacheClientBuilder);
             return this;
         }
     }

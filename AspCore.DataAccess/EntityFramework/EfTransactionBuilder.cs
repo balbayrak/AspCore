@@ -3,7 +3,7 @@
 namespace AspCore.DataAccess.EntityFramework
 {
     public class EfTransactionBuilder<TDbContext> : ITransactionBuilder
-        where  TDbContext : CoreDbContext
+        where TDbContext : CoreDbContext
     {
         private TDbContext _dbContext { get; }
         public EfTransactionBuilder(TDbContext dbContext)
@@ -26,7 +26,8 @@ namespace AspCore.DataAccess.EntityFramework
         {
             try
             {
-                _dbContext.Database.CurrentTransaction.Dispose();
+                if (_dbContext.Database.CurrentTransaction != null)
+                    _dbContext.Database.CurrentTransaction.Dispose();
             }
             catch
             {

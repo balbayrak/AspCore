@@ -2,14 +2,12 @@
 using AspCore.CacheEntityClient;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Cache;
-using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
@@ -17,10 +15,10 @@ namespace AspCore.BackendForFrontend.Concrete
         where TViewModel : BaseViewModel<TCacheEntity>, new()
         where TCacheEntity : class, ICacheEntity, new()
     {
-        private readonly ICacheClient<TCacheEntity> _cacheClient;
+        private readonly IReadOnlyCacheClient<TCacheEntity> _cacheClient;
         public BaseCacheEntityBffLayer() : base()
         {
-            _cacheClient = DependencyResolver.Current.GetService<ICacheClient<TCacheEntity>>();
+            _cacheClient = DependencyResolver.Current.GetService<IReadOnlyCacheClient<TCacheEntity>>();
         }
 
         public ServiceResult<List<TViewModel>> FindBy(bool isActiveOnly, int startIndex, int takeCount)

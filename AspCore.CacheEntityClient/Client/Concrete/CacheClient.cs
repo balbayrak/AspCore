@@ -1,6 +1,4 @@
-﻿using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.CacheEntityClient.QueryBuilder.Concrete;
+﻿using AspCore.CacheEntityClient.QueryBuilder.Concrete;
 using AspCore.Entities.Cache;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
@@ -9,23 +7,12 @@ using System;
 
 namespace AspCore.CacheEntityClient
 {
-    public class CacheClient<T> : ICacheClient<T>
+    internal class CacheClient<T> : ReadOnlyCacheClient<T>, ICacheClient<T>
         where T : class, ICacheEntity, new()
     {
-        private IAuthenticatedApiClient _apiClient { get; set; }
-        public string cacheKey { get; private set; }
-
-        private string _cacheApiRoute { get; }
-
-        public CacheClient(string apiClientKey, string cacheKey, string cacheApiRoute)
+        public CacheClient(string apiClientKey, string cacheKey, string cacheApiRoute) : base(apiClientKey,cacheKey,cacheApiRoute)
         {
-            _apiClient = ApiClientFactory.GetApiClient(apiClientKey);
-
-            if (!cacheApiRoute.StartsWith("/"))
-            {
-                cacheApiRoute = "/" + cacheApiRoute;
-            }
-            _cacheApiRoute = cacheKey;
+           
         }
 
         public ServiceResult<bool> Create(params T[] cacheItems)
@@ -42,12 +29,6 @@ namespace AspCore.CacheEntityClient
 
             _apiClient.apiUrl = _cacheApiRoute + "/" + ApiConstants.CacheApi_Urls.READ_ACTION_NAME;
             return _apiClient.PostRequest<ServiceResult<CacheResult<T>>>(requestItem).Result;
-        }
-
-        public ServiceResult<CacheResult<T>> Read(T cacheItem)
-        {
-            _apiClient.apiUrl = _cacheApiRoute + "/" + ApiConstants.CacheApi_Urls.GETDATA_ACTION_NAME;
-            return _apiClient.PostRequest<ServiceResult<CacheResult<T>>>(cacheItem).Result;
         }
 
         public ServiceResult<bool> Update(params T[] cacheItems)

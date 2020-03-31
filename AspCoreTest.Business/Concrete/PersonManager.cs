@@ -5,7 +5,7 @@ using testbusiness.Abstract;
 
 namespace testbusiness.Concrete
 {
-    public class PersonManager : BaseEntityManager<IPersonDal, Person>, IPersonService
+    public class PersonManager : BaseCacheEntityManager<IPersonDal, Person>, IPersonService
     {
     }
 }

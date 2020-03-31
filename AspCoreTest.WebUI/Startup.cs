@@ -5,6 +5,7 @@ using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Authentication.Concrete;
+using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -76,6 +77,14 @@ namespace AspCoreTest.WebUI
                 .AddMimeTypeService(option =>
                 {
                     option.Build();
+                })
+                .AddCacheEntityAccessLayer(option=>
+                {
+                    option.AddCacheApiClients("CacheApi", option =>
+                    {
+                        option.AddJWTAuthenticatedClient("CacheApi")
+                        .Build();
+                    }).AddCacheClient<Person>("person_cache", "PersonCache");
                 });
             });
         }

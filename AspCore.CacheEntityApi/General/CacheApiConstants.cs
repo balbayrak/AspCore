@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AspCore.CacheApi.General
+﻿namespace AspCore.CacheEntityApi.General
 {
     public class CacheApiConstants
     {

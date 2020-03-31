@@ -261,15 +261,15 @@ namespace AspCore.ApiClient
                     }
 
 
-                    //response.EnsureSuccessStatusCode();
+                  //  response.EnsureSuccessStatusCode();
 
-                    //if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
-                    //{
-                    string responseString = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        string responseString = await response.Content.ReadAsStringAsync();
                  
                     Debug.WriteLine(responseString);
                     result = JsonConvert.DeserializeObject<TResult>(responseString);
-                    //}
+                    }
                 }
             };
 

@@ -39,12 +39,12 @@ namespace AspCore.Entities.Constants
 
         public struct CacheApi_Urls
         {
-            public static readonly string CREATE_ACTION_NAME = "CreateCacheData";
-            public static readonly string READ_ACTION_NAME = "ReadCacheData";
-            public static readonly string UPDATE_ACTION_NAME = "UpdateCacheData";
-            public static readonly string DELETE_ACTION_NAME = "DeleteCacheData";
-            public static readonly string GETDATA_ACTION_NAME = "GetCacheData";
-            public static readonly string MIN_MAX_ACTION_NAME = "MinMaxCacheData";
+            public const string CREATE_ACTION_NAME = "CreateCacheData";
+            public const string READ_ACTION_NAME = "ReadCacheData";
+            public const string UPDATE_ACTION_NAME = "UpdateCacheData";
+            public const string DELETE_ACTION_NAME = "DeleteCacheData";
+            public const string GETDATA_ACTION_NAME = "GetCacheData";
+            public const string MIN_MAX_ACTION_NAME = "MinMaxCacheData";
         }
 
         public struct Api_Keys

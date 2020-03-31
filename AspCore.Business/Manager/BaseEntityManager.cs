@@ -114,29 +114,5 @@ namespace AspCore.Business.Manager
                 return _dataAccess.GetListAsync(expression, setting.page, setting.pageSize);
             }
         }
-
-        public virtual ServiceResult<bool> AddList(List<TEntity> entityList)
-        {
-            if (entityList.Count > 1)
-                return _dataAccess.AddWithTransaction(entityList.ToArray());
-            else
-                return _dataAccess.Add(entityList[0]);
-        }
-
-        public virtual ServiceResult<bool> UpdateList(List<TEntity> entityList)
-        {
-            if (entityList.Count > 1)
-                return _dataAccess.UpdateWithTransaction(entityList.ToArray());
-            else
-                return _dataAccess.Update(entityList[0]);
-        }
-
-        public virtual ServiceResult<bool> DeleteList(List<TEntity> entityList)
-        {
-            if (entityList.Count > 1)
-                return _dataAccess.DeleteWithTransaction(entityList.Select(t=>t.Id).ToArray());
-            else
-                return _dataAccess.Delete(entityList[0]);
-        }
     }
 }

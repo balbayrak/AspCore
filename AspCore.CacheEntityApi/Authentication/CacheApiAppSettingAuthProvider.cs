@@ -1,5 +1,5 @@
-﻿using AspCore.CacheApi.General;
-using AspCore.CacheEntityAccess.Configuration;
+﻿using AspCore.CacheEntityAccess.Configuration;
+using AspCore.CacheEntityApi.General;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
