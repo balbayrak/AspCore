@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
-    <ProjectReference Include="..\AspCore.CacheEntityClient\AspCore.CacheEntityClient.csproj" />
     <ProjectReference Include="..\AspCore.ConnectedApi\AspCore.ConnectedApi.csproj" />
   </ItemGroup>
 

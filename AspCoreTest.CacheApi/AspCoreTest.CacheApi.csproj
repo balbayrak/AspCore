@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspCore.CacheEntityApi\AspCore.CacheEntityApi.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
   </ItemGroup>
 

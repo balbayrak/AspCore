@@ -7,7 +7,7 @@ using System;
 namespace AspCore.CacheEntityClient
 {
     public interface IReadOnlyCacheClient<T>
-        where T : class, ICacheEntity, new()
+        where T : class, ISearchableEntity, new()
     {
         string cacheKey { get; }
         ServiceResult<CacheResult<T>> Read(Func<CacheSearchBuilder<T>, CacheSearchBuilder<T>> builder);

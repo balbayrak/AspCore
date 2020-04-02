@@ -1,13 +1,13 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.BackendForFrontend.Concrete;
+using AspCore.ElasticSearchApiClient.Configuration;
 using AspCore.Entities.Configuration;
 using AspCore.Entities.DocumentType;
 using AspCore.Utilities.DataProtector;
 using AspCore.Utilities.MimeMapping;
+using AspCore.WebComponents.ViewComponents.Alert.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using AspCore.WebComponents.ViewComponents.Alert.Configuration;
-using AspCore.CacheEntityClient.Configuration;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -68,10 +68,10 @@ namespace AspCore.Web.Configuration.Options
             return this;
         }
 
-        public ConfigurationBuilderOption AddCacheEntityAccessLayer(Action<CacheApiClientBuilder> builder)
+        public ConfigurationBuilderOption AddDataSearchLayer(Action<DataSearchApiClientBuilder> builder)
         {
-            CacheApiClientBuilder cacheClientBuilder = new CacheApiClientBuilder(services);
-            builder(cacheClientBuilder);
+            DataSearchApiClientBuilder dataSearchApiClientBuilder  = new DataSearchApiClientBuilder(services);
+            builder(dataSearchApiClientBuilder);
             return this;
         }
     }

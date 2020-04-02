@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AspCore.Entities.EntityType
 {
-    public class BaseCacheEntity : BaseEntity, ICacheEntity
+    public class BaseCacheEntity : BaseEntity, ISearchableEntity
     {
     }
 }

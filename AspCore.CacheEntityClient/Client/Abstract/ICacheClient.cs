@@ -7,7 +7,7 @@ using System;
 namespace AspCore.CacheEntityClient
 {
     public interface ICacheClient<T>  : IReadOnlyCacheClient<T>
-        where T : class, ICacheEntity,new()
+        where T : class, ISearchableEntity,new()
     {
         ServiceResult<bool> Create(params T[] cacheItems);
         ServiceResult<bool> Update(params T[] cacheItems);

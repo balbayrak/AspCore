@@ -95,6 +95,31 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter()
+        {
+            ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
+            try
+            {
+                var query = Entities.IgnoreQueryFilters().AsQueryable();
+
+                var countTask = query.Count();
+
+                result.Result = query.ToArray();
+                
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.SearchResultCount = result.Result.Count();
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+
         public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page = null, int? pageSize = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();

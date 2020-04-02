@@ -78,13 +78,13 @@ namespace AspCoreTest.WebUI
                 {
                     option.Build();
                 })
-                .AddCacheEntityAccessLayer(option=>
+                .AddDataSearchLayer(option =>
                 {
-                    option.AddCacheApiClients("CacheApi", option =>
+                    option.AddApiClients("CacheApi", option =>
                     {
                         option.AddJWTAuthenticatedClient("CacheApi")
                         .Build();
-                    }).AddCacheClient<Person>("person_cache", "PersonCache");
+                    }).AddESApiClient<Person>("PersonCache");
                 });
             });
         }

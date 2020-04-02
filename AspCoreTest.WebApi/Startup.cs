@@ -81,10 +81,10 @@ namespace AspCoreTest.WebApi
                         contactEmail = "balbayrak87@gmail.com"
                     };
                 })
-                .AddCacheEntityAccessLayer("CacheApi",option =>
-                {
-                    option.AddCacheClient<Person>("person_cache", "api/PersonCache");
-                });
+                .AddDataSearchAccessLayer("CacheApi", option =>
+                 {
+                     option.AddESApiClient<Person>("person_cache", "api/PersonCache");
+                 });
                 //.AddDocumentAccessLayer(option =>
                 //{
                 //    option.AddDocumentUploader<Document, TseDocumentUploaderOption, TseDocumentUploader, TseDocumentValidator>(option =>

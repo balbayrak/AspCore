@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AspCore.Entities.EntityType
 {
-    public interface ICacheEntity : IBaseEntity
+    public interface ISearchableEntity : IBaseEntity
     {
     }
 }

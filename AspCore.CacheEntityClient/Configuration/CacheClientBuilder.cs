@@ -13,7 +13,7 @@ namespace AspCore.CacheEntityClient.Configuration
             _apiClientKey = apiClientKey;
         }
         public CacheClientBuilder AddCacheClient<TCacheEntiy>(string apiClientKey, string cacheKey, string cacheApiRoute)
-     where TCacheEntiy : class, ICacheEntity, new()
+     where TCacheEntiy : class, ISearchableEntity, new()
         {
             _services.AddTransient(typeof(ICacheClient<TCacheEntiy>), sp =>
             {
@@ -24,7 +24,7 @@ namespace AspCore.CacheEntityClient.Configuration
         }
 
         public CacheClientBuilder AddCacheClient<TCacheEntiy>(string cacheKey, string cacheApiRoute)
-   where TCacheEntiy : class, ICacheEntity, new()
+   where TCacheEntiy : class, ISearchableEntity, new()
         {
             _services.AddTransient(typeof(IReadOnlyCacheClient<TCacheEntiy>), sp =>
             {

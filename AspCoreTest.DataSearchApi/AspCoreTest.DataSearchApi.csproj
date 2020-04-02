@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.DataSearchApi\AspCore.DataSearchApi.csproj" />
+    <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
+  </ItemGroup>
+
+
+</Project>

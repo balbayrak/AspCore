@@ -10,7 +10,7 @@ using System;
 namespace AspCore.CacheEntityClient
 {
     internal class ReadOnlyCacheClient<T> : IReadOnlyCacheClient<T>
-        where T : class, ICacheEntity, new()
+        where T : class, ISearchableEntity, new()
     {
         protected IAuthenticatedApiClient _apiClient { get; set; }
         public string cacheKey { get; private set; }

@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AspCore.CacheApi;
-using AspCore.CacheEntityApi.CacheProviders.Abstract;
-using AspCoreTest.Entities.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using AspCoreTest.Entities.Models;
 
 namespace AspCoreTest.CacheApi.Controllers
 {
-    public class PersonCacheController : BaseCacheEntityController<ICacheEntityProvider<Person>,Person>
+    public class PersonCacheController : BaseElasticSearchController<ICacheEntityProvider<Person>, Person>
     {
     }
 }

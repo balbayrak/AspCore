@@ -8,7 +8,7 @@ using System;
 namespace AspCore.CacheEntityClient
 {
     internal class CacheClient<T> : ReadOnlyCacheClient<T>, ICacheClient<T>
-        where T : class, ICacheEntity, new()
+        where T : class, ISearchableEntity, new()
     {
         public CacheClient(string apiClientKey, string cacheKey, string cacheApiRoute) : base(apiClientKey,cacheKey,cacheApiRoute)
         {

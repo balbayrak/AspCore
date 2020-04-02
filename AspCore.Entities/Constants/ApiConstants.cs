@@ -37,14 +37,14 @@ namespace AspCore.Entities.Constants
             public const string GET_PROJECT_FOLDERS = "ProjectFolders";
         }
 
-        public struct CacheApi_Urls
+        public struct DataSearchApi_Urls
         {
-            public const string CREATE_ACTION_NAME = "CreateCacheData";
-            public const string READ_ACTION_NAME = "ReadCacheData";
-            public const string UPDATE_ACTION_NAME = "UpdateCacheData";
-            public const string DELETE_ACTION_NAME = "DeleteCacheData";
-            public const string GETDATA_ACTION_NAME = "GetCacheData";
-            public const string MIN_MAX_ACTION_NAME = "MinMaxCacheData";
+            public const string CREATE_ACTION_NAME = "CreateIndexData";
+            public const string READ_ACTION_NAME = "ReadIndexData";
+            public const string UPDATE_ACTION_NAME = "UpdateIndexData";
+            public const string DELETE_ACTION_NAME = "DeleteIndexData";
+            public const string GETDATA_ACTION_NAME = "GetIndexData";
+            public const string INIT_INDEX_ACTION_NAME = "InitIndex";
         }
 
         public struct Api_Keys

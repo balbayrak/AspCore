@@ -1,5 +1,6 @@
 ﻿using AspCore.DataAccess.Configuration;
 using AspCore.DocumentAccess.Configuration;
+using AspCore.ElasticSearchApiClient.Configuration;
 using AspCore.WebApi.Configuration.Options;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,13 @@ namespace AspCore.BusinessApi.Configuration
             DocumentAccessBuilder documentHelperBuilder = new DocumentAccessBuilder(configurationBuilderOption.services);
             action(documentHelperBuilder);
 
+            return configurationBuilderOption;
+        }
+
+        public static ConfigurationBuilderOption AddDataSearchAccessLayer(this ConfigurationBuilderOption configurationBuilderOption,string defaultCAcheApiKey, Action<ESApiClientBuilder> builder)
+        {
+            ESApiClientBuilder cacheClientBuilder = new ESApiClientBuilder(configurationBuilderOption.services, defaultCAcheApiKey);
+            builder(cacheClientBuilder);
             return configurationBuilderOption;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using AspCore.ApiClient.Configuration;
-using AspCore.CacheEntityClient.Configuration;
 using AspCore.Dependency.Configuration;
 using AspCore.Entities.Configuration;
 using AspCore.Extension;
@@ -102,11 +101,6 @@ namespace AspCore.WebApi.Configuration.Options
             return this;
         }
 
-        public ConfigurationBuilderOption AddCacheEntityAccessLayer(string defaultCAcheApiKey, Action<CacheClientBuilder> builder)
-        {
-            CacheClientBuilder cacheClientBuilder = new CacheClientBuilder(services, defaultCAcheApiKey);
-            builder(cacheClientBuilder);
-            return this;
-        }
+
     }
 }

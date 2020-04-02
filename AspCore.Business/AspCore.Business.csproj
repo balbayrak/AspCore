@@ -13,8 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
     <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
-    <ProjectReference Include="..\AspCore.CacheEntityClient\AspCore.CacheEntityClient.csproj" />
     <ProjectReference Include="..\AspCore.DataAccess\AspCore.DataAccess.csproj" />
+    <ProjectReference Include="..\AspCore.DataSearch\AspCore.DataSearch.csproj" />
     <ProjectReference Include="..\AspCore.DocumentAccess\AspCore.DocumentAccess.csproj" />
   </ItemGroup>
 

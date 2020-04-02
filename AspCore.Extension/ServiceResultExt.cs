@@ -1,6 +1,6 @@
-﻿using AspCore.Entities.Cache;
-using AspCore.Entities.EntityType;
+﻿using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Entities.Search;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -94,17 +94,17 @@ namespace AspCore.Extension
             serviceResult.Result = entityView;
         }
 
-        public static void ToViewModelResultFromCacheEntityList<TViewModel, TEntity>(this ServiceResult<List<TViewModel>> serviceResult, ServiceResult<CacheResult<TEntity>> result)
+        public static void ToViewModelResultFromSearchableEntityList<TViewModel, TEntity>(this ServiceResult<List<TViewModel>> serviceResult, ServiceResult<DataSearchResult<TEntity>> result)
 where TViewModel : BaseViewModel<TEntity>, new()
-where TEntity : class, ICacheEntity, new()
+where TEntity : class, ISearchableEntity, new()
         {
             serviceResult.IsSucceeded = result.IsSucceeded;
             serviceResult.SearchResultCount = result.SearchResultCount;
             serviceResult.TotalResultCount = result.TotalResultCount;
             if (serviceResult.IsSucceededAndDataIncluded())
             {
-                result.Result.cacheItems.ForEach(x => x.ProtectEntity());
-                var entityView = result.Result.cacheItems.Select(t => new TViewModel
+                result.Result.items.ForEach(x => x.ProtectEntity());
+                var entityView = result.Result.items.Select(t => new TViewModel
                 {
                     dataEntity = t
                 }).ToList();
@@ -112,9 +112,9 @@ where TEntity : class, ICacheEntity, new()
             }
         }
 
-        public static void ToViewModelResultFromCacheEntity<TViewModel, TEntity>(this ServiceResult<TViewModel> serviceResult, ServiceResult<CacheResult<TEntity>> result)
+        public static void ToViewModelResultFromCacheEntity<TViewModel, TEntity>(this ServiceResult<TViewModel> serviceResult, ServiceResult<DataSearchResult<TEntity>> result)
             where TViewModel : BaseViewModel<TEntity>, new()
-            where TEntity : class, ICacheEntity, new()
+            where TEntity : class, ISearchableEntity, new()
         {
 
             serviceResult.IsSucceeded = result.IsSucceeded;
@@ -123,12 +123,12 @@ where TEntity : class, ICacheEntity, new()
 
             if (result.IsSucceededAndDataIncluded())
             {
-                result.Result.cacheItems[0].ProtectEntity();
+                result.Result.items[0].ProtectEntity();
             }
 
             var entityView = new TViewModel()
             {
-                dataEntity = result.Result.cacheItems[0]
+                dataEntity = result.Result.items[0]
             };
             serviceResult.Result = entityView;
         }

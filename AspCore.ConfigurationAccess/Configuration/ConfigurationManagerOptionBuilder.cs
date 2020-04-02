@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AspCore.ConfigurationAccess.Abstract;
+﻿using AspCore.ConfigurationAccess.Abstract;
 using AspCore.ConfigurationAccess.Concrete;
 using AspCore.Entities.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 
 namespace AspCore.ConfigurationAccess.Configuration
 {
