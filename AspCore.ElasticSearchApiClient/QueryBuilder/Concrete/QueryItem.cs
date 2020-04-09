@@ -2,7 +2,7 @@
 
 namespace AspCore.ElasticSearchApiClient.QueryBuilder.Concrete
 {
-    public abstract class QueryItem : IQueryItem
+    public class QueryItem : IQueryItem
     {
         public string FieldName { get; set; }
 

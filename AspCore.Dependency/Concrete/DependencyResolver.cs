@@ -37,7 +37,7 @@ namespace AspCore.Dependency.Concrete
         {
             return _serviceProvider.GetService<T>();
         }
-       
+
         public T GetServiceByName<T>(string name)
         {
             var factory = _serviceProvider.GetService<IServiceByNameFactory<T>>();

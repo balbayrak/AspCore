@@ -1,12 +1,9 @@
-﻿using AspCore.ApiClient;
-using AspCore.ApiClient.Configuration;
-using AspCore.ApiClient.Entities;
+﻿using AspCore.ApiClient.Configuration;
+using AspCore.ElasticSearchApiClient;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace AspCore.ElasticSearchApiClient.Configuration
+namespace AspCore.DataSearch.Configuration
 {
     public class DataSearchApiClientBuilder
     {
@@ -17,12 +14,12 @@ namespace AspCore.ElasticSearchApiClient.Configuration
             _services = services;
         }
 
-        public ESApiReadOnlyClientBuilder AddApiClients(string defaultApiClientKey, Action<ApiClientByNameBuilder> builder)
+        public DataSearchClientBuilder AddApiClients(string defaultApiClientKey, Action<ApiClientByNameBuilder> builder)
         {
             ApiClientByNameBuilder apiClientByNameBuilder = new ApiClientByNameBuilder(_services);
             builder(apiClientByNameBuilder);
 
-            return new ESApiReadOnlyClientBuilder(_services, defaultApiClientKey);
+            return new DataSearchClientBuilder(_services, defaultApiClientKey);
         }
     }
 }

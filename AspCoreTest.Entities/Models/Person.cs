@@ -3,7 +3,7 @@ using AspCore.Entities.EntityType;
 
 namespace AspCoreTest.Entities.Models
 {
-    public partial class Person : BaseCacheEntity
+    public partial class Person : BaseSearchableEntity
     {
         public Person()
         {

@@ -23,9 +23,7 @@ namespace AspCore.ElasticSearch.Abstract
 
         ServiceResult<bool> Delete<T>(string aliasName, T document) where T : class, ISearchableEntity, new();
 
-        ServiceResult<bool> BulkIndex<T>(string aliasName, List<T> documents) where T : class, ISearchableEntity, new();
-
-        ServiceResult<bool> BulkIndexWithBlockSize<T>(string aliasName, List<T> documents, int blockSize) where T : class, ISearchableEntity, new();
+        ServiceResult<bool> BulkIndex<T>(string aliasName, List<T> documents, int blockSize=1000) where T : class, ISearchableEntity, new();
 
         ServiceResult<DataSearchResult<T>> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class, ISearchableEntity, new();
 

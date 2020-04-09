@@ -31,9 +31,9 @@ namespace AspCore.ElasticSearchApiClient
             return _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities).Result;
         }
 
-        public ServiceResult<bool> InitIndex(bool initWithData)
+        public ServiceResult<bool> ResetIndex(bool initWithData)
         {
-            _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.INIT_INDEX_ACTION_NAME;
+            _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.RESET_INDEX_ACTION_NAME;
             return _apiClient.PostRequest<ServiceResult<bool>>(new InitIndexRequest
             {
                 initializeWithData = initWithData

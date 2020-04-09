@@ -1,5 +1,6 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.BackendForFrontend.Concrete;
+using AspCore.DataSearch.Configuration;
 using AspCore.ElasticSearchApiClient.Configuration;
 using AspCore.Entities.Configuration;
 using AspCore.Entities.DocumentType;

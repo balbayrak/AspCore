@@ -18,7 +18,8 @@ namespace AspCore.Business.General
             public const string TASK_ACTION_EXCEPTION = "Task içerisinde action bulunamadı!, Controller action ismi ile task içerisinde aynı isimde action bulunmalıdır!";
             public const string TASK_ACTION_RUN_EXCEPTION = "Task içerisinde action çalıştırılamadı!";
 
-            public const string CACHE_ENTITY_CONVERT_EXCEPTION = "Complex Cache entity convert error!";
+            public const string SEARCHABLE_ENTITY_CONVERT_EXCEPTION = "Complex Cache entity convert error!";
+            public const string INIT_INDEX_EXCEPTION = "Init index failure!";
         }
 
         public struct MiddlewareErrorMessages

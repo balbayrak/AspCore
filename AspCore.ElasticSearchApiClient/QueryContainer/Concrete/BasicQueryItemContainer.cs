@@ -6,7 +6,7 @@ namespace AspCore.ElasticSearchApiClient.QueryContiner.Concrete
 {
     public class BasicQueryItemContainer : IBasicQueryItemContainer
     {
-        public IQueryItem query { get; set; }
+        public QueryItem query { get; set; }
         public BasicQueryItemContainer()
         {
 

@@ -8,25 +8,29 @@ using AspCore.WebComponents.HtmlHelpers.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using AspCore.Dependency.Concrete;
+using AspCore.DataSearch.Abstract;
 
 namespace AspCore.Web.Concrete
 {
-    public abstract class BaseDatatableEntityBffLayer<TViewModel, TEntity> : BaseEntityBffLayer<TViewModel, TEntity>
-        where TViewModel : BaseViewModel<TEntity>, new()
-        where TEntity : class, IEntity, new()
+    public abstract class BaseDatatableSearchableEntityBffLayer<TViewModel, TSearchableEntity, TSearchClient> : BaseSearchableEntityBffLayer<TViewModel, TSearchableEntity, TSearchClient>
+        where TViewModel : BaseViewModel<TSearchableEntity>, new()
+        where TSearchableEntity : class, ISearchableEntity, new()
+        where TSearchClient : class, IDataSearchClient<TSearchableEntity>
     {
         public virtual JQueryDataTablesResponse GetAll(JQueryDataTablesModel jQueryDataTablesModel)
         {
-           
+
             try
             {
-                var storageObject = jQueryDataTablesModel.columnInfos.DeSerialize<TEntity>();
+                var storageObject = jQueryDataTablesModel.columnInfos.DeSerialize<TSearchableEntity>();
                 if (storageObject != null)
                 {
-                    ServiceResult<List<TViewModel>> result = GetAllAsync(jQueryDataTablesModel.ToEntityFilter<TEntity>(storageObject.GetSearchableColumnString())).Result;
+                    var entityFilter = jQueryDataTablesModel.ToEntityFilter<TSearchableEntity>(storageObject.GetSearchableColumnString());
+                    int startIndex = entityFilter.page.Value * entityFilter.pageSize.Value;
+                    ServiceResult<List<TViewModel>> result = FindBy(true, startIndex, entityFilter.pageSize.Value);
                     if (result.IsSucceeded && result.Result != null)
                     {
-                        using (var parser = new DatatableParser<TEntity>(result.Result.Select(t => t.dataEntity).ToList(), storageObject))
+                        using (var parser = new DatatableParser<TSearchableEntity>(result.Result.Select(t => t.dataEntity).ToList(), storageObject))
                         {
                             return parser.Parse(jQueryDataTablesModel, result.TotalResultCount, result.SearchResultCount);
                         }

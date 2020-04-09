@@ -10,14 +10,15 @@ using System.Collections.Generic;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public class BaseSearchableEntityBffLayer<TViewModel, TSearchableEntity> : BaseEntityBffLayer<TViewModel, TSearchableEntity>, ISearchableEntityBffLayer<TViewModel, TSearchableEntity>
+    public abstract class BaseSearchableEntityBffLayer<TViewModel, TSearchableEntity,TSearchClient> : BaseEntityBffLayer<TViewModel, TSearchableEntity>, ISearchableEntityBffLayer<TViewModel, TSearchableEntity>
         where TViewModel : BaseViewModel<TSearchableEntity>, new()
         where TSearchableEntity : class, ISearchableEntity, new()
+        where TSearchClient : class, IDataSearchClient<TSearchableEntity>
     {
-        private readonly IDataSearchClient<TSearchableEntity> _dataSearchClient;
+        protected readonly TSearchClient _dataSearchClient;
         public BaseSearchableEntityBffLayer() : base()
         {
-            _dataSearchClient = DependencyResolver.Current.GetService<IDataSearchClient<TSearchableEntity>>();
+            _dataSearchClient = DependencyResolver.Current.GetService<TSearchClient>();
         }
 
         public ServiceResult<List<TViewModel>> FindBy(bool isActiveOnly, int startIndex, int takeCount)

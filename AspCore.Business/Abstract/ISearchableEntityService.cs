@@ -1,12 +1,13 @@
 ﻿using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
-using System.Collections.Generic;
 
 namespace AspCore.Business.Abstract
 {
-    public interface ISearchableEntityService<TSearchableEntity> : IEntityService<TSearchableEntity>
-       where TSearchableEntity : class, ISearchableEntity, new()
+    public interface ISearchableEntityService<TEntity, TSearchableEntity> : IEntityService<TEntity>
+        where TSearchableEntity : class, ISearchableEntity, new()
+        where TEntity : class, IEntity, new()
     {
+        ServiceResult<bool> ResetSearchableData(bool initWithData);
         ServiceResult<TSearchableEntity[]> GetSearchableEntities();
     }
 }

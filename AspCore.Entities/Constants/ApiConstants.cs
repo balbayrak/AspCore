@@ -44,7 +44,7 @@ namespace AspCore.Entities.Constants
             public const string UPDATE_ACTION_NAME = "UpdateIndexData";
             public const string DELETE_ACTION_NAME = "DeleteIndexData";
             public const string GETDATA_ACTION_NAME = "GetIndexData";
-            public const string INIT_INDEX_ACTION_NAME = "InitIndex";
+            public const string RESET_INDEX_ACTION_NAME = "ResetIndex";
         }
 
         public struct Api_Keys

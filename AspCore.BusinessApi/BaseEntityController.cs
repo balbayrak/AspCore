@@ -16,7 +16,7 @@ using AspCore.WebApi;
 
 namespace AspCore.BusinessApi
 {
-    public class BaseEntityController<TEntityService, TEntity> : BaseController
+    public class BaseEntityController<TEntity, TEntityService> : BaseController
         where TEntityService : IEntityService<TEntity>
         where TEntity : class, IEntity, new()
     {

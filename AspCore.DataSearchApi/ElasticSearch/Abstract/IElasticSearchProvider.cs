@@ -1,26 +1,25 @@
-﻿using AspCore.Dependency.Abstract;
+﻿using AspCore.ElasticSearch.Abstract;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Entities.Search;
+using Nest;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace AspCore.DataSearchApi.ElasticSearch.Abstract
 {
-    public interface IElasticSearchProvider<T> : ITransientType where T : class, ISearchableEntity, new()
+    public interface IElasticSearchProvider<TSearchableEntity>
+          where TSearchableEntity : class, ISearchableEntity, new()
     {
-        ServiceResult<bool> CreateSearchableEntity(string indexKey, T searchableEntity);
-
-        ServiceResult<bool> UpdateSearchableEntity(string indexKey, T searchableEntity);
-
-        ServiceResult<bool> DeleteSearchableEntity(string indexKey, T searchableEntity);
-
-        ServiceResult<DataSearchResult<T>> ReadSearchableEntity(SearchRequestItem searchRequestItem);
-
-        ServiceResult<bool> UpdateSearchableEntityList(string indexKey, List<T> searchableEntityList);
-
-        ServiceResult<bool> DeleteSearchableEntityList(string indexKey, List<T> searchableEntityList);
-
-        ServiceResult<bool> CreateSearchableEntityList(string indexKey, List<T> searchableEntityList);
+        IESContext context { get; }
+        ServiceResult<TSearchableEntity[]> GetSearchableEntities();
+        ServiceResult<bool> ResetIndex(InitIndexRequest initRequest);
+        ServiceResult<bool> InitIndex(InitIndexRequest initRequest);
+        ServiceResult<bool> CreateIndexItem(TSearchableEntity[] searchableEntities);
+        ServiceResult<DataSearchResult<TSearchableEntity>> ReadIndexItem(SearchRequestItem searchRequestItem);
+        ServiceResult<bool> UpdateIndexItem( TSearchableEntity[] searchableEntities);
+        ServiceResult<bool> DeleteIndexItem(TSearchableEntity[] searchableEntities);
     }
 }

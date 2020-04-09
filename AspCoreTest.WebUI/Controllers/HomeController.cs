@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityFilter;
 using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.Entities.Models;
+using AspCoreTest.WebUI.DataSearch;
 using AspCoreTest.WebUI.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,8 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult Index()
         {
+            var client = DependencyResolver.Current.GetService<IPersonDataSearchClient>();
+            var result = client.FindBy(true, 0, 10);
             return View();
         }
 
@@ -32,6 +36,7 @@ namespace AspCoreTest.WebUI.Controllers
             AlertService.Info("default!", "Sweet!", AlertType.Sweet);
 
             AlertService.Info("default!", "Default!", AlertType.Default);
+
 
             ViewBag.Models = new List<Person>()
             {

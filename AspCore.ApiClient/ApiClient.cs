@@ -252,7 +252,6 @@ namespace AspCore.ApiClient
 
                     JsonContent jsonContent = new JsonContent(postObject);
                     var response = client.PostAsync(_apiUrl, jsonContent).Result;
-
                     if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
                         Authenticate(client, true, response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER));

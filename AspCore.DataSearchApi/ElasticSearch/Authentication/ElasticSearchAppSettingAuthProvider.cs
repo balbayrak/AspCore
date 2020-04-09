@@ -86,7 +86,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Authentication
                 || actionName.Equals(ApiConstants.DataSearchApi_Urls.DELETE_ACTION_NAME, StringComparison.InvariantCultureIgnoreCase)
                 || actionName.Equals(ApiConstants.DataSearchApi_Urls.READ_ACTION_NAME, StringComparison.InvariantCultureIgnoreCase)
                 || actionName.Equals(ApiConstants.DataSearchApi_Urls.GETDATA_ACTION_NAME, StringComparison.InvariantCultureIgnoreCase)
-                || actionName.Equals(ApiConstants.DataSearchApi_Urls.INIT_INDEX_ACTION_NAME, StringComparison.InvariantCultureIgnoreCase)
+                || actionName.Equals(ApiConstants.DataSearchApi_Urls.RESET_INDEX_ACTION_NAME, StringComparison.InvariantCultureIgnoreCase)
                 || actionName.Equals(ApiConstants.DataSearchApi_Urls.UPDATE_ACTION_NAME, StringComparison.InvariantCultureIgnoreCase))
             {
                 result.IsSucceeded = false;

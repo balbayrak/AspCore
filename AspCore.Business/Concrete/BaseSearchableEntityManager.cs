@@ -1,15 +1,17 @@
 ﻿using AspCore.Business.Abstract;
+using AspCore.Business.General;
 using AspCore.DataAccess.Abstract;
 using AspCore.DataSearch.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Extension;
 using System;
 using System.Collections.Generic;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity>
+    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity,TSearchableEntity>
       where TDataAccess : IEntityRepository<TSearchableEntity>
       where TSearchableEntity : class, ISearchableEntity, new()
     {
@@ -153,6 +155,21 @@ namespace AspCore.Business.Concrete
         public ServiceResult<TSearchableEntity[]> GetSearchableEntities()
         {
             return _dataAccess.GetListWithIgnoreGlobalFilter();
+        }
+
+        public ServiceResult<bool> ResetSearchableData(bool initWithData)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+               result = _dataSearchEngine.ResetIndex(initWithData);
+            }
+            catch(Exception ex)
+            {
+                result.ErrorMessage(BusinessConstants.BaseExceptionMessages.INIT_INDEX_EXCEPTION, ex);
+            }
+            
+            return result;
         }
     }
 }

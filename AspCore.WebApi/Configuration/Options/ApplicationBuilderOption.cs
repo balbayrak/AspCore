@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Routing;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AspCore.WebApi.Configuration.Options
 {
@@ -34,5 +32,8 @@ namespace AspCore.WebApi.Configuration.Options
 
             return this;
         }
+
+
+
     }
 }

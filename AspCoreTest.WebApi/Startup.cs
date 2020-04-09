@@ -52,7 +52,7 @@ namespace AspCoreTest.WebApi
                         option.AddBearerAuthenticatedClient("YetkiApi")
                         .AddBearerAuthenticatedClient("DocumentApi")
                         .AddBearerAuthenticatedClient("ViewerApi")
-                        .AddJWTAuthenticatedClient("CacheApi")
+                        .AddJWTAuthenticatedClient("DataSearchApi")
                         .Build();
                     });
                 })
@@ -81,9 +81,9 @@ namespace AspCoreTest.WebApi
                         contactEmail = "balbayrak87@gmail.com"
                     };
                 })
-                .AddDataSearchAccessLayer("CacheApi", option =>
+                .AddDataSearchAccessLayer("DataSearchApi", option =>
                  {
-                     option.AddESApiClient<Person>("person_cache", "api/PersonCache");
+                     option.AddDataSearchEngine<Person>("api/PersonCache");
                  });
                 //.AddDocumentAccessLayer(option =>
                 //{

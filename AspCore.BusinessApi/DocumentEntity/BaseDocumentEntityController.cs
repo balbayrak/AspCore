@@ -10,7 +10,7 @@ using AspCore.Extension;
 
 namespace AspCore.BusinessApi.DocumentEntity
 {
-    public class BaseDocumentEntityController<TEntityService, TEntity, TDocument, TDocumentRequest, TDocumentEntityRequest> : BaseEntityController<TEntityService, TEntity>
+    public class BaseDocumentEntityController<TEntityService, TEntity, TDocument, TDocumentRequest, TDocumentEntityRequest> : BaseEntityController<TEntity, TEntityService>
         where TEntityService : IDocumentEntityService<TDocument, TEntity>
         where TEntity : class, IDocumentEntity, new()
         where TDocument : class, IDocument, new()

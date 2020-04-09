@@ -16,37 +16,12 @@ namespace AspCore.ElasticSearch.Concrete
     {
         private IElasticClient _elasticClient;
 
-        public ESContext()
+        public ESContext(IElasticClient elasticClient)
         {
-            _elasticClient = DependencyResolver.Current.GetService<IElasticClient>();
+            _elasticClient = elasticClient;
         }
 
-        public ServiceResult<bool> BulkIndex<T>(string aliasName, List<T> documents)
-            where T : class, ISearchableEntity, new()
-        {
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            try
-            {
-                var response = _elasticClient.IndexMany(documents, aliasName);
-                if (response.IsValid && response.OriginalException == null)
-                {
-                    result.IsSucceeded = true;
-                    result.Result = true;
-                }
-                else
-                {
-                    result.ErrorMessage(ESConstants.ErrorMessages.ES_BULK_INDEX_ERROR_OCCURRED, response.OriginalException);
-                }
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(ESConstants.ErrorMessages.ES_BULK_INDEX_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-
-        public ServiceResult<bool> BulkIndexWithBlockSize<T>(string aliasName, List<T> documents, int blockSize)
+        public ServiceResult<bool> BulkIndex<T>(string aliasName, List<T> documents, int blockSize=1000)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -101,10 +76,17 @@ namespace AspCore.ElasticSearch.Concrete
             try
             {
                 ExistsResponse response = _elasticClient.Indices.Exists(new IndexExistsRequest(Indices.Index(indexName)));
-                if (response.IsValid && response.OriginalException == null)
+                if (response.OriginalException == null)
                 {
                     result.IsSucceeded = true;
-                    result.Result = true;
+                    result.Result = response.IsValid;
+                }
+                else
+                {
+                    result.IsSucceeded = false;
+                    result.Result = false;
+                    result.ErrorMessage = response.OriginalException.Message;
+                    result.ExceptionMessage = response.OriginalException.StackTrace;
                 }
             }
             catch (Exception ex)
@@ -114,7 +96,6 @@ namespace AspCore.ElasticSearch.Concrete
 
             return result;
         }
-
 
         public ServiceResult<bool> CreateIndex<T>(string indexName, string aliasName, int numberOfReplica, int numberOfShard)
                   where T : class, ISearchableEntity, new()

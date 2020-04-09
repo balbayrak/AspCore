@@ -3,7 +3,7 @@ using AspCoreTest.Entities.Models;
 
 namespace testbusiness.Abstract
 {
-    public interface IPersonService: IEntityService<Person>,IBusinessService
+    public interface IPersonService : ISearchableEntityService<Person, Person>, IBusinessService
     {
     }
 }

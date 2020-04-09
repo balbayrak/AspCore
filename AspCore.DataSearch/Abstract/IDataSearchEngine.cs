@@ -1,5 +1,4 @@
-﻿using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
-using AspCore.Entities.EntityType;
+﻿using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 
 namespace AspCore.DataSearch.Abstract
@@ -10,6 +9,6 @@ namespace AspCore.DataSearch.Abstract
         ServiceResult<bool> Create(params TSearchableEntity[] searchableEntities);
         ServiceResult<bool> Update(params TSearchableEntity[] searchableEntities);
         ServiceResult<bool> Delete(params TSearchableEntity[] searchableEntities);
-        ServiceResult<bool> InitIndex(bool initWithData);
+        ServiceResult<bool> ResetIndex(bool initWithData);
     }
 }

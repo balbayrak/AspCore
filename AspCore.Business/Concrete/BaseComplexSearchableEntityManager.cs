@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity> : BaseEntityManager<TDataAccess, TEntity>, IComplexSearchableEntityService<TEntity, TSearchableEntity>
+    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity> : BaseEntityManager<TDataAccess, TEntity>, ISearchableEntityService<TEntity, TSearchableEntity>
         where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TSearchableEntity : class, ISearchableEntity, new()
@@ -23,6 +23,7 @@ namespace AspCore.Business.Concrete
         {
             _dataSearchEngine = DependencyResolver.Current.GetService<IDataSearchEngine<TSearchableEntity>>();
         }
+   
         public abstract ServiceResult<TSearchableEntity> GetComplexEntity(TEntity entity);
 
         private ServiceResult<TSearchableEntity[]> GetComplexEntities(TEntity[] entities)
@@ -50,12 +51,13 @@ namespace AspCore.Business.Concrete
 
                 if(string.IsNullOrEmpty(serviceResult.ErrorMessage))
                 {
+                    serviceResult.IsSucceeded = true;
                     serviceResult.Result = list.ToArray();
                 }
             }
             catch (Exception ex)
             {
-                serviceResult.ErrorMessage(BusinessConstants.BaseExceptionMessages.CACHE_ENTITY_CONVERT_EXCEPTION, ex);
+                serviceResult.ErrorMessage(BusinessConstants.BaseExceptionMessages.SEARCHABLE_ENTITY_CONVERT_EXCEPTION, ex);
             }
 
             return serviceResult;
@@ -110,6 +112,20 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
+        public ServiceResult<bool> ResetSearchableData(bool initWithData)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                result = _dataSearchEngine.ResetIndex(initWithData);
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(BusinessConstants.BaseExceptionMessages.INIT_INDEX_EXCEPTION, ex);
+            }
+
+            return result;
+        }
         public override ServiceResult<bool> Update(params TEntity[] entities)
         {
             _transactionBuilder.BeginTransaction();

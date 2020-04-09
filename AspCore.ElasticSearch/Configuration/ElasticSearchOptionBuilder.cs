@@ -19,7 +19,7 @@ namespace AspCore.ElasticSearch.Configuration
         {
         }
 
-        public void AddElasticSearch<TOption>(string configurationKey)
+        public ElasticSearchProviderOption AddElasticSearch<TOption>(string configurationKey)
             where TOption : class, IElasticSearchOption, new()
         {
             using (ServiceProvider serviceProvider = services.BuildServiceProvider())
@@ -43,6 +43,7 @@ namespace AspCore.ElasticSearch.Configuration
 
                     if (elasticOption != null)
                     {
+                        services.AddSingleton<IElasticSearchOption>(elasticOption);
                         if (elasticOption.Servers != null && elasticOption.Servers.Length > 0)
                         {
                             ConnectionSettings _settings = null;
@@ -80,10 +81,10 @@ namespace AspCore.ElasticSearch.Configuration
                                 services.AddSingleton<IESContext, ESContext>();
                             }
                         }
-
                     }
                 }
             }
+            return new ElasticSearchProviderOption(services);
         }
 
         public void AddElasticSearch(ConnectionSettings connectionSettings = null)

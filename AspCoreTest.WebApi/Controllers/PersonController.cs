@@ -2,10 +2,9 @@
 using AspCoreTest.Entities.Models;
 using testbusiness.Abstract;
 
-
 namespace AspCoreTest.WebApi.Controllers
 {
-    public class PersonController : BaseEntityController<IPersonService, Person>
+    public class PersonController : BaseSearchableEntityController<Person, IPersonService>
     {
       
     }

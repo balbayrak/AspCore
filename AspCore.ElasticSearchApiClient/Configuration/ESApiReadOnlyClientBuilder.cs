@@ -15,14 +15,13 @@ namespace AspCore.ElasticSearchApiClient.Configuration
         public ESApiReadOnlyClientBuilder AddESApiClient<TSearchableEntity>(string apiClientKey, string elasticApiRoute)
      where TSearchableEntity : class, ISearchableEntity, new()
         {
-            _services.AddTransient(typeof(IElasticClient<TSearchableEntity>), sp =>
+            _services.AddTransient(typeof(IReadOnlyElasticClient<TSearchableEntity>), sp =>
             {
                 return new ReadOnlyElasticClient<TSearchableEntity>(apiClientKey,elasticApiRoute);
             });
 
             return this;
         }
-
         public ESApiReadOnlyClientBuilder AddESApiClient<TSearchableEntity>(string elasticApiRoute)
      where TSearchableEntity : class, ISearchableEntity, new()
         {

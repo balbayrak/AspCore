@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AspCore.BusinessApi.Configuration;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.DataSearchApi.Configuration;
 using AspCore.DataSearchApi.ElasticSearch.Authentication;
@@ -11,13 +8,14 @@ using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Filters;
+using AspCoreTest.DataAccess.Concrete.EntityFramework;
+using AspCoreTest.DataSearchApi.ESProviders;
+using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace AspCoreTest.DataSearchApi
 {
@@ -46,11 +44,15 @@ namespace AspCoreTest.DataSearchApi
                         option.type = EnumConfigurationAccessorType.AppSettingJson;
                     });
                 })
+                .AddDataAccessLayer(option =>
+                {
+                    option.ConfigureDataAccessLayer<AspCoreTestDbContext>("DataAccessLayerInfo");
+                })
                 .AddJWTAuthentication(option =>
                 {
                     option.AddAppSettingAuthenticationProvider<AuthenticationInfo, ElasticSearchApiJWTInfo, ElasticSearchApiOption, ElasticSearchAppSettingAuthProvider>(option =>
                     {
-                        option.configurationKey = "CacheApiInfo";
+                        option.configurationKey = "SearchApiInfo";
                     })
                     .AddTokenGenerator<ElasticSearchApiJWTInfo, ElasticSearchApiTokenGenerator>(option =>
                     {
@@ -72,7 +74,8 @@ namespace AspCoreTest.DataSearchApi
                 })
                 .AddDataSearchProviders(option =>
                 {
-                    option.AddElasticSearch<ElasticSearchApiOption>("CacheApiInfo");
+                    option.AddElasticSearch<ElasticSearchApiOption>("SearchApiInfo")
+                    .AddElasticSearchIndex<Person, PersonElasticSearchProvider>("person");
                 });
             }, mvcOption =>
             {
@@ -107,7 +110,11 @@ namespace AspCoreTest.DataSearchApi
                     option.SwaggerEndpoint("/swagger/v1/swagger.json", "AspCore Data Search API");
                     option.RoutePrefix = "api";
 
-                });
+                })
+                .UseDataSearch(app, option =>
+                 {
+                     option.InitElasticSearchIndex<Person, PersonElasticSearchProvider>("person", true);
+                 });
             });
         }
     }
