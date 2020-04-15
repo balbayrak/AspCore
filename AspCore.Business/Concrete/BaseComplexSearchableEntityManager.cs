@@ -112,20 +112,6 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
-        public ServiceResult<bool> ResetSearchableData(bool initWithData)
-        {
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            try
-            {
-                result = _dataSearchEngine.ResetIndex(initWithData);
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(BusinessConstants.BaseExceptionMessages.INIT_INDEX_EXCEPTION, ex);
-            }
-
-            return result;
-        }
         public override ServiceResult<bool> Update(params TEntity[] entities)
         {
             _transactionBuilder.BeginTransaction();
@@ -249,5 +235,6 @@ namespace AspCore.Business.Concrete
                 ExceptionMessage = result.ExceptionMessage
             };
         }
+
     }
 }

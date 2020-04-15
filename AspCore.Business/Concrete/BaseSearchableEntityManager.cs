@@ -157,19 +157,5 @@ namespace AspCore.Business.Concrete
             return _dataAccess.GetListWithIgnoreGlobalFilter();
         }
 
-        public ServiceResult<bool> ResetSearchableData(bool initWithData)
-        {
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            try
-            {
-               result = _dataSearchEngine.ResetIndex(initWithData);
-            }
-            catch(Exception ex)
-            {
-                result.ErrorMessage(BusinessConstants.BaseExceptionMessages.INIT_INDEX_EXCEPTION, ex);
-            }
-            
-            return result;
-        }
     }
 }

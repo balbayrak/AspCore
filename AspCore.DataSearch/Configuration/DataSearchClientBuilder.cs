@@ -1,6 +1,7 @@
 ﻿using AspCore.ElasticSearchApiClient;
 using AspCore.Entities.EntityType;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.DataSearch.Configuration
 {
@@ -13,7 +14,7 @@ namespace AspCore.DataSearch.Configuration
             _services = services;
             _apiClientKey = apiClientKey;
         }
-        public DataSearchClientBuilder AddDataSearchClient<TSearchableEntity>(string apiClientKey,string elasticApiRoute)
+        public DataSearchClientBuilder AddDataSearchClient<TSearchableEntity>(string apiClientKey, string elasticApiRoute)
                    where TSearchableEntity : class, ISearchableEntity, new()
         {
             _services.AddTransient(typeof(IReadOnlyElasticClient<TSearchableEntity>), sp =>
@@ -33,5 +34,16 @@ namespace AspCore.DataSearch.Configuration
 
             return this;
         }
+        public void ElasticSearchAdmins(Action<ElasticSearchAdminBuilder> builder)
+        {
+            ElasticSearchAdminBuilder elasticSearchAdminBuilder = new ElasticSearchAdminBuilder(_services, _apiClientKey);
+            builder(elasticSearchAdminBuilder);
+        }
+        public void ElasticSearchAdmins(string apiClientKey, Action<ElasticSearchAdminBuilder> builder)
+        {
+            ElasticSearchAdminBuilder elasticSearchAdminBuilder = new ElasticSearchAdminBuilder(_services, apiClientKey);
+            builder(elasticSearchAdminBuilder);
+        }
+
     }
 }

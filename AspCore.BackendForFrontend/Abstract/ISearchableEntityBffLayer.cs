@@ -6,9 +6,9 @@ using System.Text;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
-    public interface ISearchableEntityBffLayer<TViewModel, TCacheEntity> : IEntityBffLayer<TViewModel, TCacheEntity>
-         where TViewModel : BaseViewModel<TCacheEntity>
-         where TCacheEntity : class, ISearchableEntity, new()
+    public interface ISearchableEntityBffLayer<TViewModel, TSearchableEntity> : IEntityBffLayer<TViewModel, TSearchableEntity>
+         where TViewModel : BaseViewModel<TSearchableEntity>
+         where TSearchableEntity : class, ISearchableEntity, new()
     {
         ServiceResult<List<TViewModel>> FindBy(bool isActiveOnly, int startIndex, int takeCount);
 

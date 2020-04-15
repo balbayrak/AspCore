@@ -1,5 +1,4 @@
-﻿using AspCore.Dependency.Concrete;
-using AspCore.ElasticSearch.Abstract;
+﻿using AspCore.ElasticSearch.Abstract;
 using AspCore.ElasticSearch.General;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;

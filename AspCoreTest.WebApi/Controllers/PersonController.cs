@@ -4,7 +4,7 @@ using testbusiness.Abstract;
 
 namespace AspCoreTest.WebApi.Controllers
 {
-    public class PersonController : BaseSearchableEntityController<Person, IPersonService>
+    public class PersonController : BaseEntityController<Person, IPersonService>
     {
       
     }

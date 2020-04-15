@@ -85,7 +85,11 @@ namespace AspCoreTest.WebUI
                     {
                         option.AddJWTAuthenticatedClient("DataSearchApi")
                         .Build();
-                    }).AddDataSearchClient<Person>("api/PersonCache");
+                    }).AddDataSearchClient<Person>("api/PersonCache")
+                    .ElasticSearchAdmins(option=>
+                    {
+                        option.AddElasticSearchAdmin<Person>("api/PersonCache");
+                    });
                 });
             });
         }

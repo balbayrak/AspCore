@@ -1,10 +1,5 @@
-﻿using AspCore.ConfigurationAccess.Abstract;
-using AspCore.DataSearchApi.ElasticSearch.Abstract;
-using AspCore.DataSearchApi.ElasticSearch.Convertors;
+﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.Dependency.Concrete;
-using AspCore.ElasticSearch.Abstract;
-using AspCore.ElasticSearch.Configuration;
-using AspCore.ElasticSearch.General;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
@@ -14,10 +9,6 @@ using AspCore.Extension;
 using AspCore.WebApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AspCore.DataSearchApi
 {

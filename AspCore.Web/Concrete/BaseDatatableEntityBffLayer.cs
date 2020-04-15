@@ -1,5 +1,4 @@
-﻿using System;
-using AspCore.BackendForFrontend.Concrete;
+﻿using AspCore.BackendForFrontend.Concrete;
 using AspCore.Entities.DataTable;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
@@ -7,7 +6,6 @@ using AspCore.WebComponents.HtmlHelpers.DataTable.Storage;
 using AspCore.WebComponents.HtmlHelpers.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using AspCore.Dependency.Concrete;
 
 namespace AspCore.Web.Concrete
 {

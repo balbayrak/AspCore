@@ -7,7 +7,6 @@ namespace AspCore.Business.Abstract
         where TSearchableEntity : class, ISearchableEntity, new()
         where TEntity : class, IEntity, new()
     {
-        ServiceResult<bool> ResetSearchableData(bool initWithData);
         ServiceResult<TSearchableEntity[]> GetSearchableEntities();
     }
 }

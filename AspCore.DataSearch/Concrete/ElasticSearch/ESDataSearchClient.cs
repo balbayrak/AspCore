@@ -28,7 +28,8 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
                 result = _readOnlyElasticClient.Read(t => t.From(startIndex)  
                                            .Size(takeCount)
                                            //.Sort(tt => tt.Descending(ttt => ttt.id))
-                                           .Query(tt => tt.Bool(s => s.Filter(m => m.TermQuery(mm => mm.IsDeleted, false)))));
+                                           .Query(tt => tt.Bool(s => s.Filter(m => m.TermQuery(mm => mm.IsDeleted, false))))
+                                           .TotalCountAgg(t=>t.Id));
 
             }
             else
