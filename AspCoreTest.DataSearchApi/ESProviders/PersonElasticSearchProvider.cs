@@ -3,12 +3,13 @@ using AspCore.DataSearchApi.ElasticSearch.Concrete;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.General;
 using AspCoreTest.Entities.Models;
+using AspCoreTest.Entities.SearchableEntities;
 using Nest;
 using testbusiness.Abstract;
 
 namespace AspCoreTest.DataSearchApi.ESProviders
 {
-    public class PersonElasticSearchProvider : BaseElasticSearchProvider<Person>, IElasticSearchProvider<Person>
+    public class PersonElasticSearchProvider : BaseElasticSearchProvider<PersonSearchEntity>, IElasticSearchProvider<PersonSearchEntity>
     {
         public readonly IPersonService personService;
         public PersonElasticSearchProvider(string indexKey) : base(indexKey)
@@ -23,8 +24,14 @@ namespace AspCoreTest.DataSearchApi.ESProviders
                    .Tokenizers(tk => tk.Keyword("keyword", tkk => tkk.BufferSize(512)))))
 
 
-                   .Map<Person>(m => m.AutoMap()
+                   .Map<PersonSearchEntity>(m => m.AutoMap()
                    .Properties(p => p.Text(pp => pp.Name(n => n.Name)
+                                                                     .Analyzer("myAnalyzer")
+                                                                     .SearchAnalyzer("myAnalyzer")
+                                                                     .Fields(f => f.Keyword(t => t.Name("keyword").IgnoreAbove(256)))
+                                                                                      .Fielddata(true)
+                                                                     )
+                   .Text(pp => pp.Name(n => n.Surname)
                                                                      .Analyzer("myAnalyzer")
                                                                      .SearchAnalyzer("myAnalyzer")
                                                                      .Fields(f => f.Keyword(t => t.Name("keyword").IgnoreAbove(256)))
@@ -35,9 +42,11 @@ namespace AspCoreTest.DataSearchApi.ESProviders
 
                .Aliases(a => a.Alias(aliasKey));
 
-        public override ServiceResult<Person[]> GetSearchableEntities()
+        public override ServiceResult<PersonSearchEntity[]> GetSearchableEntities()
         {
-            return personService.GetSearchableEntities();
+            return  personService.GetSearchableEntities();
+
+
         }
     }
 }

@@ -6,5 +6,6 @@ namespace AspCore.Entities.EntityType
 {
     public class BaseSearchableEntity : BaseEntity, ISearchableEntity
     {
+        public long searchId { get; set; }
     }
 }

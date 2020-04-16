@@ -2,18 +2,23 @@
 using AspCore.Entities.General;
 using AspCoreTest.DataAccess.Abstract;
 using AspCoreTest.Entities.Models;
+using AspCoreTest.Entities.SearchableEntities;
 using testbusiness.Abstract;
 
 namespace testbusiness.Concrete
 {
-    public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person, Person>, IPersonService
+    public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person,PersonSearchEntity>, IPersonService
     {
-        public override ServiceResult<Person> GetComplexEntity(Person entity)
+        public PersonManager()
         {
-            return new ServiceResult<Person>
+
+        }
+        public override ServiceResult<PersonSearchEntity> GetComplexEntity(Person entity)
+        {
+            return new ServiceResult<PersonSearchEntity>
             {
                 IsSucceeded = true,
-                Result = entity
+                Result = mapper.MapProperties<Person, PersonSearchEntity>(entity)
             };
         }
     }

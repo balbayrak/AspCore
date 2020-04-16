@@ -6,6 +6,7 @@ using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using AspCore.Utilities.Mapper.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,15 @@ namespace AspCore.Business.Concrete
         where TEntity : class, IEntity, new()
         where TSearchableEntity : class, ISearchableEntity, new()
     {
+        protected ICustomMapper mapper { get; private set; }
         private readonly IDataSearchEngine<TSearchableEntity> _dataSearchEngine;
 
         public BaseComplexSearchableEntityManager()
         {
+            mapper = DependencyResolver.Current.GetService<ICustomMapper>();
             _dataSearchEngine = DependencyResolver.Current.GetService<IDataSearchEngine<TSearchableEntity>>();
         }
-   
+
         public abstract ServiceResult<TSearchableEntity> GetComplexEntity(TEntity entity);
 
         private ServiceResult<TSearchableEntity[]> GetComplexEntities(TEntity[] entities)
@@ -49,9 +52,10 @@ namespace AspCore.Business.Concrete
                     entityResult = null;
                 }
 
-                if(string.IsNullOrEmpty(serviceResult.ErrorMessage))
+                if (string.IsNullOrEmpty(serviceResult.ErrorMessage))
                 {
                     serviceResult.IsSucceeded = true;
+                 
                     serviceResult.Result = list.ToArray();
                 }
             }

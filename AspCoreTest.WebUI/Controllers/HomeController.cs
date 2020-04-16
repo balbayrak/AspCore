@@ -20,8 +20,8 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult Index()
         {
-            //var client = DependencyResolver.Current.GetService<IPersonDataSearchClient>();
-            //var result = client.FindBy(true, 0, 10);
+            var client = DependencyResolver.Current.GetService<IPersonDataSearchClient>();
+            var result = client.FindBy(true, 0, 10);
             return View();
         }
 

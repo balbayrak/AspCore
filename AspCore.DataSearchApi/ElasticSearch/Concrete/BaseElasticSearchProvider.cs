@@ -63,6 +63,9 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
                         if (string.IsNullOrEmpty(result.ErrorMessage) && initRequest.initializeWithData)
                         {
                             ServiceResult<TSearchableEntity[]> entityResult = GetSearchableEntities();
+                            //long counter = 0;
+                            //entityResult.Result.ForEach(t => t.searchId = counter++);
+
                             if (entityResult.IsSucceededAndDataIncluded())
                             {
                                 result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);

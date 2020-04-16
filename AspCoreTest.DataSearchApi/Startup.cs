@@ -11,6 +11,7 @@ using AspCore.WebApi.Filters;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
 using AspCoreTest.DataSearchApi.ESProviders;
 using AspCoreTest.Entities.Models;
+using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -75,7 +76,7 @@ namespace AspCoreTest.DataSearchApi
                 .AddDataSearchProviders(option =>
                 {
                     option.AddElasticSearch<ElasticSearchApiOption>("SearchApiInfo")
-                    .AddElasticSearchIndex<Person, PersonElasticSearchProvider>("person");
+                    .AddElasticSearchIndex<PersonSearchEntity, PersonElasticSearchProvider>("person");
                 });
             }, mvcOption =>
             {
@@ -113,7 +114,7 @@ namespace AspCoreTest.DataSearchApi
                 })
                 .UseDataSearch(app, option =>
                  {
-                     option.InitElasticSearchIndex<Person, PersonElasticSearchProvider>("person", true);
+                     option.InitElasticSearchIndex<PersonSearchEntity, PersonElasticSearchProvider>("person", true);
                  });
             });
         }

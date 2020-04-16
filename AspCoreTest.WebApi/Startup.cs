@@ -8,6 +8,7 @@ using AspCore.WebApi.Security.Abstract;
 using AspCoreTest.Authentication.Concrete;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
 using AspCoreTest.Entities.Models;
+using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -83,7 +84,7 @@ namespace AspCoreTest.WebApi
                 })
                 .AddDataSearchAccessLayer("DataSearchApi", option =>
                  {
-                     option.AddDataSearchEngine<Person>("api/PersonCache");
+                     option.AddDataSearchEngine<PersonSearchEntity>("api/PersonCache");
                  });
                 //.AddDocumentAccessLayer(option =>
                 //{

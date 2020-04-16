@@ -1,11 +1,8 @@
 ﻿using AspCore.DataAccess.Configuration;
 using AspCore.DataSearch.Configuration;
 using AspCore.DocumentAccess.Configuration;
-using AspCore.ElasticSearchApiClient.Configuration;
 using AspCore.WebApi.Configuration.Options;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AspCore.BusinessApi.Configuration
 {

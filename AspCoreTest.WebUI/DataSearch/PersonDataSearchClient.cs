@@ -1,14 +1,9 @@
-﻿using AspCore.DataSearch.Abstract;
-using AspCore.DataSearch.Concrete.ElasticSearch;
-using AspCoreTest.Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AspCore.DataSearch.Concrete.ElasticSearch;
+using AspCoreTest.Entities.SearchableEntities;
 
 namespace AspCoreTest.WebUI.DataSearch
 {
-    public class PersonDataSearchClient : ESDataSearchClient<Person>, IPersonDataSearchClient
+    public class PersonDataSearchClient : ESDataSearchClient<PersonSearchEntity>, IPersonDataSearchClient
     {
     }
 }

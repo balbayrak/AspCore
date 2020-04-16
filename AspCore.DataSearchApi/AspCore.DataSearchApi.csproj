@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <Company>AspCore.DataSearchApi</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +17,6 @@
     <ProjectReference Include="..\AspCore.ElasticSearchApiClient\AspCore.ElasticSearchApiClient.csproj" />
     <ProjectReference Include="..\AspCore.ElasticSearch\AspCore.ElasticSearch.csproj" />
     <ProjectReference Include="..\AspCore.Entities\AspCore.Entities.csproj" />
-    <ProjectReference Include="..\AspCore.WebApi\AspCore.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

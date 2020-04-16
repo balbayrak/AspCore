@@ -1,11 +1,9 @@
-﻿using AspCore.BusinessApi;
-using AspCore.DataSearchApi;
-using AspCoreTest.Entities.Models;
-using testbusiness.Abstract;
+﻿using AspCore.DataSearchApi;
+using AspCoreTest.Entities.SearchableEntities;
 
 namespace AspCoreTest.DataSearchApi.Controllers
 {
-    public class PersonCacheController : BaseElasticSearchController<Person>
+    public class PersonCacheController : BaseElasticSearchController<PersonSearchEntity>
     {
     }
 }

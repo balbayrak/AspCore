@@ -6,7 +6,7 @@ using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Authentication.Concrete;
 using AspCoreTest.Entities.Models;
-using AspCoreTest.WebUI.DataSearch;
+using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -85,10 +85,10 @@ namespace AspCoreTest.WebUI
                     {
                         option.AddJWTAuthenticatedClient("DataSearchApi")
                         .Build();
-                    }).AddDataSearchClient<Person>("api/PersonCache")
+                    }).AddDataSearchClient<PersonSearchEntity>("api/PersonCache")
                     .ElasticSearchAdmins(option=>
                     {
-                        option.AddElasticSearchAdmin<Person>("api/PersonCache");
+                        option.AddElasticSearchAdmin<PersonSearchEntity>("api/PersonCache");
                     });
                 });
             });
