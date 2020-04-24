@@ -1,11 +1,11 @@
-﻿using AspCore.Dependency.Concrete;
-using AspCore.Entities.Authentication;
+﻿using AspCore.Entities.Authentication;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Configuration.Options;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace AspCore.WebApi.Filters
@@ -22,12 +22,11 @@ namespace AspCore.WebApi.Filters
         {
             _jWTAuthorizationFilterOption = new JWTAuthorizationFilterOption();
             option(_jWTAuthorizationFilterOption);
-
-            authenticationProvider = DependencyResolver.Current.GetService<IApiAuthenticationProvider<TInput, TOutput>>();
         }
 
         public override void OnCustomActionExecuting(ActionExecutingContext context)
         {
+            authenticationProvider = context.HttpContext.RequestServices.GetRequiredService<IApiAuthenticationProvider<TInput, TOutput>>();
             ServiceResult<bool> result = authenticationProvider.AuthorizeAction(context.ActionDescriptor.RouteValues["action"], context.ActionArguments);
 
             if (!result.IsSucceeded)

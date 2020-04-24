@@ -18,6 +18,11 @@ namespace AspCore.BusinessApi.DocumentEntity
         where TDocumentRequest : class, IDocumentRequest<TDocument>, new()
     {
 
+        public BaseDocumentEntityController(TEntityService entityService) : base(entityService)
+        {
+
+        }
+
         [ActionName(ApiConstants.Urls.ADDDOCUMENT)]
         [HttpPost]
         [ProducesResponseType(400)]

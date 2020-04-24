@@ -14,9 +14,10 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch.Admin
         where TSearchableEntity : class, ISearchableEntity, new()
     {
         private readonly IElasticClient<TSearchableEntity> _elasticClient;
-        public ElasticSearchAdmin()
+
+        public ElasticSearchAdmin(IElasticClient<TSearchableEntity> elasticClient)
         {
-            _elasticClient = DependencyResolver.Current.GetService<IElasticClient<TSearchableEntity>>();
+            _elasticClient = elasticClient;
         }
 
         public ServiceResult<bool> ResetIndex(bool initWithData)

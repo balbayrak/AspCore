@@ -1,5 +1,8 @@
 ﻿using AspCore.ApiClient.Entities;
 using AspCore.ApiClient.Entities.Abstract;
+using AspCore.Caching.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -28,9 +31,11 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(ApiClient<TOption>), sp =>
             {
-                return new ApiClient<TOption>(apiKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new ApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, apiKey);
             });
-
         }
 
         /// <summary>
@@ -42,8 +47,12 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(ApiClient<ApiClientConfiguration>), sp =>
             {
-                return new ApiClient<ApiClientConfiguration>(apiKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new ApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, apiKey);
             });
+
         }
 
 
@@ -59,7 +68,10 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(BearerAuthenticatedApiClient<TOption>), sp =>
             {
-                return new BearerAuthenticatedApiClient<TOption>(apiKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new BearerAuthenticatedApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, apiKey);
             });
         }
 
@@ -72,7 +84,10 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(BearerAuthenticatedApiClient<ApiClientConfiguration>), sp =>
             {
-                return new BearerAuthenticatedApiClient<ApiClientConfiguration>(apiKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new BearerAuthenticatedApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, apiKey);
             });
         }
 
@@ -88,7 +103,10 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(JWTAuthenticatedApiClient<TOption>), sp =>
             {
-                return new JWTAuthenticatedApiClient<TOption>(apiKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new JWTAuthenticatedApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, apiKey);
             });
         }
 
@@ -102,7 +120,10 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(JWTAuthenticatedApiClient<ApiClientConfiguration>), sp =>
             {
-                return new JWTAuthenticatedApiClient<ApiClientConfiguration>(apiKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new JWTAuthenticatedApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, apiKey);
             });
         }
     }

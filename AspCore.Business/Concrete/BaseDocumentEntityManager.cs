@@ -8,6 +8,7 @@ using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCore.Business.Concrete
 {
@@ -18,9 +19,9 @@ namespace AspCore.Business.Concrete
     {
         private IDocumentUploader<TDocument> _documentUploader { get; set; }
 
-        public BaseDocumentEntityManager()
+        public BaseDocumentEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _documentUploader = DependencyResolver.Current.GetService<IDocumentUploader<TDocument>>();
+            _documentUploader = ServiceProvider.GetRequiredService<IDocumentUploader<TDocument>>();
         }
 
         public ServiceResult<TDocument> CreateDocument(IDocumentEntityRequest<TDocument, TEntity> documentRequest)

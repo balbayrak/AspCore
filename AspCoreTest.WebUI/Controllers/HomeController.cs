@@ -9,18 +9,24 @@ using AspCoreTest.Entities.Models;
 using AspCoreTest.WebUI.DataSearch;
 using AspCoreTest.WebUI.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCoreTest.WebUI.Controllers
 {
     public class HomeController : BaseWebEntityController<Person, PersonViewModel, IPersonBff>
     {
-        public HomeController()
+        public HomeController(IServiceProvider serviceProvider, IPersonBff personBff) :base(serviceProvider, personBff)
         {
         }
 
         public IActionResult Index()
         {
-            var client = DependencyResolver.Current.GetService<IPersonDataSearchClient>();
+            return View();
+        }
+
+        public IActionResult PersonCacheData()
+        {
+            var client = ServiceProvider.GetRequiredService<IPersonDataSearchClient>();
             var result = client.FindBy(true, 0, 10);
             return View();
         }

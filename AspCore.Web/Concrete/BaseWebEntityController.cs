@@ -14,6 +14,7 @@ using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
 using AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder;
 using Newtonsoft.Json;
+using AspCore.Utilities.DataProtector;
 
 namespace AspCore.Web.Concrete
 {
@@ -23,9 +24,9 @@ namespace AspCore.Web.Concrete
         where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>
     {
         protected TBffLayer BffLayer { get; private set; }
-        public BaseWebEntityController()
+        public BaseWebEntityController(IServiceProvider serviceProvider, TBffLayer bffLayer) : base(serviceProvider)
         {
-            BffLayer = DependencyResolver.Current.GetService<TBffLayer>();
+            BffLayer = bffLayer;
         }
 
         [HttpPost]
@@ -82,7 +83,7 @@ namespace AspCore.Web.Concrete
                 ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
                 if (!string.IsNullOrEmpty(viewModel.dataEntity.EncryptedId))
                 {
-                    viewModel.dataEntity.Id = new Guid(DataProtectorHelper.UnProtect(viewModel.dataEntity.EncryptedId));
+                    viewModel.dataEntity.Id = new Guid(DataProtectorFactory.Instance.UnProtect(viewModel.dataEntity.EncryptedId));
                     addorUpdateResult = BffLayer.Update(new List<TViewModel> { viewModel }).Result;
                 }
                 else

@@ -9,7 +9,7 @@ using AspCore.Utilities;
 
 namespace AspCore.DataAccess.Abstract
 {
-    public interface IEntityRepository<TEntity> : ITransientType where TEntity : class, IEntity, new()
+    public interface IEntityRepository<TEntity> : IScopedType where TEntity : class, IEntity, new()
     {
         ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter);
 

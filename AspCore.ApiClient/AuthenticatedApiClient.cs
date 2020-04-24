@@ -3,8 +3,11 @@ using System.Net.Http;
 using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Entities.Abstract;
 using AspCore.ApiClient.Entities.Concrete;
+using AspCore.Caching.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
+using Microsoft.AspNetCore.Http;
 
 namespace AspCore.ApiClient
 {
@@ -32,7 +35,7 @@ namespace AspCore.ApiClient
         public abstract string AuthenticationRefreshController { get; set; }
 
 
-        public AuthenticatedApiClient(string apiKey) : base(apiKey)
+        public AuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey) : base(httpContextAccessor, configurationAccessor,cacheService,apiKey)
         {
             InitializeAuthenticatedClient(apiKey);
         }
@@ -48,7 +51,7 @@ namespace AspCore.ApiClient
 
             if (!forceAuthentication)
             {
-                tokenResponse = _accessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
+                tokenResponse = AccessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
             }
             else
             {
@@ -78,7 +81,7 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    _accessTokenService.SetObject(tokenStorageKey, tokenResponse, tokenStrorageExpireTime);
+                    AccessTokenService.SetObject(tokenStorageKey, tokenResponse, tokenStrorageExpireTime);
                 }
             }
 
@@ -104,17 +107,17 @@ namespace AspCore.ApiClient
 
             tokenStorageKey = tokenStorageKey ?? apiConstantKey;
 
-            if (apiConfiguration != null && apiConfiguration.Authentication != null && apiConfiguration.Authentication.Enabled)
+            if (ApiConfiguration != null && ApiConfiguration.Authentication != null && ApiConfiguration.Authentication.Enabled)
             {
                 authenticationInfo = authenticationInfo ?? new AuthenticationInfo();
 
-                authenticationInfo.UserName = apiConfiguration.Authentication.Username;
-                authenticationInfo.Password = apiConfiguration.Authentication.Password;
+                authenticationInfo.UserName = ApiConfiguration.Authentication.Username;
+                authenticationInfo.Password = ApiConfiguration.Authentication.Password;
 
 
-                this.AuthenticationController = apiConfiguration.Authentication.TokenPath;
-                this.AuthenticationBaseUrl = apiConfiguration.Authentication.BaseAddress;
-                this.AuthenticationRefreshController = apiConfiguration.Authentication.RefreshTokenPath;
+                this.AuthenticationController = ApiConfiguration.Authentication.TokenPath;
+                this.AuthenticationBaseUrl = ApiConfiguration.Authentication.BaseAddress;
+                this.AuthenticationRefreshController = ApiConfiguration.Authentication.RefreshTokenPath;
             }
         }
 

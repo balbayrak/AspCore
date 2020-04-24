@@ -31,13 +31,11 @@ namespace AspCore.WebApi.Configuration.Options
             SwaggerOption swaggerOption = new SwaggerOption();
             option(swaggerOption);
 
-
             services.AddSwaggerGen(g =>
             {
                 g.IgnoreObsoleteActions();
                 g.DescribeAllParametersInCamelCase();
                 g.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-
 
                 if (swaggerOption.swaggerDoc != null)
                 {

@@ -1,15 +1,14 @@
-﻿using AspCore.ConfigurationAccess.Abstract;
+﻿using AspCore.Business.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Convertors;
-using AspCore.Dependency.Concrete;
 using AspCore.ElasticSearch.Abstract;
-using AspCore.ElasticSearch.Configuration;
 using AspCore.ElasticSearch.General;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Entities.Search;
 using AspCore.Extension;
+using Microsoft.Extensions.DependencyInjection;
 using Nest;
 using System;
 using System.Collections.Generic;
@@ -17,24 +16,25 @@ using System.Linq;
 
 namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 {
-    public abstract class BaseElasticSearchProvider<TSearchableEntity> : IElasticSearchProvider<TSearchableEntity>
+    public abstract class BaseElasticSearchProvider<TSearchableEntity,TSearchableEntityService> : IElasticSearchProvider<TSearchableEntity>
           where TSearchableEntity : class, ISearchableEntity, new()
+          where TSearchableEntityService : ISearchableEntityService<TSearchableEntity>
     {
         public IESContext context { get; private set; }
 
         protected abstract CreateIndexDescriptor createIndexDescriptor { get; }
 
-        public abstract ServiceResult<TSearchableEntity[]> GetSearchableEntities();
-
         protected string indexKey { get; private set; }
 
         protected string aliasKey { get; private set; }
 
-        public BaseElasticSearchProvider(string indexKey)
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseElasticSearchProvider(IServiceProvider serviceProvider, string indexKey)
         {
+            ServiceProvider = serviceProvider;
             this.aliasKey = indexKey;
-            this.indexKey = string.Format("{0}_{1}", indexKey, DateTime.Now.ToString("yyyyMMddHHss"));          
-            context = DependencyResolver.Current.GetService<IESContext>();
+            this.indexKey = string.Format("{0}_{1}", indexKey, DateTime.Now.ToString("yyyyMMddHHss"));
+            this.context = ServiceProvider.GetRequiredService<IESContext>();
         }
 
         public ServiceResult<bool> ResetIndex(InitIndexRequest initRequest)
@@ -62,18 +62,19 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                         if (string.IsNullOrEmpty(result.ErrorMessage) && initRequest.initializeWithData)
                         {
-                            ServiceResult<TSearchableEntity[]> entityResult = GetSearchableEntities();
-                            //long counter = 0;
-                            //entityResult.Result.ForEach(t => t.searchId = counter++);
-
-                            if (entityResult.IsSucceededAndDataIncluded())
+                            using (var scope = ServiceProvider.CreateScope())
                             {
-                                result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
-                            }
-                            else
-                            {
-                                result.ErrorMessage = entityResult.ErrorMessage;
-                                result.ExceptionMessage = entityResult.ExceptionMessage;
+                                var searchableEntityService = scope.ServiceProvider.GetRequiredService<TSearchableEntityService>();
+                                ServiceResult<TSearchableEntity[]> entityResult = searchableEntityService.GetSearchableEntities();
+                                if (entityResult.IsSucceededAndDataIncluded())
+                                {
+                                    result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
+                                }
+                                else
+                                {
+                                    result.ErrorMessage = entityResult.ErrorMessage;
+                                    result.ExceptionMessage = entityResult.ExceptionMessage;
+                                }
                             }
                         }
                     }
@@ -108,15 +109,20 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                         if (result.IsSucceeded && initRequest.initializeWithData)
                         {
-                            ServiceResult<TSearchableEntity[]> entityResult = GetSearchableEntities();
-                            if (entityResult.IsSucceededAndDataIncluded())
+                            using (var scope = ServiceProvider.CreateScope())
                             {
-                                result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
-                            }
-                            else
-                            {
-                                result.ErrorMessage = entityResult.ErrorMessage;
-                                result.ExceptionMessage = entityResult.ExceptionMessage;
+                                var searchableEntityService = scope.ServiceProvider.GetRequiredService<TSearchableEntityService>();
+
+                                ServiceResult<TSearchableEntity[]> entityResult = searchableEntityService.GetSearchableEntities();
+                                if (entityResult.IsSucceededAndDataIncluded())
+                                {
+                                    result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
+                                }
+                                else
+                                {
+                                    result.ErrorMessage = entityResult.ErrorMessage;
+                                    result.ExceptionMessage = entityResult.ExceptionMessage;
+                                }
                             }
                         }
                     }

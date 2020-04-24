@@ -9,6 +9,8 @@ using AspCore.Extension;
 using AspCore.WebApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.DataSearchApi
 {
@@ -17,9 +19,11 @@ namespace AspCore.DataSearchApi
     {
         protected IElasticSearchProvider<TSearchableEntity> _elasticSearchProvider;
 
-        public BaseElasticSearchController()
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseElasticSearchController(IServiceProvider serviceProvider)
         {
-            _elasticSearchProvider = DependencyResolver.Current.GetService<IElasticSearchProvider<TSearchableEntity>>();
+            ServiceProvider = serviceProvider;
+            _elasticSearchProvider = ServiceProvider.GetRequiredService<IElasticSearchProvider<TSearchableEntity>>();
         }
 
         [NonAction]

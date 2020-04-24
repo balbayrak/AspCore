@@ -36,7 +36,7 @@ namespace AspCore.WebApi.Configuration.Options
             {
                 services.AddSingleton(typeof(IApiAuthenticationProvider<TInput, TOutput>), sp =>
                 {
-                    IApiAuthenticationProvider<TInput, TOutput> implementation = (IApiAuthenticationProvider<TInput, TOutput>)Activator.CreateInstance(typeof(TAuthenticationProvider), appSettingsAuthProviderOption.configurationKey, null);
+                    IApiAuthenticationProvider<TInput, TOutput> implementation = (IApiAuthenticationProvider<TInput, TOutput>)Activator.CreateInstance(typeof(TAuthenticationProvider), sp,appSettingsAuthProviderOption.configurationKey, null);
                     return implementation;
                 });
 
@@ -45,7 +45,7 @@ namespace AspCore.WebApi.Configuration.Options
             {
                 services.AddSingleton(typeof(IApiAuthenticationProvider<TInput, TOutput>), sp =>
                 {
-                    IApiAuthenticationProvider<TInput, TOutput> implementation = (IApiAuthenticationProvider<TInput, TOutput>)Activator.CreateInstance(typeof(TAuthenticationProvider), null, appSettingsAuthProviderOption.option);
+                    IApiAuthenticationProvider<TInput, TOutput> implementation = (IApiAuthenticationProvider<TInput, TOutput>)Activator.CreateInstance(typeof(TAuthenticationProvider),sp, null, appSettingsAuthProviderOption.option);
                     return implementation;
                 });
             }

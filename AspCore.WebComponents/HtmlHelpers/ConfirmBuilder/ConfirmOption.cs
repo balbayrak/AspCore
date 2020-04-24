@@ -13,10 +13,9 @@ namespace AspCore.WebComponents.HtmlHelpers.ConfirmBuilder
         public string confirmCallBackFuncName { get; set; }
 
 
-        public IConfirmService confirmService;
         public ConfirmOption()
         {
-            this.confirmService = DependencyResolver.Current.GetService<IConfirmService>();
+            
         }
 
         public ConfirmOption(string message, string title, string confirmCallBackFuncName = null) : this()
@@ -30,7 +29,7 @@ namespace AspCore.WebComponents.HtmlHelpers.ConfirmBuilder
         {
             get
             {
-                return this.confirmService.GetConfirmString(this);
+                return ConfirmManagerFactory.Instance.GetConfirmString(this);
             }
         }
     }

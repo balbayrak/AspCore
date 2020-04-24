@@ -1,8 +1,10 @@
 ﻿using AspCore.ApiClient.Entities.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
+using AspCore.Caching.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.General;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Net.Http;
 
@@ -11,7 +13,7 @@ namespace AspCore.ApiClient
     public class JWTAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
            where TOption : class, IApiClientConfiguration, new()
     {
-        public JWTAuthenticatedApiClient(string apiKey) : base(apiKey)
+        public JWTAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, apiKey)
         {
 
         }
@@ -31,7 +33,7 @@ namespace AspCore.ApiClient
             ServiceResult<AuthenticationToken> response = null;
             if (refreshToken)
             {
-                AuthenticationToken token = _accessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
+                AuthenticationToken token = AccessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
                 if (token != null)
                 {
                     this.apiUrl = AuthenticationRefreshController;

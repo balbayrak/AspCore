@@ -1,25 +1,23 @@
 ﻿using AspCore.Business.Abstract;
-using AspCore.Business.General;
 using AspCore.DataAccess.Abstract;
 using AspCore.DataSearch.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
-using AspCore.Extension;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity,TSearchableEntity>
+    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity>,IEntityService<TSearchableEntity>
       where TDataAccess : IEntityRepository<TSearchableEntity>
       where TSearchableEntity : class, ISearchableEntity, new()
     {
         private readonly IDataSearchEngine<TSearchableEntity> _dataSearchEngine;
-
-        public BaseSearchableEntityManager()
+         
+        public BaseSearchableEntityManager(IServiceProvider serviceProvider):base(serviceProvider)
         {
-            _dataSearchEngine = DependencyResolver.Current.GetService<IDataSearchEngine<TSearchableEntity>>();
+            _dataSearchEngine = ServiceProvider.GetRequiredService<IDataSearchEngine<TSearchableEntity>>();
         }
 
         public override ServiceResult<bool> Add(params TSearchableEntity[] entities)

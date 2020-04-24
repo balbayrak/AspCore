@@ -7,6 +7,7 @@ using AspCore.Extension;
 using AspCore.Utilities;
 using AspCore.WebApi.Authentication.Abstract;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -20,29 +21,29 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
     public abstract class JwtGenerator<TJWTInfo> : ITokenGenerator<TJWTInfo>
         where TJWTInfo : class, IJWTEntity, new()
     {
-        private IHttpContextAccessor _httpContextAccessor;
         private IConfigurationAccessor _configurationHelper { get; }
 
-        protected TokenSettingOption _tokenOption { get; set; }
+        protected TokenSettingOption TokenOption { get; set; }
 
-        private DateTime _accessTokenExpiration => DateTime.Now.AddMinutes(Convert.ToDouble(_tokenOption.AccessTokenExpiration));
+        private DateTime _accessTokenExpiration => DateTime.Now.AddMinutes(Convert.ToDouble(TokenOption.AccessTokenExpiration));
 
-        public JwtGenerator(string configurationKey, TokenSettingOption tokenOption = null)
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public JwtGenerator(IServiceProvider serviceProvider, string configurationKey, TokenSettingOption tokenOption = null)
         {
-            _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>(); ;
+            ServiceProvider = serviceProvider;
+            _configurationHelper = ServiceProvider.GetRequiredService<IConfigurationAccessor>();
 
             if (tokenOption == null && !string.IsNullOrEmpty(configurationKey))
             {
-                _tokenOption = _configurationHelper.GetValueByKey<TokenSettingOption>(configurationKey);
-                if (_tokenOption == null)
+                TokenOption = _configurationHelper.GetValueByKey<TokenSettingOption>(configurationKey);
+                if (TokenOption == null)
                 {
                     throw new Exception(SecurityConstants.TOKEN_SETTING_OPTIONS.TOKEN_SETTING_KEY_IS_NULL_EXCEPTION);
                 }
             }
             else if (tokenOption != null && string.IsNullOrEmpty(configurationKey))
             {
-                _tokenOption = tokenOption;
+                TokenOption = tokenOption;
             }
         }
 
@@ -51,7 +52,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
             ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
             try
             {
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenOption.SecurityKey));
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenOption.SecurityKey));
                 var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
                 var jwt = CreateJwtSecurityToken(jwtInfo, signingCredentials);
@@ -62,7 +63,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
                 serviceResult.Result = new AuthenticationToken();
                 serviceResult.Result.access_token = token;
                 serviceResult.Result.expires = _accessTokenExpiration;
-                serviceResult.Result.refresh_token = EncryptionHelper.Encrypt(token, _tokenOption.SecurityKey).Substring(0, 10);
+                serviceResult.Result.refresh_token = EncryptionHelper.Encrypt(token, TokenOption.SecurityKey).Substring(0, 10);
 
             }
             catch (Exception ex)
@@ -78,7 +79,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
             ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
             try
             {
-                var cnt = EncryptionHelper.Encrypt(token.access_token, _tokenOption.SecurityKey).Substring(0, 10);
+                var cnt = EncryptionHelper.Encrypt(token.access_token, TokenOption.SecurityKey).Substring(0, 10);
                 if (cnt == token.refresh_token)
                 {
                     ServiceResult<TJWTInfo> activeUserResult = GetClaimsFromExpiredToken(token);
@@ -130,7 +131,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
                     ValidateAudience = false,
                     ValidateIssuer = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenOption.SecurityKey)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenOption.SecurityKey)),
                     ValidateLifetime = false
                 };
 
@@ -163,7 +164,13 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
 
             if (claims != null)
             {
-                string correlationID = _httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                string correlationID = string.Empty;
+                using (var scope = ServiceProvider.CreateScope())
+                {
+                    var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                    correlationID = httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                }
+
 
                 if (string.IsNullOrEmpty(correlationID))
                 {
@@ -174,8 +181,8 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
             }
 
             var jwt = new JwtSecurityToken(
-                issuer: _tokenOption.Issuer,
-                audience: _tokenOption.Audience,
+                issuer: TokenOption.Issuer,
+                audience: TokenOption.Audience,
                 expires: _accessTokenExpiration,
                 notBefore: DateTime.Now,
                 claims: claims,

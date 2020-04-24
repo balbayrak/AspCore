@@ -7,7 +7,6 @@ using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Security.Abstract;
 using AspCoreTest.Authentication.Concrete;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
-using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

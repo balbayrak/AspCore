@@ -1,6 +1,8 @@
-﻿using AspCore.Dependency.Concrete;
+﻿using AspCore.ApiClient.Entities.Concrete;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Json;
+using AspCore.Utilities.DataProtector;
 using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration.Options;
 using AspCore.WebApi.Middlewares;
@@ -47,8 +49,6 @@ namespace AspCore.WebApi.Configuration
 
             //All configuration completed, resolve initialize all configuration.
 
-            DependencyResolver.Init(services.BuildServiceProvider());
-
             return services;
         }
 
@@ -62,6 +62,8 @@ namespace AspCore.WebApi.Configuration
             ApplicationBuilderOption applicationBuilderOption = new ApplicationBuilderOption();
             option(applicationBuilderOption);
 
+            ApiClientFactory.Init(app.ApplicationServices);
+          //  DataProtectorFactory.Init(app.ApplicationServices.GetRequiredService<IDataProtectorHelper>());
             return app;
         }
     }

@@ -2,11 +2,11 @@
 using AspCore.Business.General;
 using AspCore.Business.Task.Abstract;
 using AspCore.Business.Task.Concrete;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Extension;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 
@@ -17,18 +17,20 @@ namespace AspCore.Business.Concrete
         where TActiveUser : class, IActiveUser, new()
         where TTaskBuilder : TaskBuilder, ITaskBuilder
     {
-        protected ITaskBuilder _taskBuilder;
+        protected ITaskBuilder TaskBuilder { get; private set; }
 
-        protected ITaskFlowBuilder _taskFlowBuilder;
+        protected ITaskFlowBuilder TaskFlowBuilder { get; private set; }
 
         private IHttpContextAccessor _httpContextAccessor;
         public TActiveUser activeUser { get; private set; }
 
-        public BaseTaskManager()
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseTaskManager(IServiceProvider serviceProvider)
         {
-            _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _taskBuilder = DependencyResolver.Current.GetService<TTaskBuilder>();
-            _taskFlowBuilder = DependencyResolver.Current.GetService<ITaskFlowBuilder>();
+            ServiceProvider = serviceProvider;
+            _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            TaskBuilder = ServiceProvider.GetRequiredService<TTaskBuilder>();
+            TaskFlowBuilder = ServiceProvider.GetRequiredService<ITaskFlowBuilder>();
 
             ServiceResult<TActiveUser> activeUserResult = _httpContextAccessor.HttpContext.GetActiveUserInfo<TActiveUser>();
             if (activeUserResult.IsSucceededAndDataIncluded())
@@ -63,7 +65,7 @@ namespace AspCore.Business.Concrete
 
         private ServiceResult<bool> TaskRun(TaskEntity<TEntity> taskEntity)
         {
-            ITask task = _taskBuilder.GenerateTask<TEntity, bool>(taskEntity);
+            ITask task = TaskBuilder.GenerateTask<TEntity, bool>(taskEntity);
             return task.Run<bool>();
         }
 
@@ -71,22 +73,22 @@ namespace AspCore.Business.Concrete
         {
             foreach (var item in taskEntityList)
             {
-                ITask task = _taskBuilder.GenerateTask<TEntity, bool>(item);
-                _taskFlowBuilder.AddTask(task);
+                ITask task = TaskBuilder.GenerateTask<TEntity, bool>(item);
+                TaskFlowBuilder.AddTask(task);
             }
 
-            return _taskFlowBuilder.RunTasks();
+            return TaskFlowBuilder.RunTasks();
         }
 
         private ServiceResult<bool> TaskListRun(List<TaskEntity<TEntity>> taskEntityList)
         {
             foreach (var item in taskEntityList)
             {
-                ITask task = _taskBuilder.GenerateTask<TEntity, bool>(item);
-                _taskFlowBuilder.AddTask(task);
+                ITask task = TaskBuilder.GenerateTask<TEntity, bool>(item);
+                TaskFlowBuilder.AddTask(task);
             }
 
-            return _taskFlowBuilder.RunTasks();
+            return TaskFlowBuilder.RunTasks();
         }
 
     }

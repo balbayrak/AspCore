@@ -9,6 +9,7 @@ using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Authentication.Providers.Concrete;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,10 @@ namespace AspCore.DataSearchApi.ElasticSearch.Authentication
     {
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenGenerator<ElasticSearchApiJWTInfo> _tokenGenerator;
-        public ElasticSearchAppSettingAuthProvider(string configurationKey, ElasticSearchApiOption option = null) : base(configurationKey, option)
+        public ElasticSearchAppSettingAuthProvider(IServiceProvider serviceProvider, string configurationKey, ElasticSearchApiOption option = null) : base(serviceProvider, configurationKey, option)
         {
-            _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _tokenGenerator = DependencyResolver.Current.GetService<ITokenGenerator<ElasticSearchApiJWTInfo>>();
+            _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            _tokenGenerator = ServiceProvider.GetRequiredService<ITokenGenerator<ElasticSearchApiJWTInfo>>();
         }
 
         public override ServiceResult<ElasticSearchApiJWTInfo> AuthenticateClient(AuthenticationInfo input)

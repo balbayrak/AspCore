@@ -22,11 +22,11 @@ namespace AspCore.ApiClient
     public class ApiClient<TOption> : IApiClient, IDisposable
         where TOption : class, IApiClientConfiguration, new()
     {
-        protected IHttpContextAccessor _httpContextAccessor;
-        private readonly IConfigurationAccessor _configurationHelper;
-        protected ICacheService _accessTokenService;
+        protected IHttpContextAccessor HttpContextAccessor { get; private set; }
+        protected IConfigurationAccessor ConfigurationHelper { get; private set; }
+        protected ICacheService AccessTokenService { get; private set; }
 
-        protected TOption apiConfiguration { get; set; }
+        protected TOption ApiConfiguration { get; set; }
 
         private string _baseAddress;
 
@@ -64,18 +64,17 @@ namespace AspCore.ApiClient
 
         public AuthenticationInfo authenticationInfo { get; set; }
 
-        public ApiClient(string apiKey)
+        public ApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor,ICacheService cacheService, string apiKey)
         {
             this.apiKey = apiKey;
 
-            _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>();
-            _accessTokenService = DependencyResolver.Current.GetService<ICacheService>();
+            HttpContextAccessor = httpContextAccessor;
+            ConfigurationHelper = configurationAccessor;
+            AccessTokenService = cacheService;
 
             _baseAddress = string.Empty;
 
             InitializeBaseAddress(apiKey);
-
         }
 
         public virtual void AddAuthenticationRoute(string route) { }
@@ -110,7 +109,7 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    string correlationID = _httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
                     if (!string.IsNullOrEmpty(correlationID))
                     {
                         client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
@@ -174,7 +173,7 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    string correlationID = _httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
                     if (!string.IsNullOrEmpty(correlationID))
                     {
                         client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
@@ -244,7 +243,7 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    string correlationID = _httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
                     if (!string.IsNullOrEmpty(correlationID))
                     {
                         client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
@@ -286,7 +285,7 @@ namespace AspCore.ApiClient
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
 
-                string correlationID = _httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
                 if (!string.IsNullOrEmpty(correlationID))
                 {
                     client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
@@ -315,14 +314,14 @@ namespace AspCore.ApiClient
         private void InitializeBaseAddress(string apiKey)
         {
             if (!string.IsNullOrEmpty(apiKey))
-                apiConfiguration = _configurationHelper.GetValueByKey<TOption>(apiKey);
+                ApiConfiguration = ConfigurationHelper.GetValueByKey<TOption>(apiKey);
 
 
-            if (apiConfiguration != null)
+            if (ApiConfiguration != null)
             {
-                if (!string.IsNullOrEmpty(apiConfiguration.BaseAddress))
+                if (!string.IsNullOrEmpty(ApiConfiguration.BaseAddress))
                 {
-                    baseAddress = apiConfiguration.BaseAddress;
+                    baseAddress = ApiConfiguration.BaseAddress;
                 }
             }
         }

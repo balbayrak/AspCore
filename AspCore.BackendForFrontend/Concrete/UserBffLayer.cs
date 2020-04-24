@@ -12,7 +12,7 @@ namespace AspCore.BackendForFrontend.Concrete
 {
     public class UserBffLayer : BaseBffLayer, IUserBffLayer
     {
-        public UserBffLayer()
+        public UserBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             apiControllerRoute = "api/AuthenticationToken";
         }
@@ -22,9 +22,9 @@ namespace AspCore.BackendForFrontend.Concrete
             ServiceResult<ActiveUser> result = new ServiceResult<ActiveUser>();
             try
             {
-                apiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_CLIENT_INFO;
+                ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_CLIENT_INFO;
 
-                result = await apiClient.PostRequest<ServiceResult<ActiveUser>>(authenticationToken, null, authenticationToken);
+                result = await ApiClient.PostRequest<ServiceResult<ActiveUser>>(authenticationToken, null, authenticationToken);
             }
             catch (Exception ex)
             {
@@ -38,9 +38,9 @@ namespace AspCore.BackendForFrontend.Concrete
             ServiceResult<AuthenticationToken> result = new ServiceResult<AuthenticationToken>();
             try
             {
-                apiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.AUTHENTICATE_CLIENT;
+                ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.AUTHENTICATE_CLIENT;
 
-                result = await apiClient.PostRequest<ServiceResult<AuthenticationToken>>(authenticationInfo);
+                result = await ApiClient.PostRequest<ServiceResult<AuthenticationToken>>(authenticationInfo);
 
             }
             catch (Exception ex)

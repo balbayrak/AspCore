@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.EntityType;
+﻿using AspCore.Entities.EntityType;
 using AspCore.Utilities.DataProtector;
 
 namespace AspCore.Extension
@@ -11,10 +7,7 @@ namespace AspCore.Extension
     {
         public static void ProtectEntity(this IEntity entity)
         {
-            IDataProtectorHelper protectorHelper = DependencyResolver.Current.GetService<IDataProtectorHelper>();
-
-            entity.EncryptedId = protectorHelper.Protect(entity.Id.ToString());
-
+            entity.EncryptedId = DataProtectorFactory.Instance.Protect(entity.Id.ToString());
         }
     }
 }

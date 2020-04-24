@@ -1,20 +1,18 @@
 ﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Concrete;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.General;
-using AspCoreTest.Entities.Models;
+using AspCore.ElasticSearch.Abstract;
 using AspCoreTest.Entities.SearchableEntities;
 using Nest;
+using System;
 using testbusiness.Abstract;
 
 namespace AspCoreTest.DataSearchApi.ESProviders
 {
-    public class PersonElasticSearchProvider : BaseElasticSearchProvider<PersonSearchEntity>, IElasticSearchProvider<PersonSearchEntity>
+    public class PersonElasticSearchProvider : BaseElasticSearchProvider<PersonSearchEntity, IPersonService>, IElasticSearchProvider<PersonSearchEntity>
     {
-        public readonly IPersonService personService;
-        public PersonElasticSearchProvider(string indexKey) : base(indexKey)
+        public PersonElasticSearchProvider(IServiceProvider serviceProvider, string indexKey) : base(serviceProvider, indexKey)
         {
-            personService = DependencyResolver.Current.GetService<IPersonService>();
+
         }
         protected override CreateIndexDescriptor createIndexDescriptor => new CreateIndexDescriptor(indexKey)
                .Settings(t => t.NumberOfReplicas(0).NumberOfShards(1)
@@ -42,11 +40,5 @@ namespace AspCoreTest.DataSearchApi.ESProviders
 
                .Aliases(a => a.Alias(aliasKey));
 
-        public override ServiceResult<PersonSearchEntity[]> GetSearchableEntities()
-        {
-            return  personService.GetSearchableEntities();
-
-
-        }
     }
 }

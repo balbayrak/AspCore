@@ -1,13 +1,13 @@
 ﻿using AspCore.Entities.Authentication;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
-using AspCoreTest.Authentication.Abstract;
+using AspCore.WebApi.Authentication.Providers.Abstract;
 using System;
 using System.Collections.Generic;
 
 namespace AspCoreTest.Authentication.Concrete
 {
-    public class CustomApiAuthenticationProvider : ICustomApiAuthenticationProvider
+    public class CustomApiAuthenticationProvider : IActiveUserAuthenticationProvider
     {
         public ServiceResult<ActiveUser> Authenticate(AuthenticationInfo input)
         {

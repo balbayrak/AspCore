@@ -1,7 +1,9 @@
 ﻿using AspCore.ApiClient.Entities.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
+using AspCore.Caching.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,7 +13,7 @@ namespace AspCore.ApiClient
     public class BearerAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
                  where TOption : class, IApiClientConfiguration, new()
     {
-        public BearerAuthenticatedApiClient(string apiKey) : base(apiKey)
+        public BearerAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, apiKey)
         {
 
         }

@@ -1,9 +1,9 @@
 ﻿using AspCore.DataSearch.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.ElasticSearchApiClient;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Entities.Search;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +14,12 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
          where TSearchableEntity : class, ISearchableEntity, new()
     {
         private readonly IReadOnlyElasticClient<TSearchableEntity> _readOnlyElasticClient;
-        public ESDataSearchClient() 
+       
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public ESDataSearchClient(IServiceProvider serviceProvider) 
         {
-            _readOnlyElasticClient = DependencyResolver.Current.GetService<IReadOnlyElasticClient<TSearchableEntity>>();
+            ServiceProvider = serviceProvider;
+            _readOnlyElasticClient = ServiceProvider.GetRequiredService<IReadOnlyElasticClient<TSearchableEntity>>();
         }
 
         public ServiceResult<DataSearchResult<TSearchableEntity>> FindBy(bool isActiveOnly, int startIndex, int takeCount)

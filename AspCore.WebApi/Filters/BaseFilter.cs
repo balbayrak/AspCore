@@ -41,5 +41,10 @@ namespace AspCore.WebApi.Filters
                 OnCustomActionExecuting(context);
             }
         }
+
+        public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

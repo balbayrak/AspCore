@@ -6,6 +6,8 @@ using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 using AspCore.Utilities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
@@ -19,11 +21,14 @@ namespace AspCore.BackendForFrontend.Concrete
         private string _viewerRoute { get; set; }
         private string _signerRoute { get; set; }
 
-        public BaseDocumentBffLayer(string uploaderRoute, string viewerRoute, string signerRoute) : base()
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseDocumentBffLayer(IServiceProvider serviceProvider, string uploaderRoute, string viewerRoute, string signerRoute) : base()
         {
-            apiClient = DependencyResolver.Current.GetService<IBffApiClient>();
+            ServiceProvider = serviceProvider;
 
-            _cache = DependencyResolver.Current.GetService<ICacheService>();
+            apiClient = ServiceProvider.GetRequiredService<IBffApiClient>();
+
+            _cache = ServiceProvider.GetRequiredService<ICacheService>();
 
             string tokenStorageKey = _cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
             apiClient.tokenStorageKey = tokenStorageKey;
@@ -39,15 +44,17 @@ namespace AspCore.BackendForFrontend.Concrete
         }
         public ServiceResult<string> ViewDocuments(IDocumentViewRequest<TDocument,ViewerToolbarSetting> viewRequest)
         {
-            IHttpContextAccessor httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-
             TViewRequest documentApiViewRequest = new TViewRequest();
+
+            using (var scope = ServiceProvider.CreateScope())
+            {
+                IHttpContextAccessor httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                documentApiViewRequest.clientIp = IpAddressHelper.GetUserIP(httpContextAccessor);
+            }
+
             documentApiViewRequest.documents = viewRequest.documents;
             documentApiViewRequest.validateFiles = viewRequest.validateFiles;
             documentApiViewRequest.viewerToolbarSetting = viewRequest.viewerToolbarSetting;
-            documentApiViewRequest.clientIp = IpAddressHelper.GetUserIP(httpContextAccessor);
-
-
 
             apiClient.apiUrl = _viewerRoute + "/" + ApiConstants.Urls.VIEWDOCUMENTS;
             return apiClient.PostRequest<ServiceResult<string>>(documentApiViewRequest).Result;

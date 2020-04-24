@@ -11,6 +11,10 @@ namespace AspCoreTest.DataAccess.Concrete.EntityFramework
 {
     public class EfCityDAL : EfEntityRepositoryBase<AspCoreTestDbContext, City>, ICityDAL
     {
+        public EfCityDAL(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+
+        }
         public ServiceResult<IList<City>> GetListNoTracking()
         {
             ServiceResult<IList<City>> result = new ServiceResult<IList<City>>();

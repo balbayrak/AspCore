@@ -32,7 +32,6 @@ namespace AspCore.Extension
             result.ErrorMessage = errorMessage;
             result.ExceptionMessage = ex.Message + "---> stacktrace:" + ex.StackTrace;
         }
-
         public static void ErrorMessage<TResult>(this ServiceResult<TResult> result, string errorMessage, string exceptionMessage, string customExceptionMessage = null)
         {
             result.IsSucceeded = false;
@@ -45,7 +44,6 @@ namespace AspCore.Extension
                     result.ExceptionMessage = customExceptionMessage;
             }
         }
-
         public static ActionResult ToHttpResponse<TModel>(this ServiceResult<TModel> response)
         {
             var status = HttpStatusCode.OK;
@@ -60,10 +58,9 @@ namespace AspCore.Extension
                 StatusCode = (int)status
             };
         }
-
         public static void ToViewModelResult<TViewModel, TEntity>(this ServiceResult<List<TViewModel>> serviceResult, ServiceResult<List<TEntity>> result)
-    where TViewModel : BaseViewModel<TEntity>, new()
-    where TEntity : class, IEntity, new()
+             where TViewModel : BaseViewModel<TEntity>, new()
+             where TEntity : class, IEntity, new()
         {
             serviceResult.IsSucceeded = result.IsSucceeded;
             serviceResult.SearchResultCount = result.SearchResultCount;
@@ -75,7 +72,6 @@ namespace AspCore.Extension
             }).ToList();
             serviceResult.Result = entityView;
         }
-
         public static void ToViewModelResult<TViewModel, TEntity>(this ServiceResult<TViewModel> serviceResult, ServiceResult<TEntity> result)
             where TViewModel : BaseViewModel<TEntity>, new()
             where TEntity : class, IEntity, new()
@@ -93,7 +89,6 @@ namespace AspCore.Extension
             };
             serviceResult.Result = entityView;
         }
-
         public static void ToViewModelResultFromSearchableEntityList<TViewModel, TEntity>(this ServiceResult<List<TViewModel>> serviceResult, ServiceResult<DataSearchResult<TEntity>> result)
 where TViewModel : BaseViewModel<TEntity>, new()
 where TEntity : class, ISearchableEntity, new()
@@ -111,7 +106,6 @@ where TEntity : class, ISearchableEntity, new()
                 serviceResult.Result = entityView;
             }
         }
-
         public static void ToViewModelResultFromCacheEntity<TViewModel, TEntity>(this ServiceResult<TViewModel> serviceResult, ServiceResult<DataSearchResult<TEntity>> result)
             where TViewModel : BaseViewModel<TEntity>, new()
             where TEntity : class, ISearchableEntity, new()

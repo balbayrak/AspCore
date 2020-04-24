@@ -4,6 +4,7 @@ using AspCore.Entities.Licence;
 using AspCore.Extension;
 using AspCore.WebApi.Authentication.JWT.Concrete;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Security;
 using System;
@@ -23,12 +24,25 @@ namespace AspCore.WebApi.Licence
         {
             get { return _instance ?? (_instance = new LicenceValidator()); }
         }
-        private LicenceValidator() {
-            isControlled = false;
+        private LicenceValidator()
+        {
+
         }
 
-        private bool isControlled { get; set; }
+        private LicenceValidator(IServiceProvider serviceProvider)
+        {
+            isControlled = false;
+            _serviceProvider = serviceProvider;
+        }
+        public static void Init(IServiceProvider services)
+        {
+            if (_instance == null)
+                _instance = new LicenceValidator(services);
+        }
 
+        private readonly IServiceProvider _serviceProvider;
+
+        private bool isControlled { get; set; }
 
         public ServiceResult<bool> CheckLicenceWebApi(string licenceStr)
         {
@@ -77,7 +91,13 @@ namespace AspCore.WebApi.Licence
             {
                 try
                 {
-                    IHttpContextAccessor _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
+                    string requestUrl = string.Empty;
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                        requestUrl = httpContextAccessor.HttpContext.Request.Host.Value;
+                    }
+
 
                     var base64EncodedBytes = Convert.FromBase64String(licenceStr);
                     string xmlLic = Encoding.UTF8.GetString(base64EncodedBytes);
@@ -91,8 +111,6 @@ namespace AspCore.WebApi.Licence
                         {
                             serviceResult.ErrorMessage = SecurityConstants.LICENCE.LICENCE_EXPIRED_ERROR;
                         }
-
-                        string requestUrl = _httpContextAccessor.HttpContext.Request.Host.Value;
 
                         if (!string.IsNullOrEmpty(requestUrl))
                         {

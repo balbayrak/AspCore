@@ -15,9 +15,9 @@ namespace AspCore.DocumentManagement.Uploader
         protected IAuthenticatedApiClient _apiClient { get; private set; }
         protected string _apiControllerRoute { get; private set; }
 
-        public BaseDocumentUploader(string uploaderKey, string apiControllerRoute)
+        public BaseDocumentUploader(IDocumentValidator<TDocument, TOption> documentValidator, string uploaderKey, string apiControllerRoute)
         {
-            _apiClient = ApiClientFactory.GetApiClient(uploaderKey);
+            _apiClient = ApiClientFactory.Instance.GetApiClient(uploaderKey);
 
             if (!apiControllerRoute.StartsWith("/"))
             {
@@ -25,7 +25,7 @@ namespace AspCore.DocumentManagement.Uploader
             }
             _apiControllerRoute = apiControllerRoute;
 
-            _documentValidator = DependencyResolver.Current.GetService<IDocumentValidator<TDocument, TOption>>();
+            _documentValidator = documentValidator;
         }
 
         public abstract ServiceResult<TDocument> CreateDocument(IDocumentRequest<TDocument> documentRequest);

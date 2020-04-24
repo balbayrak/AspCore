@@ -25,34 +25,33 @@ namespace AspCore.DocumentAccess.Configuration
             DocumentUploaderOption documentHelperOption = new DocumentUploaderOption();
             option(documentHelperOption);
 
-            TOption uploaderOption = null;
-            using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+            services.AddTransient(typeof(IDocumentValidator<TDocument, TOption>), sp =>
             {
                 //configuration helper ile setting
-
-                IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
+                IConfigurationAccessor configurationHelper = sp.GetRequiredService<IConfigurationAccessor>();
                 if (configurationHelper == null)
                 {
                     throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
                 }
 
-                uploaderOption = configurationHelper.GetValueByKey<TOption>(documentHelperOption.uploaderConfigurationKey);
-            }
+                TOption uploaderOption = configurationHelper.GetValueByKey<TOption>(documentHelperOption.uploaderConfigurationKey);
 
-            if (uploaderOption != null)
-            {
-                services.AddTransient(typeof(IDocumentValidator<TDocument, TOption>), sp =>
+                if (uploaderOption != null)
                 {
                     IDocumentValidator<TDocument, TOption> implementation = (IDocumentValidator<TDocument, TOption>)Activator.CreateInstance(typeof(TValidator), uploaderOption);
                     return implementation;
-                });
+                }
 
-                services.AddTransient(typeof(IDocumentUploader<TDocument>), sp =>
-                {
-                    IDocumentUploader<TDocument> implementation = (IDocumentUploader<TDocument>)Activator.CreateInstance(typeof(TUploder), documentHelperOption.apiKey, documentHelperOption.apiControllerRoute);
-                    return implementation;
-                });
-            }
+                return null;
+                      
+            });
+
+            services.AddTransient(typeof(IDocumentUploader<TDocument>), sp =>
+            {
+                var validator = sp.GetRequiredService<IDocumentValidator<TDocument, TOption>>();
+                IDocumentUploader<TDocument> implementation = (IDocumentUploader<TDocument>)Activator.CreateInstance(typeof(TUploder),validator, documentHelperOption.apiKey, documentHelperOption.apiControllerRoute);
+                return implementation;
+            });
 
             return this;
         }

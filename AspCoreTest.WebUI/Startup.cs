@@ -5,7 +5,6 @@ using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Authentication.Concrete;
-using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

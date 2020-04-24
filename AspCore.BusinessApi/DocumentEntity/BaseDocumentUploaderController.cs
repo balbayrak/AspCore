@@ -8,6 +8,8 @@ using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.WebApi;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCore.BusinessApi.DocumentEntity
 {
@@ -15,10 +17,11 @@ namespace AspCore.BusinessApi.DocumentEntity
         where TDocument : class, IDocument, new()
         where TDocumentRequest : class, IDocumentRequest<TDocument>, new()
     {
-        private IDocumentUploader<TDocument> _service;
-        public BaseDocumentUploaderController() : base()
+        private IDocumentUploader<TDocument> _documentUploader;
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseDocumentUploaderController(IServiceProvider serviceProvider) : base()
         {
-            _service = DependencyResolver.Current.GetService<IDocumentUploader<TDocument>>();
+            _documentUploader = ServiceProvider.GetRequiredService<IDocumentUploader<TDocument>>();
         }
 
         [ActionName(ApiConstants.Urls.ADDDOCUMENT)]
@@ -38,7 +41,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<TDocument> response = _service.Create(documentRequest);
+            ServiceResult<TDocument> response = _documentUploader.Create(documentRequest);
             return response.ToHttpResponse();
         }
 
@@ -60,7 +63,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<bool> response = _service.Update(documentRequest);
+            ServiceResult<bool> response = _documentUploader.Update(documentRequest);
             return response.ToHttpResponse();
         }
 
@@ -83,7 +86,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<bool> response = _service.Delete(documentRequest);
+            ServiceResult<bool> response = _documentUploader.Delete(documentRequest);
             return response.ToHttpResponse();
         }
 
@@ -105,7 +108,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<TDocument> response = _service.Read(documentRequest);
+            ServiceResult<TDocument> response = _documentUploader.Read(documentRequest);
             return response.ToHttpResponse();
         }
     }

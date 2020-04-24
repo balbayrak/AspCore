@@ -3,6 +3,8 @@ using AspCore.DataAccess.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.Business.Task.Abstract
 {
@@ -11,21 +13,21 @@ namespace AspCore.Business.Task.Abstract
         where TDAL : IEntityRepository<TEntity>
     {
         public abstract bool RunWithTransaction { get; }
-        protected readonly TDAL _dataLayer;
-        public EntityTask(TaskEntity<TEntity> taskEntity) : base(taskEntity)
+        protected readonly TDAL DataLayer;
+        public EntityTask(IServiceProvider serviceProvider, TaskEntity<TEntity> taskEntity) : base(serviceProvider, taskEntity)
         {
-            _dataLayer = DependencyResolver.Current.GetService<TDAL>();
+            DataLayer = ServiceProvider.GetRequiredService<TDAL>();
         }
 
         internal virtual ServiceResult<TResult> Create<TResult>()
         {
             if (RunWithTransaction)
-                _transactionBuilder.BeginTransaction();
+                TransactionBuilder.BeginTransaction();
 
             ServiceResult<TResult> result = new ServiceResult<TResult>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataLayer.Add(taskEntity.entity);
+                ServiceResult<bool> resultDAL = DataLayer.Add(TaskEntity.entity);
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;
@@ -35,12 +37,12 @@ namespace AspCore.Business.Task.Abstract
             catch
             {
                 if (RunWithTransaction)
-                    _transactionBuilder.RollbackTransaction();
+                    TransactionBuilder.RollbackTransaction();
             }
             finally
             {
                 if (RunWithTransaction)
-                    _transactionBuilder.DisposeTransaction();
+                    TransactionBuilder.DisposeTransaction();
             }
 
             return result;
@@ -49,12 +51,12 @@ namespace AspCore.Business.Task.Abstract
         internal virtual ServiceResult<TResult> Update<TResult>()
         {
             if (RunWithTransaction)
-                _transactionBuilder.BeginTransaction();
+                TransactionBuilder.BeginTransaction();
 
             ServiceResult<TResult> result = new ServiceResult<TResult>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataLayer.Update(taskEntity.entity);
+                ServiceResult<bool> resultDAL = DataLayer.Update(TaskEntity.entity);
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;
@@ -64,12 +66,12 @@ namespace AspCore.Business.Task.Abstract
             catch
             {
                 if (RunWithTransaction)
-                    _transactionBuilder.RollbackTransaction();
+                    TransactionBuilder.RollbackTransaction();
             }
             finally
             {
                 if (RunWithTransaction)
-                    _transactionBuilder.DisposeTransaction();
+                    TransactionBuilder.DisposeTransaction();
             }
 
             return result;
@@ -78,12 +80,12 @@ namespace AspCore.Business.Task.Abstract
         internal virtual ServiceResult<TResult> Delete<TResult>()
         {
             if (RunWithTransaction)
-                _transactionBuilder.BeginTransaction();
+                TransactionBuilder.BeginTransaction();
 
             ServiceResult<TResult> result = new ServiceResult<TResult>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataLayer.Delete(taskEntity.entity);
+                ServiceResult<bool> resultDAL = DataLayer.Delete(TaskEntity.entity);
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;
@@ -93,12 +95,12 @@ namespace AspCore.Business.Task.Abstract
             catch
             {
                 if (RunWithTransaction)
-                    _transactionBuilder.RollbackTransaction();
+                    TransactionBuilder.RollbackTransaction();
             }
             finally
             {
                 if (RunWithTransaction)
-                    _transactionBuilder.DisposeTransaction();
+                    TransactionBuilder.DisposeTransaction();
             }
 
             return result;

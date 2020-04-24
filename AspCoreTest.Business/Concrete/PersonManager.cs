@@ -3,13 +3,14 @@ using AspCore.Entities.General;
 using AspCoreTest.DataAccess.Abstract;
 using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
+using System;
 using testbusiness.Abstract;
 
 namespace testbusiness.Concrete
 {
-    public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person,PersonSearchEntity>, IPersonService
+    public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person, PersonSearchEntity>, IPersonService
     {
-        public PersonManager()
+        public PersonManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }
@@ -18,7 +19,7 @@ namespace testbusiness.Concrete
             return new ServiceResult<PersonSearchEntity>
             {
                 IsSucceeded = true,
-                Result = mapper.MapProperties<Person, PersonSearchEntity>(entity)
+                Result = Mapper.MapProperties<Person, PersonSearchEntity>(entity)
             };
         }
     }

@@ -1,6 +1,8 @@
-﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
+﻿using AspCore.Business.Abstract;
+using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Concrete;
 using AspCore.Dependency.Concrete;
+using AspCore.ElasticSearch.Abstract;
 using AspCore.ElasticSearch.Configuration;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.EntityType;
@@ -12,13 +14,14 @@ namespace AspCore.DataSearchApi.Configuration
 {
     public static class ElasticSearchProviderBuilder
     {
-        public static ElasticSearchProviderOption AddElasticSearchIndex<TSearchableEntity, TElasticSearchProvider>(this ElasticSearchProviderOption elasticSearchProviderOption, string indexKey)
+        public static ElasticSearchProviderOption AddElasticSearchIndex<TSearchableEntity,TSearchableEntityService, TElasticSearchProvider>(this ElasticSearchProviderOption elasticSearchProviderOption, string indexKey)
             where TSearchableEntity : class, ISearchableEntity, new()
-            where TElasticSearchProvider : BaseElasticSearchProvider<TSearchableEntity>, IElasticSearchProvider<TSearchableEntity>
+            where TSearchableEntityService : ISearchableEntityService<TSearchableEntity>
+            where TElasticSearchProvider : BaseElasticSearchProvider<TSearchableEntity,TSearchableEntityService>, IElasticSearchProvider<TSearchableEntity>
         {
             elasticSearchProviderOption.services.AddTransient(typeof(IElasticSearchProvider<TSearchableEntity>), sp =>
             {
-                return (IElasticSearchProvider<TSearchableEntity>)Activator.CreateInstance(typeof(TElasticSearchProvider), indexKey);
+                return (TElasticSearchProvider)Activator.CreateInstance(typeof(TElasticSearchProvider), sp, indexKey);
             });
 
             return elasticSearchProviderOption;

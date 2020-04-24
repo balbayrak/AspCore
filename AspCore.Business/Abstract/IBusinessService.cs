@@ -5,7 +5,7 @@ using AspCore.Dependency.Abstract;
 
 namespace AspCore.Business.Abstract
 {
-    public interface IBusinessService : ITransientType
+    public interface IBusinessService : IScopedType
     {
     }
 }

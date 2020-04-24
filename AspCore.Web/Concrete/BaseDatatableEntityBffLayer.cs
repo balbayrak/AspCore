@@ -4,6 +4,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.WebComponents.HtmlHelpers.DataTable.Storage;
 using AspCore.WebComponents.HtmlHelpers.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,9 +14,13 @@ namespace AspCore.Web.Concrete
         where TViewModel : BaseViewModel<TEntity>, new()
         where TEntity : class, IEntity, new()
     {
+        public BaseDatatableEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+
+        }
         public virtual JQueryDataTablesResponse GetAll(JQueryDataTablesModel jQueryDataTablesModel)
         {
-           
+
             try
             {
                 var storageObject = jQueryDataTablesModel.columnInfos.DeSerialize<TEntity>();

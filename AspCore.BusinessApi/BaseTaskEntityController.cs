@@ -17,7 +17,7 @@ namespace AspCore.BusinessApi
         where TEntity : class, IEntity, new()
         where TActiveUser : class, IActiveUser, new()
     {
-        public BaseTaskEntityController()
+        public BaseTaskEntityController(TEntityService entityService) : base(entityService)
         {
         }
 
