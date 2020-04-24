@@ -5,11 +5,11 @@ using AspCore.Caching.Extension;
 
 namespace AspCore.Caching.Concrete
 {
-    public class MemoryCacheManager : ICacheService
+    public class MemoryCacheManager : CacheManager, ICacheService
     {
         private IMemoryCache _MemCache;
 
-        public MemoryCacheManager(IMemoryCache MemCache)
+        public MemoryCacheManager(IMemoryCache MemCache) : base()
         {
             _MemCache = MemCache;
         }
@@ -21,6 +21,7 @@ namespace AspCore.Caching.Concrete
 
         public T GetObject<T>(string key)
         {
+            key = $"{uniqueCacheKey}_{key}";
             return _MemCache.GetValue<T>(key);
         }
 
@@ -28,6 +29,7 @@ namespace AspCore.Caching.Concrete
         {
             try
             {
+                key = $"{uniqueCacheKey}_{key}";
                 _MemCache.Remove(key);
                 return true;
             }
@@ -58,6 +60,9 @@ namespace AspCore.Caching.Concrete
         {
             try
             {
+                key = $"{uniqueCacheKey}_{key}";
+                Remove(key);
+
                 MemoryCacheEntryOptions cacheEntryOptions = null;
                 if (expires.HasValue)
                     cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(expires.Value.TimeOfDay);
