@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.EntityFilter;
-using AspCore.Web.Concrete;
+﻿using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.Entities.Models;
@@ -10,6 +6,8 @@ using AspCoreTest.WebUI.DataSearch;
 using AspCoreTest.WebUI.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 
 namespace AspCoreTest.WebUI.Controllers
 {

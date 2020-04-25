@@ -21,6 +21,7 @@ namespace AspCore.BusinessApi.DocumentEntity
         protected IServiceProvider ServiceProvider { get; private set; }
         public BaseDocumentUploaderController(IServiceProvider serviceProvider) : base()
         {
+            ServiceProvider = serviceProvider;
             _documentUploader = ServiceProvider.GetRequiredService<IDocumentUploader<TDocument>>();
         }
 

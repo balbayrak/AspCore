@@ -1,20 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.BackendForFrontend.Abstract;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.Constants;
+﻿using AspCore.Entities.Constants;
 using AspCore.Entities.DataTable;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Utilities.DataProtector;
 using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
 using AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using AspCore.Utilities.DataProtector;
+using System;
+using System.Collections.Generic;
 
 namespace AspCore.Web.Concrete
 {

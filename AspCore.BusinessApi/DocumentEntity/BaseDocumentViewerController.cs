@@ -21,6 +21,7 @@ namespace AspCore.BusinessApi.DocumentEntity
         protected IServiceProvider ServiceProvider { get; private set; }
         public BaseDocumentViewerController(IServiceProvider serviceProvider) : base()
         {
+            ServiceProvider = serviceProvider;
             _documentViewer = ServiceProvider.GetRequiredService<IDocumentViewer<TDocument>>();
         }
 

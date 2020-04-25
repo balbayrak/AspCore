@@ -1,6 +1,5 @@
 ﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Concrete;
-using AspCore.ElasticSearch.Abstract;
 using AspCoreTest.Entities.SearchableEntities;
 using Nest;
 using System;
