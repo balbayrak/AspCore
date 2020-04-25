@@ -8,7 +8,7 @@ using AspCore.Entities.General;
 
 namespace AspCore.Business.Abstract
 {
-    public interface IEntityService<TEntity> : IScopedType
+    public interface IEntityService<TEntity> : ITransientType
        where TEntity : class, IEntity, new()
     {
         ServiceResult<bool> Add(params TEntity[] entities);

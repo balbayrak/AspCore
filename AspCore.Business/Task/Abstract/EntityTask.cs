@@ -1,6 +1,5 @@
 ﻿using AspCore.Business.Task.Concrete;
 using AspCore.DataAccess.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using Microsoft.Extensions.DependencyInjection;

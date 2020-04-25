@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspCore.BackendForFrontend\AspCore.BackendForFrontend.csproj" />
     <ProjectReference Include="..\AspCore.WebComponents\AspCore.WebComponents.csproj" />
     <ProjectReference Include="..\AspCore.Web\AspCore.Web.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />

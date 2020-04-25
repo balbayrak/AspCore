@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using AspCore.RedisClient.Configuration;
 
 namespace AspCoreTest.WebUI
 {
@@ -46,7 +47,7 @@ namespace AspCoreTest.WebUI
                 })
                 .AddCacheService(option =>
                 {
-                    option.AddCookieCache();
+                    option.AddRedisCache("RedisInfo");
                 })
                 .AddBffApiClient(option =>
                 {
