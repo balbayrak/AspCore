@@ -1,14 +1,28 @@
-﻿using AspCore.BusinessApi;
+﻿using System;
+using AspCore.AOP.Abstract;
+using AspCore.Business.Task.Abstract;
+using AspCore.BusinessApi;
+using AspCore.Entities.General;
+using AspCore.Extension;
+using AspCoreTest.Business.Abstract;
 using AspCoreTest.Entities.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using testbusiness.Abstract;
 
 namespace AspCoreTest.WebApi.Controllers
 {
     public class PersonController : BaseEntityController<Person, IPersonService>
     {
-        public PersonController(IPersonService personService) : base(personService)
-        {
+        private readonly IServiceProvider _serviceProvider;
 
+        public PersonController(IPersonService personService,IServiceProvider serviceProvider) : base(personService)
+        {
+            _serviceProvider = serviceProvider;
+         
         }
+
+       
     }
 }

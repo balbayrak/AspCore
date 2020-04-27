@@ -18,5 +18,8 @@ namespace testbusiness.Concrete
   
     public class PersonCVManager2 : DocumentEntityManager<PersonCv, IPersonCvDAL>, IPersonCVService
     {
+        public PersonCVManager2(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
     }
 }

@@ -99,7 +99,7 @@ namespace AspCoreTest.WebUI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();
-            DependencyResolver.Init(app.ApplicationServices);
+       
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -25,4 +25,20 @@ namespace testbusiness.Concrete
             };
         }
     }
+
+    public class PersonManager2 : BaseComplexSearchableEntityManager<IPersonDal, Person, PersonSearchEntity>, IPersonService
+    {
+        public PersonManager2(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+
+        }
+        public override ServiceResult<PersonSearchEntity> GetComplexEntity(Person entity)
+        {
+            return new ServiceResult<PersonSearchEntity>
+            {
+                IsSucceeded = true,
+                Result = Mapper.MapProperties<Person, PersonSearchEntity>(entity)
+            };
+        }
+    }
 }
