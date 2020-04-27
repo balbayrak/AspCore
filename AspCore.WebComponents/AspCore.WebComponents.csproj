@@ -7,8 +7,9 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <Company>AspCore.WebComponents</Company>
+    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,7 +8,8 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>AspCore.ConnectedApi</Company>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
+    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

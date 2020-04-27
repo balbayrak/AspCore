@@ -4,8 +4,11 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <Company>AspCore.BusinessApi</Company>
+   <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
+    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
