@@ -85,6 +85,7 @@ namespace AspCore.Business.Concrete
                         {
                             _transactionBuilder.CommitTransaction();
                             result.IsSucceeded = true;
+                            result.StatusMessage = resultDAL.StatusMessage;
                         }
                         else
                         {
@@ -134,6 +135,7 @@ namespace AspCore.Business.Concrete
                         {
                             _transactionBuilder.CommitTransaction();
                             result.IsSucceeded = true;
+                            result.StatusMessage = resultDAL.StatusMessage;
                         }
                         else
                         {
@@ -187,6 +189,7 @@ namespace AspCore.Business.Concrete
                             {
                                 _transactionBuilder.CommitTransaction();
                                 result.IsSucceeded = true;
+                                result.StatusMessage = resultDAL.StatusMessage;
                             }
                             else
                             {
