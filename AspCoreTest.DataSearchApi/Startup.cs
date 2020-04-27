@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using testbusiness.Abstract;
 
 namespace AspCoreTest.DataSearchApi
 {
@@ -76,7 +77,7 @@ namespace AspCoreTest.DataSearchApi
                 .AddDataSearchProviders(option =>
                 {
                     option.AddElasticSearch<ElasticSearchApiOption>("SearchApiInfo")
-                    .AddElasticSearchIndex<PersonSearchEntity, PersonElasticSearchProvider>("person");
+                    .AddElasticSearchIndex<PersonSearchEntity, IPersonService, PersonElasticSearchProvider>("person");
                 });
             }, mvcOption =>
             {
@@ -114,7 +115,7 @@ namespace AspCoreTest.DataSearchApi
                 })
                 .UseDataSearch(app, option =>
                  {
-                     option.InitElasticSearchIndex<PersonSearchEntity, PersonElasticSearchProvider>("person", true);
+                     option.InitElasticSearchIndex<PersonSearchEntity, IPersonService, PersonElasticSearchProvider>("person", true);
                  });
             });
         }

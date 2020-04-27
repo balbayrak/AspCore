@@ -5,16 +5,16 @@ using System.Collections.Generic;
 using System.Text;
 using AspCore.Dependency.Concrete;
 using AspCore.Utilities.DataProtector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCore.Web.Filters
 {
     public class DataUnProtector : ActionFilterAttribute
     {
         private string _parameterName { get; set; }
-        private IDataProtectorHelper _protectorHelper;
+
         public DataUnProtector(string parameterName)
         {
-            _protectorHelper = DependencyResolver.Current.GetService<IDataProtectorHelper>();
             _parameterName = parameterName;
         }
 
@@ -25,7 +25,7 @@ namespace AspCore.Web.Filters
                 var value = context.ActionArguments[_parameterName].ToString();
                 if (!string.IsNullOrEmpty(value) && value != "-1")
                 {
-                    context.ActionArguments[_parameterName] = _protectorHelper.UnProtect(context.ActionArguments[_parameterName].ToString());
+                    context.ActionArguments[_parameterName] = DataProtectorFactory.Instance.UnProtect(context.ActionArguments[_parameterName].ToString());
                 }
             }
         }

@@ -11,15 +11,15 @@ namespace AspCore.Business.Task.Concrete
     {
         private List<TaskFlowItem> _taskList { get; set; }
         private ITransactionBuilder _transactionBuilder;
-        public TaskFlowBuilder()
+        public TaskFlowBuilder(ITransactionBuilder transactionBuilder)
         {
             _taskList = new List<TaskFlowItem>();
+            _transactionBuilder = transactionBuilder;
         }
 
         public void AddTask(ITask task)
         {
             _taskList.Add(new TaskFlowItem(task, _taskList.Count));
-            _transactionBuilder = DependencyResolver.Current.GetService<ITransactionBuilder>();
         }
 
         public ServiceResult<bool> RunTasks()

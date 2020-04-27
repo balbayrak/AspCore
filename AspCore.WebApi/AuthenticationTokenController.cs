@@ -2,12 +2,13 @@
 using AspCore.Entities.User;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Security.Abstract;
+using System;
 
 namespace AspCore.WebApi
 {
-    public class AuthenticationTokenController : BaseJWTAuthenticationController<IActiveUserAuthenticationProvider,IActiveUserTokenGenerator, AuthenticationInfo, ActiveUser>
+    public class AuthenticationTokenController : BaseJWTAuthenticationController<IActiveUserAuthenticationProvider, IActiveUserTokenGenerator, AuthenticationInfo, ActiveUser>
     {
-        public AuthenticationTokenController()
+        public AuthenticationTokenController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }

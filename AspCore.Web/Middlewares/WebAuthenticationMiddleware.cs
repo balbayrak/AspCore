@@ -12,10 +12,10 @@ namespace AspCore.Web.Middlewares
         private readonly RequestDelegate _next;
         private readonly ICacheService _cache;
         private string _authenticationControllerName;
-        public WebAuthenticationMiddleware(RequestDelegate next, string authenticationControllerName)
+        public WebAuthenticationMiddleware(RequestDelegate next, ICacheService cacheService, string authenticationControllerName)
         {
             _authenticationControllerName = authenticationControllerName;
-            _cache = DependencyResolver.Current.GetService<ICacheService>();
+            _cache = cacheService;
             _next = next;
         }
         public async Task InvokeAsync(HttpContext httpContext)

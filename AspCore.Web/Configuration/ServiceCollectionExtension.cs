@@ -45,10 +45,6 @@ namespace AspCore.Web.Configuration
             DependencyConfigurationOption configurationHelperOption = new DependencyConfigurationOption(services);
             option(configurationHelperOption);
 
-            //All configuration completed, resolve initialize all configuration.
-
-          
-
             return services;
         }
     }

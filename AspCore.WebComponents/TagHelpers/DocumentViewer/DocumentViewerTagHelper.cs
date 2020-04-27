@@ -10,6 +10,11 @@ namespace AspCore.WebComponents.TagHelpers.DocumentViewer
     [HtmlTargetElement("documentviewer")]
     public class DocumentViewerTagHelper : TagHelper
     {
+        private readonly IDocumentBffLayer<Document> _documentBffLayer;
+        public DocumentViewerTagHelper(IDocumentBffLayer<Document> documentBffLayer)
+        {
+            _documentBffLayer = documentBffLayer;
+        }
         private const string validateSignAtrributeName = "isSignedDocuments";
         [HtmlAttributeName(validateSignAtrributeName)]
         public bool isSignedDocuments { get; set; }
@@ -48,9 +53,7 @@ namespace AspCore.WebComponents.TagHelpers.DocumentViewer
 
             if (documents != null && documents.Count > 0)
             {
-                IDocumentBffLayer<Document> documentHelper = DependencyResolver.Current.GetService<IDocumentBffLayer<Document>>();
-
-                ServiceResult<string> serviceResult = documentHelper.ViewDocuments(new DocumentViewRequest
+                ServiceResult<string> serviceResult = _documentBffLayer.ViewDocuments(new DocumentViewRequest
                 {
                     documents = documents,
                     validateFiles = isSignedDocuments,

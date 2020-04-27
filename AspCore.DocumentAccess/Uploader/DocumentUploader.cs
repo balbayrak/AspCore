@@ -1,4 +1,5 @@
-﻿using AspCore.Entities.Constants;
+﻿using AspCore.DocumentManagement.Validator;
+using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 
@@ -9,7 +10,7 @@ namespace AspCore.DocumentManagement.Uploader
          where TOption : class, IUploaderOption, new()
     {
 
-        public DocumentUploader(string apiKey, string apiControllerRoute) : base(apiKey, apiControllerRoute)
+        public DocumentUploader(IDocumentValidator<TDocument,TOption> validator, string apiKey, string apiControllerRoute) : base(validator,apiKey, apiControllerRoute)
         {
 
         }

@@ -11,6 +11,7 @@ using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Extension;
 using AspCore.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCore.Business.Concrete
 {
@@ -22,9 +23,9 @@ namespace AspCore.Business.Concrete
     {
         private readonly TDAL _dataLayer;
 
-        public BaseTaskEntityManager(TDAL dataLayer) : base()
+        public BaseTaskEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _dataLayer = dataLayer;
+            _dataLayer = ServiceProvider.GetRequiredService<TDAL>();
         }
 
         public ServiceResult<TEntity> GetById(EntityFilter<TEntity> setting)

@@ -1,21 +1,20 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AspCore.DataAccess.Abstract;
+using AspCore.DataAccess.General;
+using AspCore.Entities.EntityType;
+using AspCore.Entities.General;
+using AspCore.Extension;
+using AspCore.Utilities;
+using AspCore.Utilities.Mapper.Abstract;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AspCore.DataAccess.Abstract;
-using AspCore.DataAccess.General;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.EntityType;
-using AspCore.Entities.General;
-using AspCore.Extension;
-using AspCore.Utilities;
-using AspCore.Utilities.Mapper;
-using AspCore.Utilities.Mapper.Abstract;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -23,6 +22,7 @@ namespace AspCore.DataAccess.EntityFramework
      where TEntity : class, IEntity, new()
         where TDbContext : CoreDbContext
     {
+        protected IServiceProvider ServiceProvider { get; private set; }
         private TDbContext _context { get; }
         private readonly IHttpContextAccessor _httpContextAccessor;
         private DbSet<TEntity> _entities;
@@ -36,11 +36,12 @@ namespace AspCore.DataAccess.EntityFramework
         }
         protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = _context.Set<TEntity>());
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
-        public EfEntityRepositoryBase()
+        public EfEntityRepositoryBase(IServiceProvider serviceProvider)
         {
-            _httpContextAccessor = DependencyResolver.Current.GetService<IHttpContextAccessor>();
-            _context = DependencyResolver.Current.GetService<TDbContext>();
-            _mapper = DependencyResolver.Current.GetService<ICustomMapper>();
+            ServiceProvider = serviceProvider;
+            _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            _context = ServiceProvider.GetService<TDbContext>();
+            _mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
             _entities = _context.Set<TEntity>();
         }
 
@@ -105,7 +106,7 @@ namespace AspCore.DataAccess.EntityFramework
                 var countTask = query.Count();
 
                 result.Result = query.ToArray();
-                
+
                 result.IsSucceeded = true;
                 result.TotalResultCount = countTask;
                 result.SearchResultCount = result.Result.Count();
@@ -126,7 +127,7 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 var query = TableNoTracking.AsQueryable();
-                var countTask =await query.CountAsync();
+                var countTask = await query.CountAsync();
 
                 if (filter != null)
                     query = query.Where(filter);
@@ -145,7 +146,7 @@ namespace AspCore.DataAccess.EntityFramework
                 result.TotalResultCount = countTask;
                 result.Result = resultsTask;
                 result.SearchResultCount = result.Result.Count();
-             
+
 
             }
             catch (Exception ex)
@@ -199,7 +200,7 @@ namespace AspCore.DataAccess.EntityFramework
             }
 
             ServiceResult<bool> result = ProcessEntityWithState(entities);
-            if(result.IsSucceeded)
+            if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
             }
@@ -211,7 +212,7 @@ namespace AspCore.DataAccess.EntityFramework
         {
             ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
             var updatedEntityList = entitylist.Result;
-            updatedEntityList = _mapper.MapToList(entities.ToList(),updatedEntityList);
+            updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
@@ -221,13 +222,13 @@ namespace AspCore.DataAccess.EntityFramework
                     {
                         ((IBaseEntity)updatedInput).LastUpdatedUserId = activeUserId;
                     }
-                    _context.Attach(updatedInput); 
+                    _context.Attach(updatedInput);
                     _context.Update(updatedInput);
                 }
                 int value = _context.SaveChanges();
                 if (value > 0)
                 {
-                    result.StatusMessage<bool,TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
                     result.Result = true;
                     result.IsSucceeded = true;
                 }
@@ -266,7 +267,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = ProcessEntityWithState(updatedEntityList?.ToArray());
             if (result.IsSucceeded)
             {
-               result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
             }
 
             return result;

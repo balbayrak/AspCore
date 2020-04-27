@@ -2,29 +2,29 @@
 using AspCore.Business.General;
 using AspCore.DataAccess.Abstract;
 using AspCore.DataSearch.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities.Mapper.Abstract;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity> : BaseEntityManager<TDataAccess, TEntity>, ISearchableEntityService<TEntity, TSearchableEntity>
+    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity> : BaseEntityManager<TDataAccess, TEntity>, ISearchableEntityService<TSearchableEntity>,IEntityService<TEntity>
         where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TSearchableEntity : class, ISearchableEntity, new()
     {
-        protected ICustomMapper mapper { get; private set; }
+        protected ICustomMapper Mapper { get; private set; }
         private readonly IDataSearchEngine<TSearchableEntity> _dataSearchEngine;
 
-        public BaseComplexSearchableEntityManager()
+        public BaseComplexSearchableEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            mapper = DependencyResolver.Current.GetService<ICustomMapper>();
-            _dataSearchEngine = DependencyResolver.Current.GetService<IDataSearchEngine<TSearchableEntity>>();
+            Mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
+            _dataSearchEngine = ServiceProvider.GetService<IDataSearchEngine<TSearchableEntity>>();
         }
 
         public abstract ServiceResult<TSearchableEntity> GetComplexEntity(TEntity entity);

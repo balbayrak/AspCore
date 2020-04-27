@@ -1,4 +1,5 @@
-﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
+﻿using AspCore.Business.Abstract;
+using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Concrete;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.EntityType;
@@ -14,12 +15,13 @@ namespace AspCore.DataSearchApi.Configuration
         {
             _app = app;
         }
-        public ElasticSearchInitializer InitElasticSearchIndex<TSearchableEntity, TElasticSearchProvider>(string indexKey, bool initWithData)
+        public ElasticSearchInitializer InitElasticSearchIndex<TSearchableEntity, TSearchableEntityService, TElasticSearchProvider>(string indexKey, bool initWithData)
             where TSearchableEntity : class, ISearchableEntity, new()
-            where TElasticSearchProvider : BaseElasticSearchProvider<TSearchableEntity>, IElasticSearchProvider<TSearchableEntity>
+            where TSearchableEntityService : ISearchableEntityService<TSearchableEntity>
+            where TElasticSearchProvider : BaseElasticSearchProvider<TSearchableEntity, TSearchableEntityService>, IElasticSearchProvider<TSearchableEntity>
         {
 
-            IElasticSearchProvider<TSearchableEntity> elasticSearchProvider = (IElasticSearchProvider<TSearchableEntity>)_app.ApplicationServices.GetService(typeof(IElasticSearchProvider<TSearchableEntity>));
+            TElasticSearchProvider elasticSearchProvider = (TElasticSearchProvider)_app.ApplicationServices.GetService(typeof(IElasticSearchProvider<TSearchableEntity>));
             elasticSearchProvider.InitIndex(new InitIndexRequest
             {
                 initializeWithData = initWithData

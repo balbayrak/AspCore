@@ -1,16 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.ApiClient.Abstract;
+﻿using AspCore.ApiClient.Abstract;
 using AspCore.Dependency.Concrete;
+using System;
 
 namespace AspCore.ApiClient.Entities.Concrete
 {
     public class ApiClientFactory
     {
-        public static IAuthenticatedApiClient GetApiClient(string apiKey)
+        private static ApiClientFactory _resolver;
+
+        public static ApiClientFactory Instance
         {
-           return  DependencyResolver.Current.GetServiceByName<IAuthenticatedApiClient>(apiKey);
+            get
+            {
+                if (_resolver == null)
+                    throw new Exception("ApiClientFactory not initialized. You should initialize it in Startup class");
+                return _resolver;
+            }
+        }
+
+        private ApiClientFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+        public static void Init(IServiceProvider services)
+        {
+            if (_resolver == null)
+                _resolver = new ApiClientFactory(services);
+        }
+
+        private readonly IServiceProvider _serviceProvider;
+
+        public IAuthenticatedApiClient GetApiClient(string apiKey)
+        {
+           return _serviceProvider.GetServiceByName<IAuthenticatedApiClient>(apiKey);
         }
     }
 }

@@ -8,5 +8,9 @@ namespace AspCore.BusinessApi.DocumentEntity
         where TEntityService : IDocumentEntityService<Document, TEntity>
         where TEntity : class, IDocumentEntity, new()
     {
+        public DocumentEntityController(TEntityService entityService) : base(entityService)
+        {
+
+        }
     }
 }

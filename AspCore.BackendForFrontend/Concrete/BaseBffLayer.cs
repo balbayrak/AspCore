@@ -3,15 +3,16 @@ using AspCore.Caching.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
     public abstract class BaseBffLayer : IBFFLayer
     {
-        protected ICacheService _cache;
+        protected ICacheService CacheService;
 
-        public IBffApiClient apiClient { get; private set; }
+        public IBffApiClient ApiClient { get; private set; }
 
         private string _apiClientKey { get; set; }
         protected string apiClientKey
@@ -23,7 +24,7 @@ namespace AspCore.BackendForFrontend.Concrete
             set
             {
                 _apiClientKey = value;
-                apiClient.ChangeApiSettingsKey(value);
+                ApiClient.ChangeApiSettingsKey(value);
             }
         }
 
@@ -41,31 +42,35 @@ namespace AspCore.BackendForFrontend.Concrete
             }
         }
 
-        protected BaseBffLayer()
+        protected IServiceProvider ServiceProvider { get; private set; }
+
+        protected BaseBffLayer(IServiceProvider serviceProvider)
         {
-            apiClient = DependencyResolver.Current.GetService<IBffApiClient>();
+            ServiceProvider = serviceProvider;
 
-            _cache = DependencyResolver.Current.GetService<ICacheService>();
+            ApiClient = ServiceProvider.GetRequiredService<IBffApiClient>();
 
-            string tokenStorageKey = _cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            CacheService = ServiceProvider.GetRequiredService<ICacheService>();
+
+            string tokenStorageKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
            
-            apiClient.tokenStorageKey = tokenStorageKey;
+            ApiClient.tokenStorageKey = tokenStorageKey;
         }
 
         public void SetApiClientTokenStorageKey(string tokenStorageKey)
         {
-            apiClient.tokenStorageKey = tokenStorageKey;
+            ApiClient.tokenStorageKey = tokenStorageKey;
         }
 
         public void SetApiClientTokenStorageExpireTime(DateTime expireTime)
         {
-            apiClient.tokenStrorageExpireTime = expireTime;
+            ApiClient.tokenStrorageExpireTime = expireTime;
         }
 
         public void SetAuthenticationToken(string key, AuthenticationToken authenticationToken)
         {
             DateTime? expire = null;
-            if (apiClient.tokenStrorageExpireTime == null || (apiClient.tokenStrorageExpireTime != null && (apiClient.tokenStrorageExpireTime == DateTime.MinValue || apiClient.tokenStrorageExpireTime == DateTime.MaxValue)))
+            if (ApiClient.tokenStrorageExpireTime == null || (ApiClient.tokenStrorageExpireTime != null && (ApiClient.tokenStrorageExpireTime == DateTime.MinValue || ApiClient.tokenStrorageExpireTime == DateTime.MaxValue)))
             {
                 if (authenticationToken.expires != DateTime.MinValue && authenticationToken.expires != DateTime.MaxValue)
                 {
@@ -80,14 +85,14 @@ namespace AspCore.BackendForFrontend.Concrete
             {
                 if (authenticationToken.expires != DateTime.MinValue && authenticationToken.expires != DateTime.MaxValue)
                 {
-                    if (apiClient.tokenStrorageExpireTime < authenticationToken.expires)
+                    if (ApiClient.tokenStrorageExpireTime < authenticationToken.expires)
                     {
                         expire = authenticationToken.expires.AddMinutes(10);
                     }
                 }
             }
 
-            _cache.SetObject(key, authenticationToken, expire, false);
+            CacheService.SetObject(key, authenticationToken, expire, false);
 
         }
     }

@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using AspCore.Business.Abstract;
+﻿using AspCore.Business.Abstract;
 using AspCore.DataAccess.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Concrete
 {
@@ -18,12 +17,14 @@ namespace AspCore.Business.Concrete
       where TDataAccess : IEntityRepository<TEntity>
       where TEntity : class, IEntity, new()
     {
+        protected IServiceProvider ServiceProvider { get; private set; }
         protected readonly TDataAccess _dataAccess;
         protected ITransactionBuilder _transactionBuilder;
-        public BaseEntityManager()
+        public BaseEntityManager(IServiceProvider serviceProvider)
         {
-            _dataAccess = DependencyResolver.Current.GetService<TDataAccess>(); ;
-            _transactionBuilder = DependencyResolver.Current.GetService<ITransactionBuilder>();
+            ServiceProvider = serviceProvider;
+            _dataAccess = ServiceProvider.GetRequiredService<TDataAccess>(); ;
+            _transactionBuilder = ServiceProvider.GetRequiredService<ITransactionBuilder>();
         }
 
         public virtual ServiceResult<bool> Add(params TEntity[] entities)
@@ -100,7 +101,7 @@ namespace AspCore.Business.Concrete
                 expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
             }
 
-            if ( setting.sorters != null)
+            if (setting.sorters != null)
             {
                 List<SortingExpression<TEntity>> sorters = null;
                 if (setting.sorters != null)

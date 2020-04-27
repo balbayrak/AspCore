@@ -14,7 +14,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Abstract
           where TSearchableEntity : class, ISearchableEntity, new()
     {
         IESContext context { get; }
-        ServiceResult<TSearchableEntity[]> GetSearchableEntities();
+
         ServiceResult<bool> ResetIndex(InitIndexRequest initRequest);
         ServiceResult<bool> InitIndex(InitIndexRequest initRequest);
         ServiceResult<bool> CreateIndexItem(TSearchableEntity[] searchableEntities);

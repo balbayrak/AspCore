@@ -6,7 +6,7 @@ using AspCore.Entities.User;
 
 namespace AspCore.Business.Abstract
 {
-    public interface ITaskService<TActiveUser, TEntity> : IScopedType
+    public interface ITaskService<TActiveUser, TEntity> : ITransientType
         where TEntity : class, new()
         where TActiveUser : class, IActiveUser, new()
     {

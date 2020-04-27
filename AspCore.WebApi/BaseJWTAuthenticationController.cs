@@ -10,6 +10,7 @@ using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace AspCore.WebApi
@@ -21,13 +22,16 @@ namespace AspCore.WebApi
           where TAuthenticationProvider : IApiAuthenticationProvider<TInput, TOutput>
     {
         public virtual string authenticationProviderName { get; }
-        protected TAuthenticationProvider authenticationProvider { get; private set; }
+        protected TAuthenticationProvider AuthenticationProvider { get; private set; }
 
         private TTokenGenerator _tokenGenerator;
-        public BaseJWTAuthenticationController()
+
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseJWTAuthenticationController(IServiceProvider serviceProvider)
         {
-            _tokenGenerator = DependencyResolver.Current.GetService<TTokenGenerator>(); ;
-            authenticationProvider = DependencyResolver.Current.GetService<TAuthenticationProvider>();
+            ServiceProvider = serviceProvider;
+            _tokenGenerator = ServiceProvider.GetRequiredService<TTokenGenerator>();
+            AuthenticationProvider = (TAuthenticationProvider)ServiceProvider.GetService(typeof(TAuthenticationProvider));
         }
 
         [AllowAnonymous]
@@ -41,21 +45,21 @@ namespace AspCore.WebApi
 
             ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
 
-            if (authenticationProvider == null)
+            if (AuthenticationProvider == null)
             {
                 string authProviderName = authenticationInput.authenticationProvider;
                 if (string.IsNullOrEmpty(authProviderName))
                 {
                     authProviderName = authenticationProviderName;
                 }
-                authenticationProvider = DependencyResolver.Current.GetServiceByName<TAuthenticationProvider>(authProviderName);
+                AuthenticationProvider = ServiceProvider.GetServiceByName<TAuthenticationProvider>(authProviderName);
             }
 
-            if (authenticationProvider != null)
+            if (AuthenticationProvider != null)
             {
                 try
                 {
-                    ServiceResult<TOutput> userInfoResult = authenticationProvider.Authenticate(authenticationInput);
+                    ServiceResult<TOutput> userInfoResult = AuthenticationProvider.Authenticate(authenticationInput);
 
                     if (userInfoResult.IsSucceededAndDataIncluded())
                     {

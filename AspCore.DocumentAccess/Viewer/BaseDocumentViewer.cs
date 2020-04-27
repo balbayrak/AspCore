@@ -13,7 +13,7 @@ namespace AspCore.DocumentManagement.Viewer
 
         public BaseDocumentViewer(string viewerKey, string apiControllerRoute)
         {
-            _apiClient = ApiClientFactory.GetApiClient(viewerKey);
+            _apiClient = ApiClientFactory.Instance.GetApiClient(viewerKey);
 
             if (!apiControllerRoute.StartsWith("/"))
             {

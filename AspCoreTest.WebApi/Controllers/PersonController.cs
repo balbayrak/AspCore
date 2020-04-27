@@ -6,6 +6,9 @@ namespace AspCoreTest.WebApi.Controllers
 {
     public class PersonController : BaseEntityController<Person, IPersonService>
     {
-      
+        public PersonController(IPersonService personService) : base(personService)
+        {
+
+        }
     }
 }

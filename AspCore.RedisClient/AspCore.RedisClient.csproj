@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <Company>AspCore.RedisClient</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ServiceStack.Redis.Core" Version="5.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.Caching\AspCore.Caching.csproj" />
+    <ProjectReference Include="..\AspCore.ConfigurationAccess\AspCore.ConfigurationAccess.csproj" />
+  </ItemGroup>
+
+</Project>

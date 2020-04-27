@@ -17,7 +17,7 @@ namespace AspCore.ElasticSearchApiClient
 
         public ReadOnlyElasticClient(string apiClientKey, string elasticApiRoute)
         {
-            _apiClient = ApiClientFactory.GetApiClient(apiClientKey);
+            _apiClient = ApiClientFactory.Instance.GetApiClient(apiClientKey);
 
             if (!elasticApiRoute.StartsWith("/"))
             {

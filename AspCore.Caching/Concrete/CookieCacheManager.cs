@@ -8,11 +8,11 @@ using System.Text;
 
 namespace AspCore.Caching.Concrete
 {
-    public class CookieCacheManager : ICacheService
+    public class CookieCacheManager : CacheManager, ICacheService
     {
         private readonly IHttpContextAccessor _contextAccessor;
 
-        public CookieCacheManager(IHttpContextAccessor contextAccessor)
+        public CookieCacheManager(IHttpContextAccessor contextAccessor) : base()
         {
             _contextAccessor = contextAccessor;
         }
@@ -26,6 +26,7 @@ namespace AspCore.Caching.Concrete
         {
             if (!string.IsNullOrEmpty(key))
             {
+                key = $"{uniqueCacheKey}_{key}";
                 var list = _contextAccessor.HttpContext.Response.Cookies;
 
                 if (_contextAccessor.HttpContext.Request.Cookies.ContainsKey(key))
@@ -40,6 +41,7 @@ namespace AspCore.Caching.Concrete
         {
             if (!string.IsNullOrEmpty(key))
             {
+                key = $"{uniqueCacheKey}_{key}";
                 _contextAccessor.HttpContext.Response.Cookies.Delete(key);
                 return true;
             }
@@ -57,6 +59,7 @@ namespace AspCore.Caching.Concrete
 
         public bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
         {
+            key = $"{uniqueCacheKey}_{key}";
             Remove(key);
 
             CookieOptions option = new CookieOptions();

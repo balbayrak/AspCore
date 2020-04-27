@@ -1,6 +1,5 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Caching.Abstract;
-using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
@@ -12,6 +11,7 @@ using AspCore.Utilities.MimeMapping;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace AspCore.Web.Concrete
@@ -20,56 +20,82 @@ namespace AspCore.Web.Concrete
         where TDocument : class, IDocument, new()
         where TDocumentRequest : class, IDocumentRequest<TDocument>, new()
     {
-        protected readonly ICacheService Cache;
-        protected IAlertService AlertService;
-        private readonly IUserBffLayer _userBffLayer;
-        protected IDataProtectorHelper DataProtectorHelper;
-        protected IDocumentBffLayer<TDocument> DocumentHelper;
-        protected IConfigurationAccessor ConfigurationAccessor;
 
-        protected BaseWebController()
+        protected IServiceProvider ServiceProvider { get; private set; }
+        protected readonly object ServiceProviderLock = new object();
+
+        protected TService LazyGetRequiredService<TService>(ref TService reference)
+            => LazyGetRequiredService(typeof(TService), ref reference);
+
+        protected TRef LazyGetRequiredService<TRef>(Type serviceType, ref TRef reference)
         {
-            _userBffLayer = DependencyResolver.Current.GetService<IUserBffLayer>();
-            Cache = DependencyResolver.Current.GetService<ICacheService>();
-            AlertService = DependencyResolver.Current.GetService<IAlertService>();
-            DataProtectorHelper = DependencyResolver.Current.GetService<IDataProtectorHelper>();
-            DocumentHelper = DependencyResolver.Current.GetService<IDocumentBffLayer<TDocument>>();
-            ConfigurationAccessor = DependencyResolver.Current.GetService<IConfigurationAccessor>();
+            if (reference == null)
+            {
+                lock (ServiceProviderLock)
+                {
+                    if (reference == null)
+                    {
+                        reference = (TRef)ServiceProvider.GetRequiredService(serviceType);
+                    }
+                }
+            }
+
+            return reference;
         }
-     
+
+        protected IUserBffLayer UserBffLayer => LazyGetRequiredService(ref _userBffLayer);
+        private IUserBffLayer _userBffLayer;
+
+        protected ICacheService CacheService => LazyGetRequiredService(ref _cacheService);
+        private ICacheService _cacheService;
+
+        protected IAlertService AlertService => LazyGetRequiredService(ref _alertService);
+        private IAlertService _alertService;
+
+        protected IDocumentBffLayer<TDocument> DocumentHelper => LazyGetRequiredService(ref _documentHelper);
+        private IDocumentBffLayer<TDocument> _documentHelper;
+
+        protected IDocumentBffLayer<TDocument> ConfigurationAccessor => LazyGetRequiredService(ref _configurationAccessor);
+        private IDocumentBffLayer<TDocument> _configurationAccessor;
+
+        protected BaseWebController(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
+        }
+
         protected ActiveUser activeUser
         {
             get
             {
-                string tokenKey = Cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+                string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
                 string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                return Cache.GetObject<ActiveUser>(activeUserUId);
+                return CacheService.GetObject<ActiveUser>(activeUserUId);
             }
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            string tokenKey = Cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-            var token = Cache.GetObject<AuthenticationToken>(tokenKey);
+            string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            var token = CacheService.GetObject<AuthenticationToken>(tokenKey);
             if (token != null)
             {
                 string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                var activeUser = Cache.GetObject<ActiveUser>(activeUserUId);
+                var activeUser = CacheService.GetObject<ActiveUser>(activeUserUId);
                 if (activeUser == null)
                 {
-                    ServiceResult<ActiveUser> userResult = _userBffLayer.GetClientInfo(token).Result;
+                    ServiceResult<ActiveUser> userResult = UserBffLayer.GetClientInfo(token).Result;
 
                     if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
                     {
-                        Cache.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
+                        CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
                     }
                 }
             }
             else
             {
-                
+
             }
-            
+
             base.OnActionExecuting(context);
         }
 
@@ -88,8 +114,11 @@ namespace AspCore.Web.Concrete
 
                 if (documentResult.IsSucceededAndDataIncluded())
                 {
-                    IMimeMappingService mimeMappingService = DependencyResolver.Current.GetService<IMimeMappingService>();
-                    return File(documentResult.Result.content, mimeMappingService.Map(documentResult.Result.name), documentResult.Result.name);
+                    using (var scope = ServiceProvider.CreateScope())
+                    {
+                        IMimeMappingService mappingService = scope.ServiceProvider.GetRequiredService<IMimeMappingService>();
+                        return File(documentResult.Result.content, mappingService.Map(documentResult.Result.name), documentResult.Result.name);
+                    }
                 }
             }
 

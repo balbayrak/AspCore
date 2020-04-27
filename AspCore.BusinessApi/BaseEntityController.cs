@@ -21,9 +21,9 @@ namespace AspCore.BusinessApi
         where TEntity : class, IEntity, new()
     {
         protected readonly TEntityService _service;
-        public BaseEntityController()
+        public BaseEntityController(TEntityService entityService)
         {
-            _service = DependencyResolver.Current.GetService<TEntityService>();
+            _service = entityService;
         }
 
         [ActionName(ApiConstants.Urls.LIVENESS)]

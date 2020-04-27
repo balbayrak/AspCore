@@ -8,6 +8,8 @@ using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.WebApi;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCore.BusinessApi.DocumentEntity
 {
@@ -15,10 +17,12 @@ namespace AspCore.BusinessApi.DocumentEntity
         where TDocument : class, IDocument, new()
         where TViewRequest : IDocumentApiViewRequest<TDocument, ViewerToolbarSetting>
     {
-        private IDocumentViewer<TDocument> _service;
-        public BaseDocumentViewerController() : base()
+        private readonly IDocumentViewer<TDocument> _documentViewer;
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public BaseDocumentViewerController(IServiceProvider serviceProvider) : base()
         {
-            _service = DependencyResolver.Current.GetService<IDocumentViewer<TDocument>>();
+            ServiceProvider = serviceProvider;
+            _documentViewer = ServiceProvider.GetRequiredService<IDocumentViewer<TDocument>>();
         }
 
 
@@ -40,7 +44,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<string> response = _service.ViewDocuments(viewRequest);
+            ServiceResult<string> response = _documentViewer.ViewDocuments(viewRequest);
             return response.ToHttpResponse();
         }
 

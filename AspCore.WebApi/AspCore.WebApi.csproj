@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <Company>AspCore.WebApi</Company>
-    <Version>1.0.9</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
     <ProjectReference Include="..\AspCore.ConnectedApi\AspCore.ConnectedApi.csproj" />
+    <ProjectReference Include="..\AspCore.RedisClient\AspCore.RedisClient.csproj" />
   </ItemGroup>
 
 </Project>

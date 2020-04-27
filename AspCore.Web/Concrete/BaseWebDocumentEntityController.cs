@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.Entities.Constants;
+﻿using AspCore.Entities.Constants;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AspCore.Web.Concrete
 {
@@ -16,6 +14,10 @@ namespace AspCore.Web.Concrete
         where TViewModel : BaseViewModel<TEntity>, new()
         where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>
     {
+        public BaseWebDocumentEntityController(IServiceProvider serviceProvider, TBffLayer bffLayer) : base(serviceProvider, bffLayer)
+        {
+
+        }
         [HttpGet]
         [DataUnProtector("id")]
         public IActionResult DownloadDocumentEntity(string id)
@@ -29,7 +31,7 @@ namespace AspCore.Web.Concrete
 
                 if (entityResult.IsSucceededAndDataIncluded())
                 {
-                   return DownloadDocument(entityResult.Result.dataEntity.DocumentUrl);
+                    return DownloadDocument(entityResult.Result.dataEntity.DocumentUrl);
                 }
             }
             return BadRequest(string.Format(FrontEndConstants.ERROR_MESSAGES.PARAMETER_IS_NULL, nameof(id)));

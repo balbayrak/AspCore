@@ -6,13 +6,13 @@ using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Authentication.Concrete;
-using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using AspCore.RedisClient.Configuration;
 
 namespace AspCoreTest.WebUI
 {
@@ -48,7 +48,7 @@ namespace AspCoreTest.WebUI
                 })
                 .AddCacheService(option =>
                 {
-                    option.AddCookieCache();
+                    option.AddRedisCache("RedisInfo");
                 })
                 .AddBffApiClient(option =>
                 {

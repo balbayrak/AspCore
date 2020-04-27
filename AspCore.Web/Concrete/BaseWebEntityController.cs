@@ -1,19 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.BackendForFrontend.Abstract;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.Constants;
+﻿using AspCore.Entities.Constants;
 using AspCore.Entities.DataTable;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Utilities.DataProtector;
 using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
 using AspCore.WebComponents.HtmlHelpers.DataTable.ModelBinder;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace AspCore.Web.Concrete
 {
@@ -23,9 +21,9 @@ namespace AspCore.Web.Concrete
         where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>
     {
         protected TBffLayer BffLayer { get; private set; }
-        public BaseWebEntityController()
+        public BaseWebEntityController(IServiceProvider serviceProvider, TBffLayer bffLayer) : base(serviceProvider)
         {
-            BffLayer = DependencyResolver.Current.GetService<TBffLayer>();
+            BffLayer = bffLayer;
         }
 
         [HttpPost]
@@ -82,7 +80,7 @@ namespace AspCore.Web.Concrete
                 ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
                 if (!string.IsNullOrEmpty(viewModel.dataEntity.EncryptedId))
                 {
-                    viewModel.dataEntity.Id = new Guid(DataProtectorHelper.UnProtect(viewModel.dataEntity.EncryptedId));
+                    viewModel.dataEntity.Id = new Guid(DataProtectorFactory.Instance.UnProtect(viewModel.dataEntity.EncryptedId));
                     addorUpdateResult = BffLayer.Update(new List<TViewModel> { viewModel }).Result;
                 }
                 else

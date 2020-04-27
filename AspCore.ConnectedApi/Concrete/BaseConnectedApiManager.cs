@@ -1,4 +1,5 @@
 ﻿using AspCore.ApiClient.Abstract;
+using AspCore.ApiClient.Entities.Concrete;
 using AspCore.Dependency.Concrete;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace AspCore.ConnectedApi.Concrete
 
         public BaseConnectedApiManager()
         {
-            _apiClient = DependencyResolver.Current.GetServiceByName<IAuthenticatedApiClient>(apiKey);
+            _apiClient = ApiClientFactory.Instance.GetApiClient(apiKey);
         }
     }
 }

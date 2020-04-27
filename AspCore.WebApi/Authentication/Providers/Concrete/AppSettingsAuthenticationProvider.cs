@@ -5,6 +5,7 @@ using AspCore.Entities.Configuration;
 using AspCore.Entities.General;
 using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Authentication.Providers.Abstract;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 
@@ -17,9 +18,13 @@ namespace AspCore.WebApi.Authentication.Providers.Concrete
     {
         protected TOption _option { get; private set; }
         protected IConfigurationAccessor configurationHelper { get; private set; }
-        public AppSettingsAuthenticationProvider(string configurationKey, TOption option = null)
+
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public AppSettingsAuthenticationProvider(IServiceProvider serviceProvider, string configurationKey, TOption option = null)
         {
-            configurationHelper = DependencyResolver.Current.GetService<IConfigurationAccessor>();
+            ServiceProvider = serviceProvider;
+
+            configurationHelper = ServiceProvider.GetRequiredService<IConfigurationAccessor>();
             _option = configurationHelper.GetValueByKey<TOption>(configurationKey);
 
             if (option == null && !string.IsNullOrEmpty(configurationKey))

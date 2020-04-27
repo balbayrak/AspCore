@@ -1,26 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.EntityFilter;
-using AspCore.Web.Concrete;
+﻿using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.Entities.Models;
 using AspCoreTest.WebUI.DataSearch;
 using AspCoreTest.WebUI.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 
 namespace AspCoreTest.WebUI.Controllers
 {
     public class HomeController : BaseWebEntityController<Person, PersonViewModel, IPersonBff>
     {
-        public HomeController()
+        public HomeController(IServiceProvider serviceProvider, IPersonBff personBff) :base(serviceProvider, personBff)
         {
         }
 
         public IActionResult Index()
         {
-            var client = DependencyResolver.Current.GetService<IPersonDataSearchClient>();
+            return View();
+        }
+
+        public IActionResult PersonCacheData()
+        {
+            var client = ServiceProvider.GetRequiredService<IPersonDataSearchClient>();
             var result = client.FindBy(true, 0, 10);
             return View();
         }

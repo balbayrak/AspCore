@@ -40,39 +40,32 @@ namespace AspCore.WebApi.Configuration.Options
 
             if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
             {
-                services.AddSingleton(typeof(ITokenGenerator<TJWTInfo>), sp =>
+                services.AddSingleton(typeof(JwtAuthorizationOption), sp =>
                 {
-                    ITokenGenerator<TJWTInfo> implementation = (ITokenGenerator<TJWTInfo>)Activator.CreateInstance(typeof(TTokenGenerator), tokenConfigurationOption.configurationKey, null);
-                    return implementation;
+                    var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                    return new JwtAuthorizationOption(configurationAccessor, tokenConfigurationOption.configurationKey);
                 });
+            }
 
-                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+            services.AddSingleton(typeof(ITokenGenerator<TJWTInfo>), sp =>
+            {
+                ITokenGenerator<TJWTInfo> implementation = null;
+
+                if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
                 {
-                    //configuration helper ile setting
-
-                    IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
-                    if (configurationHelper == null)
-                    {
-                        throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
-                    }
-
-                    tokenConfigurationOption.tokenSettingOption = configurationHelper.GetValueByKey<TokenSettingOption>(tokenConfigurationOption.configurationKey);
+                    implementation = (ITokenGenerator<TJWTInfo>)Activator.CreateInstance(typeof(TTokenGenerator), sp, tokenConfigurationOption.configurationKey, null);
                 }
-            }
-            else
-            {
-                services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+                else
                 {
-                    TTokenGenerator implementation = (TTokenGenerator)Activator.CreateInstance(typeof(TTokenGenerator), null, tokenConfigurationOption.tokenSettingOption);
+                    implementation = (TTokenGenerator)Activator.CreateInstance(typeof(TTokenGenerator), sp, null, tokenConfigurationOption.tokenSettingOption);
+                }
 
-                    return implementation;
-                });
-            }
+                return implementation;
+            });
 
-            if (tokenConfigurationOption.tokenSettingOption != null)
-            {
-                AddAuthenticationSetting(tokenConfigurationOption.tokenSettingOption);
-            }
+           
+                AddAuthenticationSetting();
+            services.ConfigureOptions<ConfigureJwtBearerOptions>();
         }
 
         public void AddActiveUserTokenGenerator<TImplementation>(Action<TokenConfigurationOption> option)
@@ -87,46 +80,40 @@ namespace AspCore.WebApi.Configuration.Options
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
-
             if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
             {
-                services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+                services.AddSingleton(typeof(JwtAuthorizationOption), sp =>
                 {
-                    TImplementation implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), tokenConfigurationOption.configurationKey, null);
-
-                    return implementation;
+                    var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                    return new JwtAuthorizationOption(configurationAccessor, tokenConfigurationOption.configurationKey);
                 });
+            }
 
-                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+            services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+            {
+                TImplementation implementation = null;
+
+                if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
                 {
-                    //configuration helper ile setting
-
-                    IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
-                    if (configurationHelper == null)
-                    {
-                        throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
-                    }
-
-                    tokenConfigurationOption.tokenSettingOption = configurationHelper.GetValueByKey<TokenSettingOption>(tokenConfigurationOption.configurationKey);
+                    implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), sp, tokenConfigurationOption.configurationKey, null);
                 }
-            }
-            else
-            {
-                services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+                else
                 {
-                    TImplementation implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), null, tokenConfigurationOption.tokenSettingOption);
+                    implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), sp, null, tokenConfigurationOption.tokenSettingOption);
+                }
 
-                    return implementation;
-                });
-            }
+                return implementation;
+            });
 
-            if (tokenConfigurationOption.tokenSettingOption != null)
-            {
-                AddAuthenticationSetting(tokenConfigurationOption.tokenSettingOption);
-            }
+
+        
+                AddAuthenticationSetting();
+            
+
+            services.ConfigureOptions<ConfigureJwtBearerOptions>();
         }
 
-        private void AddAuthenticationSetting(TokenSettingOption tokenSettingOption)
+        private void AddAuthenticationSetting()
         {
             services.AddAuthorization(auth =>
             {
@@ -135,44 +122,14 @@ namespace AspCore.WebApi.Configuration.Options
                     .RequireAuthenticatedUser()
                     .Build());
             });
+
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ClockSkew = TimeSpan.Zero,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = tokenSettingOption.Issuer ?? string.Empty,
-                    ValidAudience = tokenSettingOption.Audience ?? string.Empty,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettingOption.SecurityKey))
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = ctx =>
-                    {
-                        return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = context =>
-                    {
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
-                            context.Response.Headers.Add(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER, "true");
-                        }
-                        return Task.CompletedTask;
-                    },
-                    OnMessageReceived = ctx =>
-                    {
-                        Console.WriteLine("Exception:{0}", ctx.Request);
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+            })
+            .AddJwtBearer();
         }
     }
 }

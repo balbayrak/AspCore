@@ -22,68 +22,62 @@ namespace AspCore.ElasticSearch.Configuration
         public ElasticSearchProviderOption AddElasticSearch<TOption>(string configurationKey)
             where TOption : class, IElasticSearchOption, new()
         {
-            using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+            services.AddSingleton(typeof(IElasticClient), sp =>
             {
-                if (!string.IsNullOrEmpty(configurationKey))
+                //configuration helper ile setting
+                IConfigurationAccessor configurationHelper = sp.GetRequiredService<IConfigurationAccessor>();
+                if (configurationHelper == null)
                 {
-                    var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
-                    if (httpContextAccessor == null)
-                    {
-                        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                    }
-                    //configuration helper ile setting
+                    throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
+                }
 
-                    IConfigurationAccessor configurationHelper = serviceProvider.GetRequiredService<IConfigurationAccessor>();
-                    if (configurationHelper == null)
-                    {
-                        throw new Exception(ConfigurationHelperConstants.ErrorMessages.CONFIGURATION_HELPER_NOT_FOUND);
-                    }
+                TOption elasticOption = configurationHelper.GetValueByKey<TOption>(configurationKey);
 
-                    TOption elasticOption = configurationHelper.GetValueByKey<TOption>(configurationKey);
-
-                    if (elasticOption != null)
+                if (elasticOption != null)
+                {
+                   // services.AddSingleton<IElasticSearchOption>(elasticOption);
+                   
+                    if (elasticOption.Servers != null && elasticOption.Servers.Length > 0)
                     {
-                        services.AddSingleton<IElasticSearchOption>(elasticOption);
-                        if (elasticOption.Servers != null && elasticOption.Servers.Length > 0)
+                        ConnectionSettings _settings = null;
+                        if (elasticOption.Servers.Length > 1)
                         {
-                            ConnectionSettings _settings = null;
-                            if (elasticOption.Servers.Length > 1)
+                            var connectionUris = new List<Uri>();
+                            foreach (var server in elasticOption.Servers)
                             {
-                                var connectionUris = new List<Uri>();
-                                foreach (var server in elasticOption.Servers)
-                                {
-                                    connectionUris.Add(new Uri(server.Url));
-                                }
-
-                                var _connectionPool = new SniffingConnectionPool(connectionUris);
-                                _settings = new ConnectionSettings(_connectionPool)
-                                     .PrettyJson(true)
-                                    .EnableHttpCompression(true)
-                                    .SniffOnConnectionFault(false)
-                                    .SniffOnStartup(false)
-                                    .SniffLifeSpan(TimeSpan.FromMinutes(1))
-                                    .DefaultFieldNameInferrer(p => p);
-
-                            }
-                            else
-                            {
-                                _settings = new ConnectionSettings(new Uri(elasticOption.Servers[0].Url))
-                                                .PrettyJson(true)
-                                                .EnableHttpCompression(true)
-                                                   .DefaultFieldNameInferrer(p => p);
+                                connectionUris.Add(new Uri(server.Url));
                             }
 
-                            if (_settings != null)
-                            {
-                                var client = new ElasticClient(_settings);
+                            var _connectionPool = new SniffingConnectionPool(connectionUris);
+                            _settings = new ConnectionSettings(_connectionPool)
+                                 .PrettyJson(true)
+                                .EnableHttpCompression(true)
+                                .SniffOnConnectionFault(false)
+                                .SniffOnStartup(false)
+                                .SniffLifeSpan(TimeSpan.FromMinutes(1))
+                                .DefaultFieldNameInferrer(p => p);
 
-                                services.AddSingleton<IElasticClient>(client);
-                                services.AddSingleton<IESContext, ESContext>();
-                            }
+                        }
+                        else
+                        {
+                            _settings = new ConnectionSettings(new Uri(elasticOption.Servers[0].Url))
+                                            .PrettyJson(true)
+                                            .EnableHttpCompression(true)
+                                               .DefaultFieldNameInferrer(p => p);
+                        }
+
+                        if (_settings != null)
+                        {
+                            return new ElasticClient(_settings);
                         }
                     }
                 }
-            }
+
+                return null;
+            });
+
+            services.AddSingleton<IESContext, ESContext>();
+
             return new ElasticSearchProviderOption(services);
         }
 

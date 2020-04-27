@@ -5,6 +5,9 @@ using AspCore.ApiClient.Entities.Abstract;
 using AspCore.BackendForFrontend.Abstract;
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.Entities.Configuration;
+using Microsoft.AspNetCore.Http;
+using AspCore.ConfigurationAccess.Abstract;
+using AspCore.Caching.Abstract;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -21,7 +24,10 @@ namespace AspCore.Web.Configuration.Options
 
             services.AddTransient(typeof(IBffApiClient), sp =>
             {
-                return new BffApiClient(bffClientOption.apiConfigurationKey);
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                var cacheService = sp.GetRequiredService<ICacheService>();
+                return new BffApiClient(httpContextAccessor, configurationAccessor, cacheService, bffClientOption.apiConfigurationKey);
             });
 
             return new ConfigurationBuilderOption(services);

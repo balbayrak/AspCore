@@ -9,7 +9,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
 {
     public class ActiveUserJwtGenerator : JwtGenerator<ActiveUser>, IActiveUserTokenGenerator
     {
-        public ActiveUserJwtGenerator(string configurationKey, TokenSettingOption tokenOption = null) : base(configurationKey, tokenOption)
+        public ActiveUserJwtGenerator(IServiceProvider serviceProvider, string configurationKey, TokenSettingOption tokenOption = null) : base(serviceProvider, configurationKey, tokenOption)
         {
         }
 

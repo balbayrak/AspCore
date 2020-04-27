@@ -7,7 +7,7 @@ namespace AspCore.BackendForFrontend.Abstract
 {
     public interface IBFFLayer : ITransientType
     {
-        IBffApiClient apiClient { get; }
+        IBffApiClient ApiClient { get; }
 
         void SetApiClientTokenStorageKey(string tokenStorageKey);
 

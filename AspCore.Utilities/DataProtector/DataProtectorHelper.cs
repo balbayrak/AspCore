@@ -1,8 +1,4 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.Dependency.Concrete;
 
 namespace AspCore.Utilities.DataProtector
 {
@@ -10,10 +6,10 @@ namespace AspCore.Utilities.DataProtector
     {
         private string _secretKey { get; set; }
         private IDataProtectionProvider _dataProtectionProvider { get; set; }
-        public DataProtectorHelper(string secretKey)
+        public DataProtectorHelper(IDataProtectionProvider dataProtectionProvider, string secretKey)
         {
             _secretKey = secretKey;
-            _dataProtectionProvider = DependencyResolver.Current.GetService<IDataProtectionProvider>();
+            _dataProtectionProvider = dataProtectionProvider;
         }
         public string Protect(string input)
         {

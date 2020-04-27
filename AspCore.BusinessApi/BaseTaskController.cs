@@ -18,9 +18,9 @@ namespace AspCore.BusinessApi
         where TActiveUser : class, IActiveUser, new()
     {
         protected readonly TEntityService _service;
-        public BaseTaskController()
+        public BaseTaskController(TEntityService entityService)
         {
-            _service = DependencyResolver.Current.GetService<TEntityService>();
+            _service = entityService;
         }
 
         [ActionName("Liveness")]

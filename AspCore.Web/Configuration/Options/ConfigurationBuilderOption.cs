@@ -7,6 +7,7 @@ using AspCore.Entities.DocumentType;
 using AspCore.Utilities.DataProtector;
 using AspCore.Utilities.MimeMapping;
 using AspCore.WebComponents.ViewComponents.Alert.Configuration;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -36,7 +37,7 @@ namespace AspCore.Web.Configuration.Options
 
             services.AddTransient(typeof(IDocumentBffLayer<TDocument>), sp =>
             {
-                IDocumentBffLayer<TDocument> implementation = (IDocumentBffLayer<TDocument>)Activator.CreateInstance(typeof(TDocumentHelper), documentHelperOption.uploaderRoute, documentHelperOption.viewerRoute, documentHelperOption.signerRoute);
+                IDocumentBffLayer<TDocument> implementation = (IDocumentBffLayer<TDocument>)Activator.CreateInstance(typeof(TDocumentHelper), sp, documentHelperOption.uploaderRoute, documentHelperOption.viewerRoute, documentHelperOption.signerRoute);
                 return implementation;
             });
 
@@ -52,9 +53,10 @@ namespace AspCore.Web.Configuration.Options
             {
                 services.AddDataProtection();
 
-                services.AddTransient(typeof(IDataProtectorHelper), sp =>
+                services.AddSingleton(typeof(IDataProtectorHelper), sp =>
                 {
-                    return new DataProtectorHelper(dataProtectorOption.dataProtectorKey);
+                    var dataProtectionProvider = sp.GetRequiredService<IDataProtectionProvider>();
+                    return new DataProtectorHelper(dataProtectionProvider, dataProtectorOption.dataProtectorKey);
                 });
             }
 
@@ -71,7 +73,7 @@ namespace AspCore.Web.Configuration.Options
 
         public ConfigurationBuilderOption AddDataSearchLayer(Action<DataSearchApiClientBuilder> builder)
         {
-            DataSearchApiClientBuilder dataSearchApiClientBuilder  = new DataSearchApiClientBuilder(services);
+            DataSearchApiClientBuilder dataSearchApiClientBuilder = new DataSearchApiClientBuilder(services);
             builder(dataSearchApiClientBuilder);
             return this;
         }

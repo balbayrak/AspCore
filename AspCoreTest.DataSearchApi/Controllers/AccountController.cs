@@ -3,13 +3,14 @@ using AspCore.Entities.Authentication;
 using AspCore.WebApi;
 using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Authentication.Providers.Abstract;
+using System;
 
-namespace AspCoreTest.CacheApi.Controllers
+namespace AspCoreTest.DataSearchApi.Controllers
 {
     public class AccountController : BaseJWTAuthenticationController<IApiAuthenticationProvider<AuthenticationInfo, ElasticSearchApiJWTInfo>, ITokenGenerator<ElasticSearchApiJWTInfo>, AuthenticationInfo, ElasticSearchApiJWTInfo>
     {
         public override string authenticationProviderName => typeof(ElasticSearchAppSettingAuthProvider).Name;
-        public AccountController()
+        public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }
