@@ -64,7 +64,7 @@ namespace AspCore.ApiClient
 
         public AuthenticationInfo authenticationInfo { get; set; }
 
-        public ApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor,ICacheService cacheService, string apiKey)
+        public ApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey)
         {
             this.apiKey = apiKey;
 
@@ -146,7 +146,7 @@ namespace AspCore.ApiClient
                 {
                     client.BaseAddress = new Uri(_baseAddress);
 
-                    if(authenticationInfo == null)
+                    if (authenticationInfo == null)
                         Authenticate(client, false, false);
                     else
                     {
@@ -185,7 +185,7 @@ namespace AspCore.ApiClient
                     if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
                         bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-                       
+
                         Authenticate(client, true, refreshTokenCnt);
 
                         response = await client.PostAsync(_apiUrl, jsonContent);
@@ -193,7 +193,7 @@ namespace AspCore.ApiClient
 
                     string responseString = await response.Content.ReadAsStringAsync();
                     result = JsonConvert.DeserializeObject<TResult>(responseString);
-                    
+
                 }
             };
 
@@ -253,20 +253,28 @@ namespace AspCore.ApiClient
                     var response = client.PostAsync(_apiUrl, jsonContent).Result;
                     if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
-                        Authenticate(client, true, response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER));
 
-                        response = client.PostAsync(_apiUrl, jsonContent).Result;
+                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+                        if (!refreshTokenCnt)
+                        {
+                            string s = response.Headers.WwwAuthenticate.ToString();
+                            refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
+                        }
+
+                        Authenticate(client, true, refreshTokenCnt);
+
+                        response = await client.PostAsync(_apiUrl, jsonContent);
                     }
 
 
-                  //  response.EnsureSuccessStatusCode();
+                    //  response.EnsureSuccessStatusCode();
 
                     if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
                     {
                         string responseString = await response.Content.ReadAsStringAsync();
-                 
-                    Debug.WriteLine(responseString);
-                    result = JsonConvert.DeserializeObject<TResult>(responseString);
+
+                        Debug.WriteLine(responseString);
+                        result = JsonConvert.DeserializeObject<TResult>(responseString);
                     }
                 }
             };
@@ -299,7 +307,7 @@ namespace AspCore.ApiClient
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
-                  
+
                     result = JsonConvert.DeserializeObject<TResult>(responseString);
                 }
             }
