@@ -47,7 +47,7 @@ namespace AspCore.Web.Configuration
 
             //All configuration completed, resolve initialize all configuration.
 
-            DependencyResolver.Init(services.BuildServiceProvider());
+          
 
             return services;
         }

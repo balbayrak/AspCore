@@ -36,6 +36,7 @@ namespace AspCore.BusinessApi
         public IActionResult Liveness()
         {
             ServiceResult<bool> response = new ServiceResult<bool>();
+
             response.IsSucceeded = true;
             response.Result = true;
             return response.ToHttpResponse();

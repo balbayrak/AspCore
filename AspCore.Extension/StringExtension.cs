@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace AspCore.Extension
+namespace System
 {
     public static class StringExtension
     {
@@ -33,6 +33,20 @@ namespace AspCore.Extension
             value = value.Replace("Ğ", "G").TrimStart('.').TrimEnd('.');
             value = value.Replace("Ç", "C").TrimStart('.').TrimEnd('.');
             return value;
+        }
+
+        public static string Right(this string str, int len)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException("verilen string değeri boş olamaz.");
+            }
+            if (str.Length < len)
+            {
+                throw new ArgumentException("len verilen string değerinden büyük olamaz.");
+            }
+
+            return str.Substring(str.Length - len, len);
         }
     }
 }

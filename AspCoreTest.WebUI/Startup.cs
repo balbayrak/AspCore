@@ -1,5 +1,6 @@
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.DocumentType;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
@@ -98,7 +99,7 @@ namespace AspCoreTest.WebUI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();
-
+            DependencyResolver.Init(app.ApplicationServices);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -1,4 +1,5 @@
 ﻿using AspCore.Business.Concrete;
+using AspCore.Dependency.DependencyAttributes;
 using AspCore.Entities.General;
 using AspCoreTest.DataAccess.Abstract;
 using AspCoreTest.Entities.Models;
@@ -7,6 +8,7 @@ using testbusiness.Abstract;
 
 namespace testbusiness.Concrete
 {
+    [ExposedService(typeof(IPersonService))]
     public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person,PersonSearchEntity>, IPersonService
     {
         public PersonManager()
