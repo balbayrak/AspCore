@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryType></RepositoryType>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <Company>AspCore.ConfigurationAccess</Company>
   </PropertyGroup>
 

@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <Company>AspCore.WebApi</Company>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
