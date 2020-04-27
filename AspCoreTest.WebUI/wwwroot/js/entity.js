@@ -30,12 +30,12 @@
         successTitle = null,
         errorTitle = null) {
         if (this.Validate(formid)) {
-            var formData = new FormData($('#' + formid)[$('#' + formid).length -1]);
+            var formData = $('#' + formid).serialize();
             $.ajax({
                 url: "/" + entity + "/AddOrEdit",
                 type: "POST",
                 data: formData,
-                contentType: false,
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',  
                 datatype: 'json',
                 cache: false,
                 processData: false,

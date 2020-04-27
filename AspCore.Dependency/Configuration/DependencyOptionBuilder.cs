@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using AspCore.Dependency.Abstract;
 using AspCore.Dependency.Concrete;
+using AspCore.Dependency.DependencyAttributes;
 using AspCore.Entities.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AspCore.Dependency.Configuration
 {
@@ -61,34 +63,46 @@ namespace AspCore.Dependency.Configuration
 
         private void BindType<TInterface>(ServiceLifetime lifeTime = ServiceLifetime.Scoped, string namespaceStr = null)
         {
-            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr);
+            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr,true);
 
             foreach (var typeMap in maps)
             {
-                foreach (var serviceType in typeMap.ServiceTypes)
+               
+                if (!typeMap.ExposedTypes.Any())
                 {
-                    var implementationType = typeMap.ImplementationType;
-
-                    if (!implementationType.IsAssignableTo(serviceType))
+                    foreach (var serviceType in typeMap.ServiceTypes)
                     {
-                        throw new InvalidOperationException($@"Type ""{implementationType.ToFriendlyName()}"" is not assignable to ""${serviceType.ToFriendlyName()}"".");
+                        var implementationType = typeMap.ImplementationType;
+
+                        if (!implementationType.IsAssignableTo(serviceType))
+                        {
+                            throw new InvalidOperationException($@"Type ""{implementationType.ToFriendlyName()}"" is not assignable to ""${serviceType.ToFriendlyName()}"".");
+                        }
+
+                        var descriptor = new ServiceDescriptor(serviceType, implementationType, lifeTime);
+
+                        var oldDescription = services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
+                        if (oldDescription != null)
+                        {
+                            services.Remove(oldDescription);
+                        }
+
+                        var oldDescriptionImp = services.FirstOrDefault(t => t.ServiceType == implementationType);
+                        if (oldDescriptionImp != null)
+                        {
+                            services.Remove(oldDescriptionImp);
+                        }
+
+                        services.Add(descriptor);
                     }
-
-                    var descriptor = new ServiceDescriptor(serviceType, implementationType, lifeTime);
-
-                    var oldDescription = services.FirstOrDefault(t => t.ServiceType == typeof(TInterface));
-                    if (oldDescription != null)
+                }
+                else
+                {
+                    foreach (var serviceType in typeMap.ExposedTypes)
                     {
-                        services.Remove(oldDescription);
+                        var descriptor = ServiceDescriptor.Describe(serviceType, typeMap.ImplementationType, lifeTime);
+                        services.Replace(descriptor);
                     }
-
-                    var oldDescriptionImp = services.FirstOrDefault(t => t.ServiceType == implementationType);
-                    if (oldDescriptionImp != null)
-                    {
-                        services.Remove(oldDescriptionImp);
-                    }
-
-                    services.Add(descriptor);
                 }
             }
         }

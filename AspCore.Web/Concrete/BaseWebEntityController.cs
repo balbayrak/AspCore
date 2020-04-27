@@ -63,7 +63,7 @@ namespace AspCore.Web.Concrete
                 }
                 else
                 {
-                    return PartialView("AddOrEdit");
+                    return PartialView("AddOrEdit", (TViewModel) null);
                 }
             }
 
