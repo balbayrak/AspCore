@@ -1,5 +1,4 @@
-﻿using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;

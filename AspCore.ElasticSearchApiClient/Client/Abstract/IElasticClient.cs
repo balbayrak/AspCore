@@ -12,5 +12,7 @@ namespace AspCore.ElasticSearchApiClient
         ServiceResult<bool> Update(params T[] searchableEntities);
         ServiceResult<bool> Delete(params T[] searchableEntities);
 
+        
+
     }
 }

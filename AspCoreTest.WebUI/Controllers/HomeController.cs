@@ -1,8 +1,8 @@
 ﻿using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
+using AspCoreTest.DataSearch.Abstract;
 using AspCoreTest.Entities.Models;
-using AspCoreTest.WebUI.DataSearch;
 using AspCoreTest.WebUI.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,7 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult PersonCacheData()
         {
-            var client = ServiceProvider.GetRequiredService<IPersonDataSearchClient>();
+            var client = ServiceProvider.GetRequiredService<IPersonDataSearchEngine>();
             var result = client.FindBy(true, 0, 10);
             return View();
         }

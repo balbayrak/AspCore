@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.6</Version>
+    <Version>1.0.7</Version>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <Company>AspCore.Caching</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspCore.WebComponents\AspCore.WebComponents.csproj" />
     <ProjectReference Include="..\AspCore.Web\AspCore.Web.csproj" />
+    <ProjectReference Include="..\AspCoreTest.DataSearch\AspCoreTest.DataSearch.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
   </ItemGroup>
 

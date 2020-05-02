@@ -107,7 +107,7 @@ namespace AspCore.WebApi.Configuration.Options
 
 
         
-                AddAuthenticationSetting();
+           AddAuthenticationSetting();
             
 
             services.ConfigureOptions<ConfigureJwtBearerOptions>();

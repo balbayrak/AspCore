@@ -13,18 +13,19 @@ using System.Linq;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity> : BaseEntityManager<TDataAccess, TEntity>, ISearchableEntityService<TSearchableEntity>,IEntityService<TEntity>
+    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TEntity>, ISearchableEntityService<TSearchableEntity>, IEntityService<TEntity>
         where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TSearchableEntity : class, ISearchableEntity, new()
+        where TDataSearchEngine : IDataSearchEngine<TSearchableEntity>
     {
         protected ICustomMapper Mapper { get; private set; }
-        private readonly IDataSearchEngine<TSearchableEntity> _dataSearchEngine;
+        private readonly TDataSearchEngine _dataSearchEngine;
 
         public BaseComplexSearchableEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             Mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
-            _dataSearchEngine = ServiceProvider.GetService<IDataSearchEngine<TSearchableEntity>>();
+            _dataSearchEngine = ServiceProvider.GetService<TDataSearchEngine>();
         }
 
         public abstract ServiceResult<TSearchableEntity> GetComplexEntity(TEntity entity);
@@ -55,7 +56,7 @@ namespace AspCore.Business.Concrete
                 if (string.IsNullOrEmpty(serviceResult.ErrorMessage))
                 {
                     serviceResult.IsSucceeded = true;
-                 
+
                     serviceResult.Result = list.ToArray();
                 }
             }
@@ -80,6 +81,7 @@ namespace AspCore.Business.Concrete
                     ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities);
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
+
                         ServiceResult<bool> resultCache = _dataSearchEngine.Create(entityResult.Result.ToArray());
                         if (resultCache.IsSucceeded)
                         {

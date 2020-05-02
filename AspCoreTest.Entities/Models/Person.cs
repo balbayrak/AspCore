@@ -3,7 +3,7 @@ using AspCore.Entities.EntityType;
 
 namespace AspCoreTest.Entities.Models
 {
-    public partial class Person : BaseEntity
+    public partial class Person : BaseEntity, IAutoHistory
     {
         public Person()
         {

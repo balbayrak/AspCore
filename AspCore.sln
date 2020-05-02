@@ -63,6 +63,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.DataSearch", "AspCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore.RedisClient", "AspCore.RedisClient\AspCore.RedisClient.csproj", "{B32D0240-B062-499B-BF69-DD231D5F43B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreTest.DataSearch", "AspCoreTest.DataSearch\AspCoreTest.DataSearch.csproj", "{CC3D3588-6406-4707-8FA4-662395360FDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{B32D0240-B062-499B-BF69-DD231D5F43B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B32D0240-B062-499B-BF69-DD231D5F43B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B32D0240-B062-499B-BF69-DD231D5F43B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC3D3588-6406-4707-8FA4-662395360FDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC3D3588-6406-4707-8FA4-662395360FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC3D3588-6406-4707-8FA4-662395360FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC3D3588-6406-4707-8FA4-662395360FDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -214,6 +220,7 @@ Global
 		{5AC4355A-FA48-4C62-9D38-E1006DCF639D} = {B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}
 		{4BFF4F03-D238-4737-AD44-895B88CF4BB8} = {968AC7B7-17FA-41A4-A643-9C4D03AC9525}
 		{B32D0240-B062-499B-BF69-DD231D5F43B7} = {968AC7B7-17FA-41A4-A643-9C4D03AC9525}
+		{CC3D3588-6406-4707-8FA4-662395360FDC} = {B56A2C0A-54B0-48B8-8A25-64A9EB0ECDD0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E4B24D4-6FE9-4271-B972-1395D3515740}

@@ -14,12 +14,12 @@ namespace AspCore.DataSearch.Configuration
             _services = services;
         }
 
-        public DataSearchClientBuilder AddApiClients(string defaultApiClientKey, Action<ApiClientByNameBuilder> builder)
+        public DataSearchEngineBuilder AddApiClients(string defaultApiClientKey, Action<ApiClientByNameBuilder> builder)
         {
             ApiClientByNameBuilder apiClientByNameBuilder = new ApiClientByNameBuilder(_services);
             builder(apiClientByNameBuilder);
 
-            return new DataSearchClientBuilder(_services, defaultApiClientKey);
+            return new DataSearchEngineBuilder(_services, defaultApiClientKey);
         }
     }
 }
