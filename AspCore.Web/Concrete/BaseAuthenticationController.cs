@@ -146,7 +146,7 @@ namespace AspCore.Web.Concrete
             try
             {
                 CacheService.RemoveAll();
-            //    CookieService.RemoveAll();
+                CookieService.RemoveAll();
             }
             catch
             {
