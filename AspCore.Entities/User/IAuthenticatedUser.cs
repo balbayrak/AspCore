@@ -3,8 +3,7 @@ using AspCore.Entities.EntityType;
 
 namespace AspCore.Entities.User
 {
-    public interface IActiveUser : IJWTEntity
+    public interface IAuthenticatedUser : IJWTEntity
     {
-        public Guid id { get; set; }
     }
 }

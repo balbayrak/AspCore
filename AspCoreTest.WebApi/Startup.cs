@@ -81,6 +81,10 @@ namespace AspCoreTest.WebApi
                         contactEmail = "balbayrak87@gmail.com"
                     };
                 })
+                .AddDataProtectorHelper(option =>
+                {
+                    option.dataProtectorKey = "tsesecretkey";
+                })
                 .AddDataSearchAccessLayer("DataSearchApi", option =>
                  {
                      option.AddDataSearchEngine<PersonSearchEntity>("api/PersonCache");

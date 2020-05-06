@@ -18,7 +18,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, jwtInfo.id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, jwtInfo.authenticatedUserId.ToString()),
                 new Claim(ClaimTypes.Email, jwtInfo.email ?? string.Empty),
                 new Claim(ClaimTypes.Name, (jwtInfo.name + " " + jwtInfo.surname) ?? string.Empty),
                 new Claim(ClaimTypes.HomePhone, jwtInfo.telephone ?? string.Empty),
@@ -38,7 +38,7 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
             return new ActiveUser
             {
                 id = new Guid(claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value),
-                activeUserId = new Guid(claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value),
+                authenticatedUserId = new Guid(claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier)?.Value),
                 job = claims.FirstOrDefault(t => t.Type == ClaimTypes.Actor)?.Value,
                 email = claims.FirstOrDefault(t => t.Type == ClaimTypes.Email)?.Value,
                 jobCompany = claims.FirstOrDefault(t => t.Type == ClaimTypes.Locality)?.Value,

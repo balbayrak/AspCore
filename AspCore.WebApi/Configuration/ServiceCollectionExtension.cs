@@ -63,7 +63,12 @@ namespace AspCore.WebApi.Configuration
             option(applicationBuilderOption);
 
             ApiClientFactory.Init(app.ApplicationServices);
-          //  DataProtectorFactory.Init(app.ApplicationServices.GetRequiredService<IDataProtectorHelper>());
+            var dataProtector = app.ApplicationServices.GetService<IDataProtectorHelper>();
+            if(dataProtector!=null)
+            {
+                DataProtectorFactory.Init(dataProtector);
+            }
+            
             return app;
         }
     }

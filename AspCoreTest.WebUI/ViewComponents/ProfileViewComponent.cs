@@ -1,6 +1,4 @@
 ﻿using AspCore.Caching.Abstract;
-using AspCore.Entities.Constants;
-using AspCore.Entities.User;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -19,7 +17,6 @@ namespace AspCoreTest.WebUI.ViewComponents
 
         public IViewComponentResult Invoke()
         {
-            var user = _cache.GetObject<ActiveUser>(FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER);
             return View("Default");
         }
     }

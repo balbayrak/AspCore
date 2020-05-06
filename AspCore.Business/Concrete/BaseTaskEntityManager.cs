@@ -18,7 +18,7 @@ namespace AspCore.Business.Concrete
     public abstract class BaseTaskEntityManager<TActiveUser, TEntity, TDAL,TTaskBuilder> : BaseTaskManager<TActiveUser, TEntity, TTaskBuilder>, ITaskEntityService<TActiveUser, TEntity>
         where TDAL : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
-        where TActiveUser : class, IActiveUser, new()
+        where TActiveUser : class, IAuthenticatedUser, new()
         where TTaskBuilder : TaskBuilder, ITaskBuilder
     {
         private readonly TDAL _dataLayer;

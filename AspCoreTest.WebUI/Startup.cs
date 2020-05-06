@@ -47,7 +47,8 @@ namespace AspCoreTest.WebUI
                 })
                 .AddCacheService(option =>
                 {
-                    option.AddRedisCache("RedisInfo");
+                     option.AddRedisCache("RedisInfo");
+                   // option.AddCookieCache();
                 })
                 .AddBffApiClient(option =>
                 {
@@ -86,7 +87,7 @@ namespace AspCoreTest.WebUI
                         option.AddJWTAuthenticatedClient("DataSearchApi")
                         .Build();
                     }).AddDataSearchEngine<PersonSearchEntity>("api/PersonCache")
-                    .ElasticSearchAdmins(option=>
+                    .ElasticSearchAdmins(option =>
                     {
                         option.AddElasticSearchAdmin<PersonSearchEntity>("api/PersonCache");
                     });
@@ -98,7 +99,7 @@ namespace AspCoreTest.WebUI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();
-       
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

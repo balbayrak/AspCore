@@ -5,7 +5,7 @@ using AspCore.Entities.Authentication;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
-    public interface IBFFLayer : ITransientType
+    public interface IBffLayer : ITransientType
     {
         IBffApiClient ApiClient { get; }
 

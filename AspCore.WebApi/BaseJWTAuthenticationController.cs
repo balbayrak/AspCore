@@ -137,7 +137,6 @@ namespace AspCore.WebApi
             return serviceResult.ToHttpResponse();
         }
 
-
         [HttpPost]
         [ActionName(ApiConstants.Urls.GET_CLIENT_INFO)]
         [ProducesResponseType(400)]

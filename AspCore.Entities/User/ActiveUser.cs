@@ -6,7 +6,7 @@ using AspCore.Entities.Json;
 
 namespace AspCore.Entities.User
 {
-    public class ActiveUser : IActiveUser
+    public class ActiveUser : IAuthenticatedUser
     {
         public Guid id { get; set; }
         public string tckn { get; set; }
@@ -20,7 +20,7 @@ namespace AspCore.Entities.User
         public string telephone { get; set; }
         public List<string> roles { get; set; }
         public string correlationId { get; set; }
-        public Guid activeUserId { get; set; }
+        public Guid authenticatedUserId { get; set; }
 
         public ActiveUser()
         {

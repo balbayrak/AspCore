@@ -42,7 +42,7 @@ namespace AspCore.WebApi.Middlewares
 
                         if (jwtInfoResult.IsSucceededAndDataIncluded())
                         {
-                            if (typeof(IActiveUser).IsAssignableFrom(typeof(TJWTInfo)))
+                            if (typeof(IAuthenticatedUser).IsAssignableFrom(typeof(TJWTInfo)))
                             {
                                 httpContext.Request.Headers.Add(HttpContextConstant.HEADER_KEY.ACTIVE_USER, JsonConvert.SerializeObject(jwtInfoResult.Result));
                             }
@@ -55,7 +55,7 @@ namespace AspCore.WebApi.Middlewares
                                 httpContext.Request.Headers.Remove(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID);
                             }
 
-                            httpContext.Request.Headers.Add(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID, jwtInfoResult.Result.activeUserId.ToString());
+                            httpContext.Request.Headers.Add(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID, jwtInfoResult.Result.authenticatedUserId.ToString());
                         }
                     }
                 }

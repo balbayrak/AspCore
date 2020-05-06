@@ -79,7 +79,7 @@ namespace AspCore.Entities.Constants
 
             public const string TOKEN_EXPIRED_HEADER_STR = "Token Expired";
 
-            public const string CUSTOM_TOKEN_STORAGE_KEY = "CT_A1CC32F1-73A3-47B4-A1D8-7599C8D69BC9";
+            public const string APP_USER_STORAGE_KEY = "AppUser_A1CC32F1-73A3-47B4-A1D8-7599C8D69BC9";
         }
     }
 }

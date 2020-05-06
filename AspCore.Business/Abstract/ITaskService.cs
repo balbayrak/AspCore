@@ -8,7 +8,7 @@ namespace AspCore.Business.Abstract
 {
     public interface ITaskService<TActiveUser, TEntity> : ITransientType
         where TEntity : class, new()
-        where TActiveUser : class, IActiveUser, new()
+        where TActiveUser : class, IAuthenticatedUser, new()
     {
         public TActiveUser activeUser { get; }
 

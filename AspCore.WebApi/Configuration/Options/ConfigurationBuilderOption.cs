@@ -2,9 +2,11 @@
 using AspCore.Dependency.Configuration;
 using AspCore.Entities.Configuration;
 using AspCore.Extension;
+using AspCore.Utilities.DataProtector;
 using AspCore.WebApi.Configuration.Swagger.Abstract;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Extension;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System;
@@ -99,6 +101,24 @@ namespace AspCore.WebApi.Configuration.Options
             return this;
         }
 
+        public ConfigurationBuilderOption AddDataProtectorHelper(Action<DataProtectorOption> option)
+        {
+            var dataProtectorOption = new DataProtectorOption();
+            option(dataProtectorOption);
+
+            if (!string.IsNullOrEmpty(dataProtectorOption.dataProtectorKey))
+            {
+                services.AddDataProtection();
+
+                services.AddSingleton(typeof(IDataProtectorHelper), sp =>
+                {
+                    var dataProtectionProvider = sp.GetRequiredService<IDataProtectionProvider>();
+                    return new DataProtectorHelper(dataProtectionProvider, dataProtectorOption.dataProtectorKey);
+                });
+            }
+
+            return this;
+        }
 
     }
 }
