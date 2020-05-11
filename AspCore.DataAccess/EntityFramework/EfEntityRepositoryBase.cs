@@ -5,7 +5,6 @@ using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities;
 using AspCore.Utilities.Mapper.Abstract;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -24,22 +23,14 @@ namespace AspCore.DataAccess.EntityFramework
     {
         protected IServiceProvider ServiceProvider { get; private set; }
         private TDbContext _context { get; }
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private DbSet<TEntity> _entities;
         private readonly ICustomMapper _mapper;
-        private Guid activeUserId
-        {
-            get
-            {
-                return new Guid(_httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID));
-            }
-        }
+
         protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = _context.Set<TEntity>());
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
         public EfEntityRepositoryBase(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
-            _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
             _context = ServiceProvider.GetService<TDbContext>();
             _mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
             _entities = _context.Set<TEntity>();
@@ -164,10 +155,6 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (TEntity item in entities)
                 {
-                    if (item is IBaseEntity)
-                    {
-                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                    }
                     _context.Entry(item).State = EntityState.Added;
                 }
                 int value = _context.SaveChanges();
@@ -218,10 +205,6 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (var updatedInput in updatedEntityList)
                 {
-                    if (updatedInput is IBaseEntity)
-                    {
-                        ((IBaseEntity)updatedInput).LastUpdatedUserId = activeUserId;
-                    }
                     _context.Attach(updatedInput);
                     _context.Update(updatedInput);
                 }
@@ -256,10 +239,6 @@ namespace AspCore.DataAccess.EntityFramework
                 updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
                 foreach (var item in updatedEntityList)
                 {
-                    if (item is IBaseEntity)
-                    {
-                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                    }
                     _context.Attach(item);
                     _context.Update(item);
                 }
@@ -280,10 +259,6 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (TEntity item in entities)
                 {
-                    if (item is IBaseEntity)
-                    {
-                        ((IBaseEntity)item).LastUpdatedUserId = activeUserId;
-                    }
                     var updatedEntity = _context.Entry(item);
                     updatedEntity.State = EntityState.Deleted;
                 }

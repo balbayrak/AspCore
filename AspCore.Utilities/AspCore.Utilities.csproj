@@ -7,8 +7,9 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.7</Version>
+    <Version>1.1.1</Version>
     <Company>AspCore.Utilities</Company>
+        <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

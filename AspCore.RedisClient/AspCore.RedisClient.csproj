@@ -7,6 +7,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
+    <Version>1.0.4</Version>
+    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

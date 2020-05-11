@@ -8,7 +8,7 @@ using AspCore.Entities.General;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
-    public interface IEntityBffLayer<TViewModel, TEntity> : IBFFLayer
+    public interface IEntityBffLayer<TViewModel, TEntity> : IBffLayer
          where TViewModel : BaseViewModel<TEntity> 
          where TEntity : class, IEntity, new()
     {

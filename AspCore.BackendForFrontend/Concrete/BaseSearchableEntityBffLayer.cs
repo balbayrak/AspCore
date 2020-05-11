@@ -11,22 +11,22 @@ using System.Collections.Generic;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public abstract class BaseSearchableEntityBffLayer<TViewModel, TSearchableEntity,TSearchClient> : BaseEntityBffLayer<TViewModel, TSearchableEntity>, ISearchableEntityBffLayer<TViewModel, TSearchableEntity>
+    public abstract class BaseSearchableEntityBffLayer<TViewModel, TSearchableEntity,TDataSearchEngine> : BaseEntityBffLayer<TViewModel, TSearchableEntity>, ISearchableEntityBffLayer<TViewModel, TSearchableEntity>
         where TViewModel : BaseViewModel<TSearchableEntity>, new()
         where TSearchableEntity : class, ISearchableEntity, new()
-        where TSearchClient : class, IDataSearchClient<TSearchableEntity>
+        where TDataSearchEngine : class, IDataSearchEngine<TSearchableEntity>
     {
-        protected readonly TSearchClient DataSearchClient;
+        protected readonly TDataSearchEngine DataSearchEngine;
         public BaseSearchableEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            DataSearchClient = ServiceProvider.GetRequiredService<TSearchClient>();
+            DataSearchEngine = ServiceProvider.GetRequiredService<TDataSearchEngine>();
         }
 
         public ServiceResult<List<TViewModel>> FindBy(bool isActiveOnly, int startIndex, int takeCount)
         {
             var viewResult = new ServiceResult<List<TViewModel>>();
 
-            ServiceResult<DataSearchResult<TSearchableEntity>> result = DataSearchClient.FindBy(isActiveOnly, startIndex, takeCount);
+            ServiceResult<DataSearchResult<TSearchableEntity>> result = DataSearchEngine.FindBy(isActiveOnly, startIndex, takeCount);
 
             if (result.IsSucceededAndDataIncluded())
             {
@@ -40,7 +40,7 @@ namespace AspCore.BackendForFrontend.Concrete
             var viewResult = new ServiceResult<TViewModel>();
             ServiceResult<DataSearchResult<TSearchableEntity>> result = null;
 
-            result = DataSearchClient.FindById(Id, isActive);
+            result = DataSearchEngine.FindById(Id, isActive);
 
             if (result.IsSucceededAndDataIncluded())
             {
@@ -53,7 +53,7 @@ namespace AspCore.BackendForFrontend.Concrete
         public ServiceResult<List<TViewModel>> FindByIdList(List<Guid> idList, bool isActive)
         {
             var viewResult = new ServiceResult<List<TViewModel>>();
-            ServiceResult<DataSearchResult<TSearchableEntity>> result = DataSearchClient.FindByIdList(idList, isActive);
+            ServiceResult<DataSearchResult<TSearchableEntity>> result = DataSearchEngine.FindByIdList(idList, isActive);
            
             if (result.IsSucceededAndDataIncluded())
             {

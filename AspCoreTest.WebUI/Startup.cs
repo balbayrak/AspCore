@@ -1,7 +1,7 @@
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.DocumentType;
+using AspCore.RedisClient.Configuration;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using AspCore.RedisClient.Configuration;
 
 namespace AspCoreTest.WebUI
 {
@@ -48,7 +47,8 @@ namespace AspCoreTest.WebUI
                 })
                 .AddCacheService(option =>
                 {
-                    option.AddRedisCache("RedisInfo");
+                     option.AddRedisCache("RedisInfo");
+                   // option.AddCookieCache();
                 })
                 .AddBffApiClient(option =>
                 {
@@ -86,8 +86,8 @@ namespace AspCoreTest.WebUI
                     {
                         option.AddJWTAuthenticatedClient("DataSearchApi")
                         .Build();
-                    }).AddDataSearchClient<PersonSearchEntity>("api/PersonCache")
-                    .ElasticSearchAdmins(option=>
+                    }).AddDataSearchEngine<PersonSearchEntity>("api/PersonCache")
+                    .ElasticSearchAdmins(option =>
                     {
                         option.AddElasticSearchAdmin<PersonSearchEntity>("api/PersonCache");
                     });
@@ -99,7 +99,7 @@ namespace AspCoreTest.WebUI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseStaticFiles();
-       
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -1,17 +1,17 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Caching.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
-using AspCore.Entities.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public abstract class BaseBffLayer : IBFFLayer
+    public abstract class BaseBffLayer : IBffLayer
     {
         protected ICacheService CacheService;
 
+        protected IApplicationCachedClient ApplicationCachedClient;
+       
         public IBffApiClient ApiClient { get; private set; }
 
         private string _apiClientKey { get; set; }
@@ -52,9 +52,9 @@ namespace AspCore.BackendForFrontend.Concrete
 
             CacheService = ServiceProvider.GetRequiredService<ICacheService>();
 
-            string tokenStorageKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-           
-            ApiClient.tokenStorageKey = tokenStorageKey;
+            ApplicationCachedClient = ServiceProvider.GetRequiredService<IApplicationCachedClient>();
+
+            ApiClient.tokenStorageKey = ApplicationCachedClient.ApplicationUserKey;
         }
 
         public void SetApiClientTokenStorageKey(string tokenStorageKey)

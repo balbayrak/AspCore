@@ -5,7 +5,11 @@
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <Company>AspCore.ElasticSearchApiClient</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>1.0.6</Version>
+    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />

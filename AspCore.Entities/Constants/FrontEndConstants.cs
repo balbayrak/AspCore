@@ -4,8 +4,7 @@
     {
         public struct STORAGE_CONSTANT
         {
-            public const string COOKIE_USER = "AU";
-            public const string TOKEN_INFO = "TI";
+            public const string APPLICATION_USER = "AU";
         }
 
         public struct ERROR_MESSAGES

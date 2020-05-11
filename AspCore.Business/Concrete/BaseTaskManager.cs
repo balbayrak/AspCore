@@ -14,7 +14,7 @@ namespace AspCore.Business.Concrete
 {
     public abstract class BaseTaskManager<TActiveUser, TEntity, TTaskBuilder> : ITaskService<TActiveUser, TEntity>
         where TEntity : class, new()
-        where TActiveUser : class, IActiveUser, new()
+        where TActiveUser : class, IAuthenticatedUser, new()
         where TTaskBuilder : TaskBuilder, ITaskBuilder
     {
         protected ITaskBuilder TaskBuilder { get; private set; }

@@ -15,8 +15,9 @@ namespace AspCore.BackendForFrontend.Concrete
         where TDocument : class, IDocument, new()
         where TViewRequest : class, IDocumentApiViewRequest<TDocument,ViewerToolbarSetting>, new()
     {
-        private IBffApiClient apiClient { get; set; }
-        private ICacheService _cache { get; set; }
+        protected IApplicationCachedClient ApplicationCachedClient;
+        protected IBffApiClient ApiClient { get; private set; }
+        protected ICacheService Cache { get; set; }
         private string _uploaderRoute { get; set; }
         private string _viewerRoute { get; set; }
         private string _signerRoute { get; set; }
@@ -26,12 +27,13 @@ namespace AspCore.BackendForFrontend.Concrete
         {
             ServiceProvider = serviceProvider;
 
-            apiClient = ServiceProvider.GetRequiredService<IBffApiClient>();
+            ApiClient = ServiceProvider.GetRequiredService<IBffApiClient>();
 
-            _cache = ServiceProvider.GetRequiredService<ICacheService>();
+            Cache = ServiceProvider.GetRequiredService<ICacheService>();
 
-            string tokenStorageKey = _cache.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-            apiClient.tokenStorageKey = tokenStorageKey;
+            ApplicationCachedClient = ServiceProvider.GetRequiredService<IApplicationCachedClient>();
+
+            ApiClient.tokenStorageKey = ApplicationCachedClient.ApplicationUserKey;
 
             _uploaderRoute = uploaderRoute;
             _viewerRoute = viewerRoute;
@@ -39,8 +41,8 @@ namespace AspCore.BackendForFrontend.Concrete
         }
         public ServiceResult<TDocument> GetDocument(IDocumentRequest<TDocument> documentRequest)
         {
-            apiClient.apiUrl = _uploaderRoute + "/" + ApiConstants.Urls.READDOCUMENT;
-            return apiClient.PostRequest<ServiceResult<TDocument>>(documentRequest).Result;
+            ApiClient.apiUrl = _uploaderRoute + "/" + ApiConstants.Urls.READDOCUMENT;
+            return ApiClient.PostRequest<ServiceResult<TDocument>>(documentRequest).Result;
         }
         public ServiceResult<string> ViewDocuments(IDocumentViewRequest<TDocument,ViewerToolbarSetting> viewRequest)
         {
@@ -56,8 +58,8 @@ namespace AspCore.BackendForFrontend.Concrete
             documentApiViewRequest.validateFiles = viewRequest.validateFiles;
             documentApiViewRequest.viewerToolbarSetting = viewRequest.viewerToolbarSetting;
 
-            apiClient.apiUrl = _viewerRoute + "/" + ApiConstants.Urls.VIEWDOCUMENTS;
-            return apiClient.PostRequest<ServiceResult<string>>(documentApiViewRequest).Result;
+            ApiClient.apiUrl = _viewerRoute + "/" + ApiConstants.Urls.VIEWDOCUMENTS;
+            return ApiClient.PostRequest<ServiceResult<string>>(documentApiViewRequest).Result;
         }
     }
 }

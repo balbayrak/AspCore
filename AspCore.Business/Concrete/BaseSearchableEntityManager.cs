@@ -9,15 +9,16 @@ using System.Collections.Generic;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity>,IEntityService<TSearchableEntity>
+    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity>, IEntityService<TSearchableEntity>
       where TDataAccess : IEntityRepository<TSearchableEntity>
       where TSearchableEntity : class, ISearchableEntity, new()
+      where TDataSearchEngine : IDataSearchEngine<TSearchableEntity>
     {
-        private readonly IDataSearchEngine<TSearchableEntity> _dataSearchEngine;
-         
-        public BaseSearchableEntityManager(IServiceProvider serviceProvider):base(serviceProvider)
+        private readonly TDataSearchEngine _dataSearchEngine;
+
+        public BaseSearchableEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _dataSearchEngine = ServiceProvider.GetRequiredService<IDataSearchEngine<TSearchableEntity>>();
+            _dataSearchEngine = ServiceProvider.GetRequiredService<TDataSearchEngine>();
         }
 
         public override ServiceResult<bool> Add(params TSearchableEntity[] entities)

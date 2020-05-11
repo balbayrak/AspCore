@@ -1,10 +1,7 @@
-﻿using AspCore.DataSearch.Abstract;
-using AspCore.DataSearch.Concrete.ElasticSearch;
+﻿using AspCore.ElasticSearchApiClient;
 using AspCore.Entities.EntityType;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AspCore.DataSearch.Configuration
 {
@@ -20,22 +17,33 @@ namespace AspCore.DataSearch.Configuration
         public DataSearchEngineBuilder AddDataSearchEngine<TSearchableEntity>(string apiClientKey, string elasticApiRoute)
      where TSearchableEntity : class, ISearchableEntity, new()
         {
-            _services.AddTransient(typeof(IDataSearchEngine<TSearchableEntity>), sp =>
+            _services.AddTransient(typeof(IElasticClient<TSearchableEntity>), sp =>
             {
-                return new ESDataSearchEngine<TSearchableEntity>(apiClientKey, elasticApiRoute);
+                return new ElasticClient<TSearchableEntity>(apiClientKey, elasticApiRoute);
             });
 
             return this;
         }
         public DataSearchEngineBuilder AddDataSearchEngine<TSearchableEntity>(string elasticApiRoute)
-   where TSearchableEntity : class, ISearchableEntity, new()
+            where TSearchableEntity : class, ISearchableEntity, new()
         {
-            _services.AddTransient(typeof(IDataSearchEngine<TSearchableEntity>), sp =>
+            _services.AddTransient(typeof(IElasticClient<TSearchableEntity>), sp =>
             {
-                return new ESDataSearchEngine<TSearchableEntity>(_apiClientKey, elasticApiRoute);
+                return new ElasticClient<TSearchableEntity>(_apiClientKey, elasticApiRoute);
             });
 
             return this;
+        }
+
+        public void ElasticSearchAdmins(Action<ElasticSearchAdminBuilder> builder)
+        {
+            ElasticSearchAdminBuilder elasticSearchAdminBuilder = new ElasticSearchAdminBuilder(_services, _apiClientKey);
+            builder(elasticSearchAdminBuilder);
+        }
+        public void ElasticSearchAdmins(string apiClientKey, Action<ElasticSearchAdminBuilder> builder)
+        {
+            ElasticSearchAdminBuilder elasticSearchAdminBuilder = new ElasticSearchAdminBuilder(_services, apiClientKey);
+            builder(elasticSearchAdminBuilder);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace AspCore.Entities.EntityType
     {
         string correlationId { get; set; }
 
-        Guid activeUserId { get; set; }
+        Guid authenticatedUserId { get; set; }
     }
 }

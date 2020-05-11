@@ -20,7 +20,7 @@ namespace AspCoreTest.Authentication.Concrete
                 if (input.UserName == "Admin" && input.Password == "Admin")
                 {
                     activeUser = new ActiveUser();
-                    activeUser.id = Guid.NewGuid();
+                    activeUser.authenticatedUserId = Guid.NewGuid();
                     activeUser.name = "Bilal";
                     activeUser.surname = "Albayrak";
                     activeUser.tckn = "11111111111";

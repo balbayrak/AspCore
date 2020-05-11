@@ -1,11 +1,13 @@
-﻿using AspCore.Entities.Authentication;
+﻿using AspCore.BackendForFrontend.Abstract;
+using AspCore.Entities.Authentication;
+using AspCore.Entities.User;
 using AspCore.Web.Concrete;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace AspCoreTest.WebUI.Controllers
 {
-    public class AccountController : BaseAuthenticationController<AuthenticationInfo>
+    public class AccountController : BaseAuthenticationController<AuthenticationInfo,ActiveUser, IAuthenticationBffLayer<AuthenticationInfo, ActiveUser>>
     {
         public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {

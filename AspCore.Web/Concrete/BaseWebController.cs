@@ -1,12 +1,8 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Caching.Abstract;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
-using AspCore.Entities.User;
-using AspCore.Utilities.DataProtector;
 using AspCore.Utilities.MimeMapping;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +16,6 @@ namespace AspCore.Web.Concrete
         where TDocument : class, IDocument, new()
         where TDocumentRequest : class, IDocumentRequest<TDocument>, new()
     {
-
         protected IServiceProvider ServiceProvider { get; private set; }
         protected readonly object ServiceProviderLock = new object();
 
@@ -43,9 +38,6 @@ namespace AspCore.Web.Concrete
             return reference;
         }
 
-        protected IUserBffLayer UserBffLayer => LazyGetRequiredService(ref _userBffLayer);
-        private IUserBffLayer _userBffLayer;
-
         protected ICacheService CacheService => LazyGetRequiredService(ref _cacheService);
         private ICacheService _cacheService;
 
@@ -63,38 +55,28 @@ namespace AspCore.Web.Concrete
             ServiceProvider = serviceProvider;
         }
 
-        protected ActiveUser activeUser
-        {
-            get
-            {
-                string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-                string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                return CacheService.GetObject<ActiveUser>(activeUserUId);
-            }
-        }
-
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-            var token = CacheService.GetObject<AuthenticationToken>(tokenKey);
-            if (token != null)
-            {
-                string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-                var activeUser = CacheService.GetObject<ActiveUser>(activeUserUId);
-                if (activeUser == null)
-                {
-                    ServiceResult<ActiveUser> userResult = UserBffLayer.GetClientInfo(token).Result;
+            //string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            //var token = CacheService.GetObject<AuthenticationToken>(tokenKey);
+            //if (token != null)
+            //{
+            //    string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
+            //    var activeUser = CacheService.GetObject<ActiveUser>(activeUserUId);
+            //    if (activeUser == null)
+            //    {
+            //        ServiceResult<ActiveUser> userResult = UserBffLayer.GetClientInfo(token).Result;
 
-                    if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
-                    {
-                        CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
-                    }
-                }
-            }
-            else
-            {
+            //        if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
+            //        {
+            //            CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
+            //        }
+            //    }
+            //}
+            //else
+            //{
 
-            }
+            //}
 
             base.OnActionExecuting(context);
         }

@@ -1,5 +1,6 @@
 ﻿using AspCore.Caching.Abstract;
 using AspCore.Utilities;
+using AspCore.Utilities.DataProtector;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
@@ -48,7 +49,8 @@ namespace AspCore.RedisClient
                     string entity = redis.Get<string>(key);
                     if (!string.IsNullOrEmpty(entity))
                     {
-                        return JsonConvert.DeserializeObject<T>(entity.UnCompressString());
+                        var unProtectJson = DataProtectorFactory.Instance.UnProtect(entity);
+                        return JsonConvert.DeserializeObject<T>(unProtectJson.UnCompressString());
                     }
                 }
             }
@@ -89,9 +91,11 @@ namespace AspCore.RedisClient
                 JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
                 serializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 string json = JsonConvert.SerializeObject(obj, Formatting.None, serializerSettings).CompressString();
+                var protectJson = DataProtectorFactory.Instance.Protect(json);
+
                 using (IRedisClient redis = _redisClientsManager.GetClient())
                 {
-                    return redis.Set(key, json, expires.Value);
+                    return redis.Set(key, protectJson, expires.Value);
                 }
             }
             return false;

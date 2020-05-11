@@ -4,7 +4,6 @@ using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.General;
-using AspCore.Entities.User;
 using AspCore.Web.Authentication.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +11,10 @@ using System;
 
 namespace AspCore.Web.Concrete
 {
-    public abstract class BaseAuthenticationController<TAuthenticationInfo> : Controller
-         where TAuthenticationInfo : AuthenticationInfo
+    public abstract class BaseAuthenticationController<TAuthenticationInfo, TAuthenticationResult, TAuthenticatonBff> : Controller
+        where TAuthenticationInfo : AuthenticationInfo
+        where TAuthenticationResult : class, new()
+        where TAuthenticatonBff : IAuthenticationBffLayer<TAuthenticationInfo, TAuthenticationResult>
     {
         public IServiceProvider ServiceProvider { get; set; }
         protected readonly object ServiceProviderLock = new object();
@@ -37,7 +38,7 @@ namespace AspCore.Web.Concrete
             return reference;
         }
 
-        protected TService LazyGetRequiredServiceByName<TService>(ref TService reference,string name)
+        protected TService LazyGetRequiredServiceByName<TService>(ref TService reference, string name)
            => LazyGetRequiredServiceByName(typeof(TService), ref reference, name);
 
         protected TRef LazyGetRequiredServiceByName<TRef>(Type serviceType, ref TRef reference, string name)
@@ -61,11 +62,15 @@ namespace AspCore.Web.Concrete
         protected ICacheService CacheService => LazyGetRequiredService(ref _cacheService);
         private ICacheService _cacheService;
 
-        protected IUserBffLayer UserBffLayer => LazyGetRequiredService(ref _userBffLayer);
-        private IUserBffLayer _userBffLayer;
+        protected ICookieService CookieService => LazyGetRequiredService(ref _cookieService);
+        private ICookieService _cookieService;
 
-        protected IWebAuthenticationProvider<TAuthenticationInfo> AuthenticationProvider => LazyGetRequiredServiceByName(ref _authenticationProvider,AuthenticationProviderName);
+        protected TAuthenticatonBff AuthenticationBffLayer => LazyGetRequiredService(ref _authenticationBffLayer);
+        private TAuthenticatonBff _authenticationBffLayer;
+
+        protected IWebAuthenticationProvider<TAuthenticationInfo> AuthenticationProvider => LazyGetRequiredServiceByName(ref _authenticationProvider, AuthenticationProviderName);
         private IWebAuthenticationProvider<TAuthenticationInfo> _authenticationProvider;
+
 
         public BaseAuthenticationController(IServiceProvider serviceProvider)
         {
@@ -88,20 +93,21 @@ namespace AspCore.Web.Concrete
             {
                 string tokenKey = Guid.NewGuid().ToString("N");
 
-                CacheService.SetObject(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY, tokenKey, DateTime.Now.AddHours(1), false);
+                CookieService.SetObject(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY, tokenKey, DateTime.Now.AddDays(1), false);
 
-                ServiceResult<AuthenticationToken> authenticationResult = UserBffLayer.AuthenticateClient(serviceResult.Result).Result;
+                ServiceResult<AuthenticationToken> authenticationResult = AuthenticationBffLayer.AuthenticateClient((TAuthenticationInfo)serviceResult.Result).Result;
+
                 if (authenticationResult.IsSucceededAndDataIncluded())
                 {
-                    UserBffLayer.SetAuthenticationToken(tokenKey, authenticationResult.Result);
+                    AuthenticationBffLayer.SetAuthenticationToken(tokenKey, authenticationResult.Result);
 
-                    ServiceResult<ActiveUser> userResult = UserBffLayer.GetClientInfo(authenticationResult.Result).Result;
+                    ServiceResult<TAuthenticationResult> userResult = AuthenticationBffLayer.GetClientInfo(authenticationResult.Result).Result;
 
                     if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
                     {
-                        string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
+                        string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.APPLICATION_USER + "_" + tokenKey;
 
-                        CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
+                        CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddDays(1), false);
 
                         Response.Redirect(AuthenticationProvider.mainPageUrl);
                     }
@@ -123,7 +129,7 @@ namespace AspCore.Web.Concrete
         }
         public void Login(TAuthenticationInfo authenticationInfo = null)
         {
-            string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
+            string tokenKey = CookieService.GetObject<string>(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY);
 
             if (string.IsNullOrEmpty(tokenKey) || (!string.IsNullOrEmpty(tokenKey) && CacheService.GetObject<AuthenticationToken>(tokenKey) == null))
             {
@@ -140,6 +146,7 @@ namespace AspCore.Web.Concrete
             try
             {
                 CacheService.RemoveAll();
+                CookieService.RemoveAll();
             }
             catch
             {

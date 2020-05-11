@@ -1,5 +1,4 @@
-﻿using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
@@ -137,7 +136,6 @@ namespace AspCore.WebApi
             }
             return serviceResult.ToHttpResponse();
         }
-
 
         [HttpPost]
         [ActionName(ApiConstants.Urls.GET_CLIENT_INFO)]

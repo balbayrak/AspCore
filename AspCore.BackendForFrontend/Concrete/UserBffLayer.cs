@@ -10,46 +10,12 @@ using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public class UserBffLayer : BaseBffLayer, IUserBffLayer
+    public class UserBffLayer : BaseAuthenticationBffLayer<AuthenticationInfo, ActiveUser>, IAuthenticationBffLayer<AuthenticationInfo, ActiveUser>
     {
+        public override string authenticationRoute => "api/AuthenticationToken";
+
         public UserBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            apiControllerRoute = "api/AuthenticationToken";
         }
-
-        public async Task<ServiceResult<ActiveUser>> GetClientInfo(AuthenticationToken authenticationToken)
-        {
-            ServiceResult<ActiveUser> result = new ServiceResult<ActiveUser>();
-            try
-            {
-                ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_CLIENT_INFO;
-
-                result = await ApiClient.PostRequest<ServiceResult<ActiveUser>>(authenticationToken, null, authenticationToken);
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(FrontEndConstants.ERROR_MESSAGES.GET_USER_INFO_ERROR, ex);
-            }
-            return result;
-        }
-
-        public async Task<ServiceResult<AuthenticationToken>> AuthenticateClient(AuthenticationInfo authenticationInfo)
-        {
-            ServiceResult<AuthenticationToken> result = new ServiceResult<AuthenticationToken>();
-            try
-            {
-                ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.AUTHENTICATE_CLIENT;
-
-                result = await ApiClient.PostRequest<ServiceResult<AuthenticationToken>>(authenticationInfo);
-
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(FrontEndConstants.ERROR_MESSAGES.AUTHENTICATE_CLIENT_ERROR, ex);
-            }
-
-            return result;
-        }
-
     }
 }

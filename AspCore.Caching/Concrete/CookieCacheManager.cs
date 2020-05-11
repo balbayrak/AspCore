@@ -1,14 +1,16 @@
 ﻿using AspCore.Caching.Abstract;
 using AspCore.Utilities;
+using AspCore.Utilities.DataProtector;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace AspCore.Caching.Concrete
 {
-    public class CookieCacheManager : CacheManager, ICacheService
+    public class CookieCacheManager : CacheManager, ICacheService, ICookieService
     {
         private readonly IHttpContextAccessor _contextAccessor;
 
@@ -31,7 +33,8 @@ namespace AspCore.Caching.Concrete
 
                 if (_contextAccessor.HttpContext.Request.Cookies.ContainsKey(key))
                 {
-                    return JsonConvert.DeserializeObject<T>(_contextAccessor.HttpContext.Request.Cookies[key].ToString().UnCompressString());
+                    var unProtectJson = DataProtectorFactory.Instance.UnProtect(_contextAccessor.HttpContext.Request.Cookies[key].ToString());
+                    return JsonConvert.DeserializeObject<T>(unProtectJson.UnCompressString());
                 }
             }
             return default(T);
@@ -41,7 +44,7 @@ namespace AspCore.Caching.Concrete
         {
             if (!string.IsNullOrEmpty(key))
             {
-                key = $"{uniqueCacheKey}_{key}";
+                //key = $"{uniqueCacheKey}_{key}";
                 _contextAccessor.HttpContext.Response.Cookies.Delete(key);
                 return true;
             }
@@ -51,7 +54,7 @@ namespace AspCore.Caching.Concrete
 
         public void RemoveAll()
         {
-            foreach (var cookie in _contextAccessor.HttpContext.Request.Cookies.Keys)
+            foreach (var cookie in _contextAccessor.HttpContext.Request.Cookies.Keys.Where(t => t.StartsWith(uniqueCacheKey)))
             {
                 Remove(cookie);
             }
@@ -71,7 +74,9 @@ namespace AspCore.Caching.Concrete
             JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
             serializerSettings.NullValueHandling = NullValueHandling.Ignore;
             string json = JsonConvert.SerializeObject(obj, Formatting.None, serializerSettings).CompressString();
-            _contextAccessor.HttpContext.Response.Cookies.Append(key, json, option);
+
+            var protectJson = DataProtectorFactory.Instance.Protect(json);
+            _contextAccessor.HttpContext.Response.Cookies.Append(key, protectJson, option);
             return true;
         }
     }

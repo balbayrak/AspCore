@@ -19,7 +19,7 @@ namespace AspCore.Extension
             return null;
         }
         public static ServiceResult<TActiveUser> GetActiveUserInfo<TActiveUser>(this HttpContext httpContext)
-                  where TActiveUser : class, IActiveUser, new()
+                  where TActiveUser : class, IAuthenticatedUser, new()
         {
             ServiceResult<TActiveUser> result = new ServiceResult<TActiveUser>();
             try

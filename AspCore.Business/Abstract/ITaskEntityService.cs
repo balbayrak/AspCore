@@ -10,7 +10,7 @@ namespace AspCore.Business.Abstract
 {
     public interface ITaskEntityService<TActiveUser, TEntity> : ITaskService<TActiveUser, TEntity>, IScopedType
         where TEntity : class, IEntity, new()
-        where TActiveUser : class, IActiveUser, new()
+        where TActiveUser : class, IAuthenticatedUser, new()
     {
         ServiceResult<TEntity> GetById(EntityFilter<TEntity> setting);
 

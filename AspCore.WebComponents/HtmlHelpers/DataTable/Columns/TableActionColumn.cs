@@ -84,7 +84,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
                             actionItem.action.actionUrl = actionurl;
                         }
 
-                        columnActionsHtml += actionItem.CreateLink(); ;
+                        columnActionsHtml += actionItem.CreateLink();
 
 
                         if (actionItem is ModalActionButton)
