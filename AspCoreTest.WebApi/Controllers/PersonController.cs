@@ -20,9 +20,30 @@ namespace AspCoreTest.WebApi.Controllers
         public PersonController(IPersonService personService,IServiceProvider serviceProvider) : base(personService)
         {
             _serviceProvider = serviceProvider;
-         
         }
 
-       
+        [ActionName("Liveness2")]
+        [HttpGet]
+        [ProducesResponseType(typeof(ServiceResult<bool>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [AllowAnonymous]
+
+        public IActionResult Liveness2()
+        {
+            ServiceResult<bool> response = new ServiceResult<bool>();
+            _serviceProvider.GetService(typeof(IPersonCVService));
+            using (var scope=_serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetService<IPersonCVService>();
+                var service2 = scope.ServiceProvider.GetService<ITaskFlowBuilder>();
+                var service23 = scope.ServiceProvider.GetService<IInterceptorContext>();
+            }
+         
+
+            response.IsSucceeded = true;
+            response.Result = true;
+            return response.ToHttpResponse();
+        }
     }
 }

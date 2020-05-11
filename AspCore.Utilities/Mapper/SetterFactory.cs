@@ -12,7 +12,7 @@ namespace AspCore.Utilities.Mapper
             where TD : class, new()
         {
             SetterBase<TS, TD> setter;
-            if (!sourceProperty.PropertyType.IsClass)
+            if (!destinationProperty.PropertyType.IsClass)
             {
                 object value = sourceProperty.GetValue(source, null);
                 Type enumType = Nullable.GetUnderlyingType(destinationProperty.PropertyType);
@@ -25,15 +25,15 @@ namespace AspCore.Utilities.Mapper
                     setter = new SetterBase<TS, TD>();
                 }
             }
-            else if (IsSetableListOrArrayType(sourceProperty))
+            else if (IsSetableListOrArrayType(destinationProperty))
             {
                 setter = new SetterBase<TS, TD>();
             }
-            else if (sourceProperty.PropertyType.IsArray)
+            else if (destinationProperty.PropertyType.IsArray)
             {
                 setter = new ArraySetter<TS, TD>();
             }
-            else if (sourceProperty.PropertyType.IsGenericType)
+            else if (destinationProperty.PropertyType.IsGenericType)
             {
                 setter = new GenericSetter<TS, TD>();
             }
