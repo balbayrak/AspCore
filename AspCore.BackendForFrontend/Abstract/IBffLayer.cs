@@ -1,7 +1,6 @@
-﻿using System;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Dependency.Abstract;
+﻿using AspCore.Dependency.Abstract;
 using AspCore.Entities.Authentication;
+using System;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
