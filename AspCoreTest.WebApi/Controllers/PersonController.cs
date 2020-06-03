@@ -1,6 +1,15 @@
 ﻿using AspCore.BusinessApi;
 using AspCoreTest.Entities.Models;
 using System;
+using AspCore.AOP.Abstract;
+using AspCore.Business.Task.Abstract;
+using AspCore.Entities.EntityFilter;
+using AspCore.Entities.General;
+using AspCore.Extension;
+using AspCoreTest.Business.Abstract;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using testbusiness.Abstract;
 
 namespace AspCoreTest.WebApi.Controllers
@@ -28,6 +37,7 @@ namespace AspCoreTest.WebApi.Controllers
             using (var scope=_serviceProvider.CreateScope())
             {
                 var service = scope.ServiceProvider.GetService<IPersonCVService>();
+                 var  result= service.GetAll(new EntityFilter<PersonCv>());
                 var service2 = scope.ServiceProvider.GetService<ITaskFlowBuilder>();
                 var service23 = scope.ServiceProvider.GetService<IInterceptorContext>();
             }

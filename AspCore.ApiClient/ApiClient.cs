@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspCore.ApiClient
@@ -180,19 +181,23 @@ namespace AspCore.ApiClient
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
-                    var response = await client.PostAsync(_apiUrl, jsonContent);
-
-                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                    using (var cancellationToken=new CancellationTokenSource(new TimeSpan(0,10,0)))
                     {
-                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+                        var response = await client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token);
 
-                        Authenticate(client, true, refreshTokenCnt);
+                        if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                        {
+                            bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
 
-                        response = await client.PostAsync(_apiUrl, jsonContent);
+                            Authenticate(client, true, refreshTokenCnt);
+
+                            response = await client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token);
+                        }
+
+                        string responseString = await response.Content.ReadAsStringAsync();
+                        result = JsonConvert.DeserializeObject<TResult>(responseString);
                     }
-
-                    string responseString = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<TResult>(responseString);
+                  
 
                 }
             };
@@ -250,31 +255,30 @@ namespace AspCore.ApiClient
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
-                    var response = client.PostAsync(_apiUrl, jsonContent).Result;
-                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                    using (var cancellationToken = new CancellationTokenSource(new TimeSpan(0, 10, 0)))
                     {
-
-                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-                        if (!refreshTokenCnt)
+                        var response = client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token).Result;
+                        if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                         {
-                            string s = response.Headers.WwwAuthenticate.ToString();
-                            refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
+
+                            bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+                            if (!refreshTokenCnt)
+                            {
+                                string s = response.Headers.WwwAuthenticate.ToString();
+                                refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
+                            }
+
+                            Authenticate(client, true, refreshTokenCnt);
+
+                            response = await client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token);
                         }
+                        if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            string responseString = await response.Content.ReadAsStringAsync();
 
-                        Authenticate(client, true, refreshTokenCnt);
-
-                        response = await client.PostAsync(_apiUrl, jsonContent);
-                    }
-
-
-                    //  response.EnsureSuccessStatusCode();
-
-                    if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        string responseString = await response.Content.ReadAsStringAsync();
-
-                        Debug.WriteLine(responseString);
-                        result = JsonConvert.DeserializeObject<TResult>(responseString);
+                            Debug.WriteLine(responseString);
+                            result = JsonConvert.DeserializeObject<TResult>(responseString);
+                        }
                     }
                 }
             };
