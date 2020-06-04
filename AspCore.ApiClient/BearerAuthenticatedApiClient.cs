@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using AspCore.ApiClient.Abstract;
 
 namespace AspCore.ApiClient
 {
     public class BearerAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
                  where TOption : class, IApiClientConfiguration, new()
     {
-        public BearerAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, apiKey)
+        public BearerAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper,apiKey)
         {
 
         }

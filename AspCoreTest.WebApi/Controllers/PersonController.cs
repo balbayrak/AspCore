@@ -1,6 +1,7 @@
 ﻿using AspCore.AOP.Abstract;
 using AspCore.Business.Task.Abstract;
 using AspCore.BusinessApi;
+using AspCore.Entities.EntityFilter;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCoreTest.Business.Abstract;
@@ -9,15 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using AspCore.AOP.Abstract;
-using AspCore.Business.Task.Abstract;
-using AspCore.Entities.EntityFilter;
-using AspCore.Entities.General;
-using AspCore.Extension;
-using AspCoreTest.Business.Abstract;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using testbusiness.Abstract;
 
 namespace AspCoreTest.WebApi.Controllers

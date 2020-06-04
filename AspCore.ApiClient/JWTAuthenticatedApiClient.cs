@@ -7,13 +7,14 @@ using AspCore.Entities.General;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net.Http;
+using AspCore.ApiClient.Abstract;
 
 namespace AspCore.ApiClient
 {
     public class JWTAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
            where TOption : class, IApiClientConfiguration, new()
     {
-        public JWTAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, apiKey)
+        public JWTAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService,  ICancellationTokenHelper cancellationTokenHelper,string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey)
         {
 
         }

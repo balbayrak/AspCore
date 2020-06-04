@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Configuration;
 using AspCore.ApiClient.Entities.Abstract;
 using AspCore.BackendForFrontend.Abstract;
@@ -27,7 +28,9 @@ namespace AspCore.Web.Configuration.Options
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
-                return new BffApiClient(httpContextAccessor, configurationAccessor, cacheService, bffClientOption.apiConfigurationKey);
+                var tokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
+
+                return new BffApiClient(httpContextAccessor, configurationAccessor, cacheService, tokenHelper, bffClientOption.apiConfigurationKey);
             });
 
             return new ConfigurationBuilderOption(services);

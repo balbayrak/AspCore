@@ -35,7 +35,7 @@ namespace AspCore.ApiClient
         public abstract string AuthenticationRefreshController { get; set; }
 
 
-        public AuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey) : base(httpContextAccessor, configurationAccessor,cacheService,apiKey)
+        public AuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper,string apiKey) : base(httpContextAccessor, configurationAccessor,cacheService,cancellationTokenHelper, apiKey)
         {
             InitializeAuthenticatedClient(apiKey);
         }

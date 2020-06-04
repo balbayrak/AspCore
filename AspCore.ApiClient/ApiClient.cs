@@ -26,7 +26,7 @@ namespace AspCore.ApiClient
         protected IHttpContextAccessor HttpContextAccessor { get; private set; }
         protected IConfigurationAccessor ConfigurationHelper { get; private set; }
         protected ICacheService AccessTokenService { get; private set; }
-
+        protected ICancellationTokenHelper CancellationTokenHelper { get; }
         protected TOption ApiConfiguration { get; set; }
 
         private string _baseAddress;
@@ -65,16 +65,16 @@ namespace AspCore.ApiClient
 
         public AuthenticationInfo authenticationInfo { get; set; }
 
-        public ApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, string apiKey)
+        public ApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey)
         {
             this.apiKey = apiKey;
-
+            CancellationTokenHelper = cancellationTokenHelper;
             HttpContextAccessor = httpContextAccessor;
             ConfigurationHelper = configurationAccessor;
             AccessTokenService = cacheService;
 
             _baseAddress = string.Empty;
-
+            
             InitializeBaseAddress(apiKey);
         }
 
@@ -88,15 +88,10 @@ namespace AspCore.ApiClient
             using (HttpClientHandler handler = new HttpClientHandler())
             {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                using (var client = new HttpClient(handler))
+                using (var client = new CoreHttpClient(handler,TimeSpan.FromMinutes(10)))
                 {
 
                     client.BaseAddress = new Uri(_baseAddress);
-
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
-                    client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
-
 
                     if (headerValues != null && headerValues.Count > 0)
                     {
@@ -115,9 +110,7 @@ namespace AspCore.ApiClient
                     {
                         client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
                     }
-
-
-                    var response = await client.GetAsync(_apiUrl).ConfigureAwait(false);
+                    var response = await client.GetAsync(_apiUrl,CancellationTokenHelper.Token).ConfigureAwait(false);
 
                     response.EnsureSuccessStatusCode();
 
@@ -143,7 +136,7 @@ namespace AspCore.ApiClient
             {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-                using (var client = new HttpClient(handler))
+                using (var client = new CoreHttpClient(handler,TimeSpan.FromMinutes(10)))
                 {
                     client.BaseAddress = new Uri(_baseAddress);
 
@@ -157,11 +150,7 @@ namespace AspCore.ApiClient
                         client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
                         client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, authenticationInfo.access_token);
                     }
-
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
-                    client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
-
+                
                     if (headerValues != null && headerValues.Count > 0)
                     {
                         foreach (var key in headerValues.Keys)
@@ -181,23 +170,21 @@ namespace AspCore.ApiClient
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
-                    using (var cancellationToken=new CancellationTokenSource(new TimeSpan(0,10,0)))
+                    client.Timeout = TimeSpan.FromMinutes(10);
+                    var response = await client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token);
+
+                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
-                        var response = await client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token);
+                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
 
-                        if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
-                        {
-                            bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+                        Authenticate(client, true, refreshTokenCnt);
 
-                            Authenticate(client, true, refreshTokenCnt);
-
-                            response = await client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token);
-                        }
-
-                        string responseString = await response.Content.ReadAsStringAsync();
-                        result = JsonConvert.DeserializeObject<TResult>(responseString);
+                        response = await client.PostAsync(_apiUrl, jsonContent);
                     }
-                  
+
+                    string responseString = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<TResult>(responseString);
+
 
                 }
             };
@@ -214,7 +201,7 @@ namespace AspCore.ApiClient
             {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-                using (var client = new HttpClient(handler))
+                using (var client = new CoreHttpClient(handler,TimeSpan.FromMinutes(10)))
                 {
                     client.BaseAddress = new Uri(_baseAddress);
 
@@ -228,14 +215,9 @@ namespace AspCore.ApiClient
 
                         client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
                         client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, token);
-
-
                     }
 
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
-                    client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
-
+                 
                     if (headerValues != null && headerValues.Count > 0)
                     {
                         foreach (var key in headerValues.Keys)
@@ -255,30 +237,28 @@ namespace AspCore.ApiClient
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
-                    using (var cancellationToken = new CancellationTokenSource(new TimeSpan(0, 10, 0)))
+                    client.Timeout = TimeSpan.FromMinutes(10);
+                    var response = client.PostAsync(_apiUrl, jsonContent,CancellationTokenHelper.Token).Result;
+                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
-                        var response = client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token).Result;
-                        if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+
+                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+                        if (!refreshTokenCnt)
                         {
-
-                            bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-                            if (!refreshTokenCnt)
-                            {
-                                string s = response.Headers.WwwAuthenticate.ToString();
-                                refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
-                            }
-
-                            Authenticate(client, true, refreshTokenCnt);
-
-                            response = await client.PostAsync(_apiUrl, jsonContent, cancellationToken.Token);
+                            string s = response.Headers.WwwAuthenticate.ToString();
+                            refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
                         }
-                        if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
-                        {
-                            string responseString = await response.Content.ReadAsStringAsync();
 
-                            Debug.WriteLine(responseString);
-                            result = JsonConvert.DeserializeObject<TResult>(responseString);
-                        }
+                        Authenticate(client, true, refreshTokenCnt);
+
+                        response = await client.PostAsync(_apiUrl, jsonContent);
+                    }
+                    if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        string responseString = await response.Content.ReadAsStringAsync();
+
+                        Debug.WriteLine(responseString);
+                        result = JsonConvert.DeserializeObject<TResult>(responseString);
                     }
                 }
             };
@@ -291,11 +271,8 @@ namespace AspCore.ApiClient
         {
             TResult result = null;
 
-            using (var client = new HttpClient())
+            using (var client = new CoreHttpClient(TimeSpan.FromMinutes(10)))
             {
-                client.BaseAddress = new Uri(_baseAddress);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
 
                 string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
                 if (!string.IsNullOrEmpty(correlationID))
@@ -303,8 +280,8 @@ namespace AspCore.ApiClient
                     client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
                 }
 
-
-                var response = client.PostAsync(_apiUrl, content).Result;
+              
+                var response = client.PostAsync(_apiUrl, content,CancellationTokenHelper.Token).Result;
 
                 //response.EnsureSuccessStatusCode();
 
