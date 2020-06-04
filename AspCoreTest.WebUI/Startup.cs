@@ -47,8 +47,8 @@ namespace AspCoreTest.WebUI
                 })
                 .AddCacheService(option =>
                 {
-                     option.AddRedisCache("RedisInfo");
-                   // option.AddCookieCache();
+                    // option.AddRedisCache("RedisInfo");
+                   option.AddCookieCache();
                 })
                 .AddBffApiClient(option =>
                 {

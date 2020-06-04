@@ -56,7 +56,15 @@ namespace AspCore.RedisClient.Configuration
             {
                 var sentinel = new RedisSentinel(redisCacheOption.servers, redisCacheOption.masterName);
                 sentinel.RedisManagerFactory = (master, slaves) => new RedisManagerPool(master);
-                return sentinel.Start();
+                try
+                {
+                    return sentinel.Start();
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
+               
             }
             else
             {

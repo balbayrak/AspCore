@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TSearchableEntity>, ISearchableEntityService<TSearchableEntity>, IEntityService<TSearchableEntity>
+    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TSearchableEntity>, IEntityService<TSearchableEntity>
       where TDataAccess : IEntityRepository<TSearchableEntity>
       where TSearchableEntity : class, ISearchableEntity, new()
       where TDataSearchEngine : IDataSearchEngine<TSearchableEntity>
@@ -149,11 +149,6 @@ namespace AspCore.Business.Concrete
             }
 
             return result;
-        }
-
-        public ServiceResult<TSearchableEntity[]> GetSearchableEntities()
-        {
-            return _dataAccess.GetListWithIgnoreGlobalFilter();
         }
 
     }

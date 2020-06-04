@@ -4,7 +4,7 @@ using AspCoreTest.Entities.SearchableEntities;
 
 namespace testbusiness.Abstract
 {
-    public interface IPersonService : ISearchableEntityService<PersonSearchEntity>, IEntityService<Person>, IBusinessService
+    public interface IPersonService :  IEntityService<Person>, IBusinessService
     {
     }
 }

@@ -109,6 +109,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                         if (result.IsSucceeded && initRequest.initializeWithData)
                         {
+
                             using (var scope = ServiceProvider.CreateScope())
                             {
                                 var searchableEntityService = scope.ServiceProvider.GetRequiredService<TSearchableEntityService>();
@@ -120,6 +121,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
                                 }
                                 else
                                 {
+                                    context.DeleteIndex(indexKey);
                                     result.ErrorMessage = entityResult.ErrorMessage;
                                     result.ExceptionMessage = entityResult.ExceptionMessage;
                                 }

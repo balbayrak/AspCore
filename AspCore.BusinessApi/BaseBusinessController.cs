@@ -10,6 +10,7 @@ namespace AspCore.BusinessApi
 
         public BaseBusinessController()
         {
+
         }
         public BaseBusinessController(TService service)
         {

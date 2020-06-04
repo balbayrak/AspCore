@@ -8,6 +8,7 @@ using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Filters;
+using AspCoreTest.Business.Abstract;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
 using AspCoreTest.DataSearchApi.ESProviders;
 using AspCoreTest.Entities.Models;
@@ -77,7 +78,7 @@ namespace AspCoreTest.DataSearchApi
                 .AddDataSearchProviders(option =>
                 {
                     option.AddElasticSearch<ElasticSearchApiOption>("SearchApiInfo")
-                    .AddElasticSearchIndex<PersonSearchEntity, IPersonService, PersonElasticSearchProvider>("person");
+                    .AddElasticSearchIndex<PersonSearchEntity, IPersonSearchEntityService, PersonElasticSearchProvider>("person");
                 });
             }, mvcOption =>
             {
@@ -115,7 +116,7 @@ namespace AspCoreTest.DataSearchApi
                 })
                 .UseDataSearch(app, option =>
                  {
-                     option.InitElasticSearchIndex<PersonSearchEntity, IPersonService, PersonElasticSearchProvider>("person", true);
+                     option.InitElasticSearchIndex<PersonSearchEntity, IPersonSearchEntityService, PersonElasticSearchProvider>("person", true);
                  });
             });
         }

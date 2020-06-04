@@ -1,5 +1,6 @@
 ﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Concrete;
+using AspCoreTest.Business.Abstract;
 using AspCoreTest.Entities.SearchableEntities;
 using Nest;
 using System;
@@ -7,7 +8,7 @@ using testbusiness.Abstract;
 
 namespace AspCoreTest.DataSearchApi.ESProviders
 {
-    public class PersonElasticSearchProvider : BaseElasticSearchProvider<PersonSearchEntity, IPersonService>, IElasticSearchProvider<PersonSearchEntity>
+    public class PersonElasticSearchProvider : BaseElasticSearchProvider<PersonSearchEntity, IPersonSearchEntityService>, IElasticSearchProvider<PersonSearchEntity>
     {
         public PersonElasticSearchProvider(IServiceProvider serviceProvider, string indexKey) : base(serviceProvider, indexKey)
         {

@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TEntity>, ISearchableEntityService<TSearchableEntity>, IEntityService<TEntity>
+    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TEntity>, IEntityService<TEntity>
         where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TSearchableEntity : class, ISearchableEntity, new()
@@ -229,21 +229,7 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
-        public ServiceResult<TSearchableEntity[]> GetSearchableEntities()
-        {
-            ServiceResult<TEntity[]> result = _dataAccess.GetListWithIgnoreGlobalFilter();
-            if (result.IsSucceededAndDataIncluded())
-            {
-                return GetComplexEntities(result.Result);
-            }
-            return new ServiceResult<TSearchableEntity[]>
-            {
-                IsSucceeded = false,
-                Result = null,
-                ErrorMessage = result.ErrorMessage,
-                ExceptionMessage = result.ExceptionMessage
-            };
-        }
+
 
     }
 }
