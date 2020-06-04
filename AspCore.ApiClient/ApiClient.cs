@@ -273,18 +273,13 @@ namespace AspCore.ApiClient
 
             using (var client = new CoreHttpClient(TimeSpan.FromMinutes(10)))
             {
-
+                client.BaseAddress=new Uri(_baseAddress);
                 string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
                 if (!string.IsNullOrEmpty(correlationID))
                 {
                     client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
                 }
-
-              
                 var response = client.PostAsync(_apiUrl, content,CancellationTokenHelper.Token).Result;
-
-                //response.EnsureSuccessStatusCode();
-
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
