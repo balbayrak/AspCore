@@ -170,9 +170,7 @@ namespace AspCore.ApiClient
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
-                    client.Timeout = TimeSpan.FromMinutes(10);
                     var response = await client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token);
-
                     if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
                         bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
@@ -237,7 +235,6 @@ namespace AspCore.ApiClient
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
-                    client.Timeout = TimeSpan.FromMinutes(10);
                     var response = client.PostAsync(_apiUrl, jsonContent,CancellationTokenHelper.Token).Result;
                     if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
                     {
