@@ -3,7 +3,9 @@ using AspCore.DataSearchApi.ElasticSearch.Abstract;
 using AspCore.DataSearchApi.ElasticSearch.Concrete;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.EntityType;
+using AspCore.Entities.General;
 using Microsoft.AspNetCore.Builder;
+using System;
 
 namespace AspCore.DataSearchApi.Configuration
 {
@@ -22,10 +24,15 @@ namespace AspCore.DataSearchApi.Configuration
         {
 
             TElasticSearchProvider elasticSearchProvider = (TElasticSearchProvider)_app.ApplicationServices.GetService(typeof(IElasticSearchProvider<TSearchableEntity>));
-            elasticSearchProvider.InitIndex(new InitIndexRequest
+             ServiceResult<bool> result =  elasticSearchProvider.InitIndex(new InitIndexRequest
             {
                 initializeWithData = initWithData
             });
+
+            if(!result.IsSucceeded)
+            {
+                throw new Exception(result.ErrorMessage + " " + result.ExceptionMessage);
+            }
 
 
             return this;

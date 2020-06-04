@@ -105,10 +105,14 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                    if (!string.IsNullOrEmpty(correlationID))
+
+                    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
                     {
-                        client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                        if (!string.IsNullOrEmpty(correlationID))
+                        {
+                            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                        }
                     }
                     var response = await client.GetAsync(_apiUrl,CancellationTokenHelper.Token).ConfigureAwait(false);
 
@@ -163,10 +167,13 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                    if (!string.IsNullOrEmpty(correlationID))
+                    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
                     {
-                        client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                        if (!string.IsNullOrEmpty(correlationID))
+                        {
+                            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                        }
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
@@ -230,10 +237,14 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                    if (!string.IsNullOrEmpty(correlationID))
+
+                    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
                     {
-                        client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                        if (!string.IsNullOrEmpty(correlationID))
+                        {
+                            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                        }
                     }
 
                     JsonContent jsonContent = new JsonContent(postObject);
@@ -274,13 +285,17 @@ namespace AspCore.ApiClient
             using (var client = new CoreHttpClient(TimeSpan.FromMinutes(10)))
             {
 
-                string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                if (!string.IsNullOrEmpty(correlationID))
+
+                if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
                 {
-                    client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                    if (!string.IsNullOrEmpty(correlationID))
+                    {
+                        client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                    }
                 }
 
-              
+
                 var response = client.PostAsync(_apiUrl, content,CancellationTokenHelper.Token).Result;
 
                 //response.EnsureSuccessStatusCode();
