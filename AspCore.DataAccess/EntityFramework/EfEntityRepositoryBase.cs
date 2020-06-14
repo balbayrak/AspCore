@@ -1,5 +1,7 @@
 ﻿using AspCore.DataAccess.Abstract;
+using AspCore.DataAccess.EntityFramework.History;
 using AspCore.DataAccess.General;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
@@ -9,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -343,6 +347,73 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 result.Result = Entities.Find(id);
                 result.IsSucceeded = true;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<List<TEntity>>> GetHistoriesById(Guid id, int? page = null, int? pageSize = null)
+        {
+            ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
+
+            try
+            {
+                if (typeof(TEntity).IsAssignableTo(typeof(IAutoHistory)))
+                {
+                    List<TEntity> entities = new List<TEntity>();
+
+                    List<AspCoreAutoHistory> list = await _context.Set<AspCoreAutoHistory>().AsNoTracking().Where(t => t.RowId.Equals(id.ToString())).OrderByDescending(t => t.Changed).ToListAsync();
+                    if (list != null && list.Count > 0)
+                    {
+                        int start = 0;
+                        int count = list.Count;
+
+                        if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
+                        {
+                            start = page.Value * pageSize.Value;
+                            count = pageSize.Value;
+                        }
+
+                        for (int i = start; i < count; i++)
+                        {
+                            JObject obj = (JObject)JsonConvert.DeserializeObject(list[i].Changed);
+                            EntityHistoryChanged<TEntity> historyChanged = obj.ToObject<EntityHistoryChanged<TEntity>>();
+                            if (i == 0)
+                            {
+                                if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
+                                {
+                                    ((IBaseEntity)historyChanged.before).LastUpdateDate = list[i].Created;
+                                }
+                                entities.Add(historyChanged.before);
+                                entities.Add(historyChanged.after);
+                            }
+                            else
+                            {
+                                entities.Add(historyChanged.after);
+                            }
+                        }
+                        result.Result = entities;
+                        result.IsSucceeded = true;
+                        result.TotalResultCount = entities.Count;
+                        result.SearchResultCount = pageSize.HasValue ? pageSize.Value + 1 : entities.Count;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = false;
+                        result.Result = null;
+                    }
+                }
+                else
+                {
+                    result.IsSucceeded = false;
+                    result.Result = null;
+                    result.ErrorMessage = DALConstants.DALErrorMessages.ENTITY_IS_NOT_IAUTOHISTORY;
+                }
+
             }
             catch (Exception ex)
             {

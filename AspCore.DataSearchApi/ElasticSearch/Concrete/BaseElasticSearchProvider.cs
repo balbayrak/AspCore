@@ -118,6 +118,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
                                 if (entityResult.IsSucceededAndDataIncluded())
                                 {
                                     result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
+                                    result.IsSucceeded = true;
                                 }
                                 else
                                 {

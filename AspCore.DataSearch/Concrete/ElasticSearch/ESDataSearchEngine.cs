@@ -13,28 +13,28 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
     public abstract class ESDataSearchEngine<TSearchableEntity>
          where TSearchableEntity : class, ISearchableEntity, new()
     {
-        private readonly IElasticClient<TSearchableEntity> _elasticClient;
+        protected readonly IElasticClient<TSearchableEntity> ElasticClient;
 
         protected readonly IServiceProvider ServiceProvider;
         public ESDataSearchEngine(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
-            _elasticClient = ServiceProvider.GetRequiredService<IElasticClient<TSearchableEntity>>();
+            ElasticClient = ServiceProvider.GetRequiredService<IElasticClient<TSearchableEntity>>();
         }
 
         public ServiceResult<bool> Create(params TSearchableEntity[] searchableEntities)
         {
-            return _elasticClient.Create(searchableEntities);
+            return ElasticClient.Create(searchableEntities);
         }
 
         public ServiceResult<bool> Update(params TSearchableEntity[] searchableEntities)
         {
-            return _elasticClient.Update(searchableEntities);
+            return ElasticClient.Update(searchableEntities);
         }
 
         public ServiceResult<bool> Delete(params TSearchableEntity[] searchableEntities)
         {
-            return _elasticClient.Delete(searchableEntities);
+            return ElasticClient.Delete(searchableEntities);
         }
 
         public ServiceResult<DataSearchResult<TSearchableEntity>> FindBy(bool isActiveOnly, int startIndex, int takeCount)
@@ -43,7 +43,7 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
 
             if (isActiveOnly)
             {
-                result = _elasticClient.Read(t => t.From(startIndex)
+                result = ElasticClient.Read(t => t.From(startIndex)
                                            .Size(takeCount)
                                            //.Sort(tt => tt.Descending(ttt => ttt.id))
                                            .Query(tt => tt.Bool(s => s.Filter(m => m.TermQuery(mm => mm.IsDeleted, false))))
@@ -52,7 +52,7 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
             }
             else
             {
-                result = _elasticClient.Read(t => t.From(startIndex)
+                result = ElasticClient.Read(t => t.From(startIndex)
                                            .Size(takeCount)
                                            // .Sort(tt => tt.Descending(ttt => ttt.id))
                                            .Query(tt => tt.Bool(s => s.Must(m => m.MatchAllQuery())))
@@ -67,7 +67,7 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
         {
             ServiceResult<DataSearchResult<TSearchableEntity>> result = null;
 
-            result = _elasticClient.Read(t => t.Query(tt => tt.Bool(s => s.Filter(m => m.TermQuery(mm => mm.Id, Id),
+            result = ElasticClient.Read(t => t.Query(tt => tt.Bool(s => s.Filter(m => m.TermQuery(mm => mm.Id, Id),
                                                                                 m => m.TermQuery(mm => mm.IsDeleted, !isActive)))));
 
             return result;
@@ -76,7 +76,7 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch
         public ServiceResult<DataSearchResult<TSearchableEntity>> FindByIdList(List<Guid> idList, bool isActive)
         {
             List<object> objectList = idList.Cast<object>().ToList();
-            return _elasticClient.Read(t => t.Query(tt => tt.Bool(s => s.Filter(m => m.TermsQuery(mm => mm.Id, objectList),
+            return ElasticClient.Read(t => t.Query(tt => tt.Bool(s => s.Filter(m => m.TermsQuery(mm => mm.Id, objectList),
                                                                                m => m.TermQuery(mm => mm.IsDeleted, !isActive)))));
         }
 

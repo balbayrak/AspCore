@@ -1,4 +1,6 @@
-﻿using AspCore.Web.Concrete;
+﻿using AspCore.Entities.EntityFilter;
+using AspCore.Entities.General;
+using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.DataSearch.Abstract;
@@ -19,7 +21,16 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult Index()
         {
+
+            ServiceResult<List<PersonViewModel>> histories =  BffLayer.GetEntityHistoriesAsync(new EntityFilter<Person>
+            {
+                id = new Guid("fe809d66-1e58-40cc-9050-012daff25a04"),
+                page=0,
+                pageSize=5
+
+            }).Result;
             return View();
+
         }
 
         public IActionResult PersonCacheData()

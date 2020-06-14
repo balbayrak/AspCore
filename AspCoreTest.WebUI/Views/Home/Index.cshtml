@@ -34,6 +34,10 @@
 
                   });
               })
+              .RowCssConditions(condition =>
+{
+    condition.AddRowCss(p => p.Name, "Bilal", "red");
+})
              .ToolBarActions(action =>
              {
                  action.ModalActionButton()

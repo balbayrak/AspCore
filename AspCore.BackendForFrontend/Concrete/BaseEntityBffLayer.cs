@@ -85,5 +85,15 @@ namespace AspCore.BackendForFrontend.Concrete
             viewResult.ToViewModelResult(result);
             return viewResult;
         }
+
+        public async Task<ServiceResult<List<TViewModel>>> GetEntityHistoriesAsync(EntityFilter<TEntity> filterSetting)
+        {
+            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_ENTITY_HISTORIES_ASYNC;
+            var viewResult = new ServiceResult<List<TViewModel>>();
+            var result = await ApiClient.PostRequest<ServiceResult<List<TEntity>>>(filterSetting);
+            viewResult.ToViewModelResult(result);
+
+            return viewResult;
+        }
     }
 }

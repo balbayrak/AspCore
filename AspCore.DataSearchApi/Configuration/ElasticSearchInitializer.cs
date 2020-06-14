@@ -24,15 +24,10 @@ namespace AspCore.DataSearchApi.Configuration
         {
 
             TElasticSearchProvider elasticSearchProvider = (TElasticSearchProvider)_app.ApplicationServices.GetService(typeof(IElasticSearchProvider<TSearchableEntity>));
-             ServiceResult<bool> result =  elasticSearchProvider.InitIndex(new InitIndexRequest
+            ServiceResult<bool> result = elasticSearchProvider.InitIndex(new InitIndexRequest
             {
                 initializeWithData = initWithData
             });
-
-            if(!result.IsSucceeded)
-            {
-                throw new Exception(result.ErrorMessage + " " + result.ExceptionMessage);
-            }
 
 
             return this;

@@ -85,3 +85,7 @@ body {
     display: none;
     margin-top: -50px;
 }
+
+.red {
+    background-color: #f2dede;
+}

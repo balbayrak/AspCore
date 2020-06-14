@@ -178,5 +178,16 @@ namespace AspCore.BusinessApi
             ServiceResult<TEntity> response = _service.GetById(filterSetting);
             return response.ToHttpResponse();
         }
+
+        [ActionName(ApiConstants.Urls.GET_ENTITY_HISTORIES_ASYNC)]
+        [HttpPost]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public async Task<IActionResult> GetEntityHistoriesAsync(EntityFilter<TEntity> filterSetting)
+        {
+            ServiceResult<List<TEntity>> response = await _service.GetHistoriesByIdAsync(filterSetting);
+            return response.ToHttpResponse();
+        }
     }
 }

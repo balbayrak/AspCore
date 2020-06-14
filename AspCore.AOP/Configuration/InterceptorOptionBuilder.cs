@@ -191,8 +191,5 @@ namespace AspCore.AOP.Configuration
             }
         }
 
-        public void Dispose()
-        {
-        }
     }
 }

@@ -115,5 +115,10 @@ namespace AspCore.Business.Concrete
                 return _dataAccess.GetListAsync(expression, setting.page, setting.pageSize);
             }
         }
+
+        public Task<ServiceResult<List<TEntity>>> GetHistoriesByIdAsync(EntityFilter<TEntity> setting)
+        {
+            return _dataAccess.GetHistoriesById(setting.id, setting.page, setting.pageSize);
+        }
     }
 }

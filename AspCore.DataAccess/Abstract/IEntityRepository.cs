@@ -49,5 +49,6 @@ namespace AspCore.DataAccess.Abstract
 
         ServiceResult<bool> ProcessEntitiesWithState(List<TEntity> items);
 
+        Task<ServiceResult<List<TEntity>>> GetHistoriesById(Guid id, int? page = null, int? pageSize = null);
     }
 }

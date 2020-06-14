@@ -23,5 +23,7 @@ namespace AspCore.Business.Abstract
 
         Task<ServiceResult<IList<TEntity>>> GetAllAsync(EntityFilter<TEntity> setting);
 
+        Task<ServiceResult<List<TEntity>>> GetHistoriesByIdAsync(EntityFilter<TEntity> setting);
+
     }
 }

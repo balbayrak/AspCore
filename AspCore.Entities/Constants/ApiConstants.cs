@@ -16,6 +16,7 @@ namespace AspCore.Entities.Constants
             public const string DELETE_WITH_IDs = "DeleteWithIDs";
             public const string GET_ALL = "GetAll";
             public const string GET_ALL_ASYNC = "GetAllAsync";
+            public const string GET_ENTITY_HISTORIES_ASYNC = "GetEntityHistoriesAsync";
             public const string GET_BY_ID = "GetById";
             public const string AUTHENTICATE_CLIENT = "AuthenticateClient";
             public const string REFRESH_TOKEN = "RefreshToken";

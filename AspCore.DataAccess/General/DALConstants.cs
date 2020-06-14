@@ -21,6 +21,8 @@ namespace AspCore.DataAccess.General
 
             public const string DAL_DELETE_SUCCESS_MESSAGE = "Deleted successfully";
             public const string DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER = "{0}/s is deleted successfully";
+
+            public const string ENTITY_IS_NOT_IAUTOHISTORY = "Entity is not a IAutoHistory type";
         }
     }
 }

@@ -33,7 +33,7 @@ namespace AspCore.DataAccess.EntityFramework
             }
         }
 
-        //   public virtual DbSet<AutoHistory> AutoHistories { get; set; }
+       // public virtual DbSet<AspCoreAutoHistory> AutoHistories { get; set; }
 
         public virtual void OnConfiguringDbContext(DbContextOptionsBuilder optionsBuilder)
         {
@@ -72,11 +72,15 @@ namespace AspCore.DataAccess.EntityFramework
 
             IEnumerable<Type> types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(asm => asm.DefinedTypes).Select(x => x.AsType());
 
-            var typesToRegister = types.Where(type => type.BaseType != null && (type.BaseType.IsGenericType && (type.Name.Contains(nameof(AspCoreAutoHistory)) || type.BaseType.GetGenericTypeDefinition() == typeof(BaseMap<>) || type.BaseType.GetGenericTypeDefinition() == typeof(EntityMap<>))));
+            var typesToRegister = types.Where(type => type.BaseType != null && (type.BaseType.IsGenericType && (type.Name.Contains(nameof(AspCoreAutoHistory)) 
+            || type.BaseType.GetGenericTypeDefinition() == typeof(BaseMap<>) 
+            || type.BaseType.GetGenericTypeDefinition() == typeof(EntityMap<>) 
+            || type.BaseType.GetGenericTypeDefinition() == typeof(BaseEntityKeyMap<,>)
+            || type.BaseType.GetGenericTypeDefinition() == typeof(EntityKeyMap<,>))));
 
             foreach (var type in typesToRegister)
             {
-                if (type.Name.Contains("BaseMap") || type.Name.Contains("EntityMap")) continue;
+                if (type.Name.Contains("BaseMap") || type.Name.Contains("EntityMap") || type.Name.Contains("BaseEntityKeyMap") || type.Name.Contains("EntityKeyMap")) continue;
                 dynamic configurationInstance = Activator.CreateInstance(type);
                 modelBuilder.ApplyConfiguration(configurationInstance);
             }

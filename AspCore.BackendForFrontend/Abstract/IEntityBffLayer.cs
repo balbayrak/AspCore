@@ -21,8 +21,7 @@ namespace AspCore.BackendForFrontend.Abstract
         Task<ServiceResult<List<TViewModel>>> GetAll(EntityFilter<TEntity> entityFilter);
         Task<ServiceResult<List<TViewModel>>> GetAllAsync(EntityFilter<TEntity> filterSetting);
         Task<ServiceResult<TViewModel>> GetById(EntityFilter<TEntity> filterSetting);
-
-
+        Task<ServiceResult<List<TViewModel>>> GetEntityHistoriesAsync(EntityFilter<TEntity> filterSetting);
 
     }
 }
