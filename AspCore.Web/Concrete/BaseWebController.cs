@@ -1,5 +1,6 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Caching.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
@@ -52,8 +53,8 @@ namespace AspCore.Web.Concrete
         protected IDocumentBffLayer<TDocument> DocumentHelper => LazyGetRequiredService(ref _documentHelper);
         private IDocumentBffLayer<TDocument> _documentHelper;
 
-        protected IDocumentBffLayer<TDocument> ConfigurationAccessor => LazyGetRequiredService(ref _configurationAccessor);
-        private IDocumentBffLayer<TDocument> _configurationAccessor;
+        protected IConfigurationAccessor ConfigurationAccessor => LazyGetRequiredService(ref _configurationAccessor);
+        private IConfigurationAccessor _configurationAccessor;
 
         protected BaseWebController(IServiceProvider serviceProvider)
         {

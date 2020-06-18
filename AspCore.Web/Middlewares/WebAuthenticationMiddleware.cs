@@ -38,13 +38,13 @@ namespace AspCore.Web.Middlewares
             }
             else
             {
-                if (httpContext.Response.HttpContext != null && !httpContext.Response.HttpContext.Request.Path.Value.Contains(_authenticationControllerName))
-                {
-                    httpContext.Response.Redirect($"/{_authenticationControllerName}/LogOut");
-                }
-                else
+                try
                 {
                     await _next(httpContext);
+                }
+                catch
+                {
+                    httpContext.Response.Redirect($"/{_authenticationControllerName}/LogOut");
                 }
             }
         }
