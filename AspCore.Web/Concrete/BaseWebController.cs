@@ -62,7 +62,6 @@ namespace AspCore.Web.Concrete
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            
             base.OnActionExecuting(context);
         }
 
