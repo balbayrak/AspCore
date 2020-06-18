@@ -11,19 +11,19 @@ namespace AspCore.Web.Middlewares
     public class WebAuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IApplicationCachedClient _applicationCachedClient;
+        private readonly ICookieService _cookieService;
         private readonly ICacheService _cacheService;
         private string _authenticationControllerName;
-        public WebAuthenticationMiddleware(RequestDelegate next,ICacheService cacheService, IApplicationCachedClient applicationCachedClient, string authenticationControllerName)
+        public WebAuthenticationMiddleware(RequestDelegate next, ICacheService cacheService, ICookieService cookieService, string authenticationControllerName)
         {
             _authenticationControllerName = authenticationControllerName;
-            _applicationCachedClient = applicationCachedClient;
+            _cookieService = cookieService;
             _cacheService = cacheService;
             _next = next;
         }
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            string tokenKey = _applicationCachedClient.ApplicationUserKey;
+            string tokenKey = _cookieService.GetObject<string>(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY);
 
             if (!string.IsNullOrEmpty(tokenKey))
             {
@@ -31,9 +31,22 @@ namespace AspCore.Web.Middlewares
                 {
                     httpContext.Response.Redirect($"/{_authenticationControllerName}/LogOut");
                 }
+                else
+                {
+                    await _next(httpContext);
+                }
             }
-
-            await _next(httpContext);
+            else
+            {
+                if (httpContext.Response.HttpContext != null && !httpContext.Response.HttpContext.Request.Path.Value.Contains(_authenticationControllerName))
+                {
+                    httpContext.Response.Redirect($"/{_authenticationControllerName}/LogOut");
+                }
+                else
+                {
+                    await _next(httpContext);
+                }
+            }
         }
     }
 }

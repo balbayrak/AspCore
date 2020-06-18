@@ -12,9 +12,9 @@ namespace AspCore.Business.Abstract
     {
         public TActiveUser activeUser { get; }
 
-        ServiceResult<bool> RunAction(params TaskEntity<TEntity>[] taskEntities);
+        ServiceResult<TResult> RunAction<TResult>(params TaskEntity<TEntity>[] taskEntities);
 
-        ServiceResult<bool> RunAction(List<TaskEntity<TEntity>> taskEntities);
+        ServiceResult<TResult> RunAction<TResult>(List<TaskEntity<TEntity>> taskEntities);
 
 
     }

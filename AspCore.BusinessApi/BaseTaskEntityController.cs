@@ -12,7 +12,7 @@ using AspCore.Extension;
 
 namespace AspCore.BusinessApi
 {
-    public class BaseTaskEntityController<TActiveUser, TEntity, TEntityService> : BaseTaskController<TActiveUser, TEntity, TEntityService>
+    public class BaseTaskEntityController<TActiveUser, TEntity, TEntityService,TResult> : BaseTaskController<TActiveUser, TEntity, TEntityService, TResult>
         where TEntityService : ITaskEntityService<TActiveUser, TEntity>
         where TEntity : class, IEntity, new()
         where TActiveUser : class, IAuthenticatedUser, new()

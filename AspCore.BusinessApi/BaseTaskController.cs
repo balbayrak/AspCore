@@ -12,7 +12,7 @@ using AspCore.WebApi;
 
 namespace AspCore.BusinessApi
 {
-    public class BaseTaskController<TActiveUser, TEntity, TEntityService> : BaseController
+    public class BaseTaskController<TActiveUser, TEntity, TEntityService,TResult> : BaseController
         where TEntityService : ITaskService<TActiveUser, TEntity>
         where TEntity : class, new()
         where TActiveUser : class, IAuthenticatedUser, new()
@@ -81,7 +81,7 @@ namespace AspCore.BusinessApi
             {
                 entity = t
             }).ToArray();
-            ServiceResult<bool> response = _service.RunAction(tasks);
+            ServiceResult<TResult> response = _service.RunAction<TResult>(tasks);
             return response.ToHttpResponse();
         }
 
@@ -107,7 +107,7 @@ namespace AspCore.BusinessApi
                 entity = t
             }).ToArray();
 
-            ServiceResult<bool> response = _service.RunAction(tasks);
+            ServiceResult<TResult> response = _service.RunAction<TResult>(tasks);
             return response.ToHttpResponse();
         }
 
@@ -134,7 +134,7 @@ namespace AspCore.BusinessApi
                 entity = t
             }).ToArray();
 
-            ServiceResult<bool> response = _service.RunAction(tasks);
+            ServiceResult<TResult> response = _service.RunAction<TResult>(tasks);
             return response.ToHttpResponse();
 
         }

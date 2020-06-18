@@ -9,7 +9,7 @@ namespace AspCoreTest.Authentication.Concrete
     public class CustomWebAuthenticationProvider : ICustomWebAuthenticationProvider
     {
 
-        public string loginPageUrl => "Account/UserLogin";
+        public string loginPageUrl => "/Account/UserLogin";
 
         public string mainPageUrl => "/Home/Index";
 

@@ -7,7 +7,7 @@ namespace AspCore.Business.Task.Abstract
     {
         void AddTask(ITask task);
 
-        ServiceResult<bool> RunTasks();
+        ServiceResult<TResult> RunTasks<TResult>();
 
         ServiceResult<bool> ValidateAllTasks();
     }

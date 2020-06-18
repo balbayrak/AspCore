@@ -43,52 +43,52 @@ namespace AspCore.Business.Concrete
             }
         }
 
-        public virtual ServiceResult<bool> RunAction(params TaskEntity<TEntity>[] taskEntities)
+        public virtual ServiceResult<TResult> RunAction<TResult>(params TaskEntity<TEntity>[] taskEntities)
         {
             if (taskEntities.Length == 1)
-                return TaskRun(taskEntities[0]);
+                return TaskRun<TResult>(taskEntities[0]);
             else
             {
-                return TaskListRun(taskEntities);
+                return TaskListRun<TResult>(taskEntities);
             }
         }
 
-        public virtual ServiceResult<bool> RunAction(List<TaskEntity<TEntity>> taskEntities)
+        public virtual ServiceResult<TResult> RunAction<TResult>(List<TaskEntity<TEntity>> taskEntities)
         {
             if (taskEntities.Count == 1)
-                return TaskRun(taskEntities[0]);
+                return TaskRun<TResult>(taskEntities[0]);
             else
             {
-                return TaskListRun(taskEntities);
+                return TaskListRun<TResult>(taskEntities);
             }
         }
 
-        private ServiceResult<bool> TaskRun(TaskEntity<TEntity> taskEntity)
+        private ServiceResult<TResult> TaskRun<TResult>(TaskEntity<TEntity> taskEntity)
         {
             ITask task = TaskBuilder.GenerateTask<TEntity, bool>(taskEntity);
-            return task.Run<bool>();
+            return task.Run<TResult>();
         }
 
-        private ServiceResult<bool> TaskListRun(TaskEntity<TEntity>[] taskEntityList)
+        private ServiceResult<TResult> TaskListRun<TResult>(TaskEntity<TEntity>[] taskEntityList)
         {
             foreach (var item in taskEntityList)
             {
-                ITask task = TaskBuilder.GenerateTask<TEntity, bool>(item);
+                ITask task = TaskBuilder.GenerateTask<TEntity, TResult>(item);
                 TaskFlowBuilder.AddTask(task);
             }
 
-            return TaskFlowBuilder.RunTasks();
+            return TaskFlowBuilder.RunTasks<TResult>();
         }
 
-        private ServiceResult<bool> TaskListRun(List<TaskEntity<TEntity>> taskEntityList)
+        private ServiceResult<TResult> TaskListRun<TResult>(List<TaskEntity<TEntity>> taskEntityList)
         {
             foreach (var item in taskEntityList)
             {
-                ITask task = TaskBuilder.GenerateTask<TEntity, bool>(item);
+                ITask task = TaskBuilder.GenerateTask<TEntity, TResult>(item);
                 TaskFlowBuilder.AddTask(task);
             }
 
-            return TaskFlowBuilder.RunTasks();
+            return TaskFlowBuilder.RunTasks<TResult>();
         }
 
     }

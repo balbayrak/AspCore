@@ -1,5 +1,6 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Caching.Abstract;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
@@ -38,6 +39,10 @@ namespace AspCore.Web.Concrete
             return reference;
         }
 
+
+        private ICookieService CookieService => LazyGetRequiredService(ref _cookieService);
+        private ICookieService _cookieService;
+
         protected ICacheService CacheService => LazyGetRequiredService(ref _cacheService);
         private ICacheService _cacheService;
 
@@ -57,27 +62,7 @@ namespace AspCore.Web.Concrete
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            //string tokenKey = CacheService.GetObject<string>(ApiConstants.Api_Keys.CUSTOM_TOKEN_STORAGE_KEY);
-            //var token = CacheService.GetObject<AuthenticationToken>(tokenKey);
-            //if (token != null)
-            //{
-            //    string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.COOKIE_USER + "_" + tokenKey;
-            //    var activeUser = CacheService.GetObject<ActiveUser>(activeUserUId);
-            //    if (activeUser == null)
-            //    {
-            //        ServiceResult<ActiveUser> userResult = UserBffLayer.GetClientInfo(token).Result;
-
-            //        if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
-            //        {
-            //            CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddHours(1), false);
-            //        }
-            //    }
-            //}
-            //else
-            //{
-
-            //}
-
+            
             base.OnActionExecuting(context);
         }
 

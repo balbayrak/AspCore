@@ -22,19 +22,19 @@ namespace AspCore.Business.Task.Concrete
             _taskList.Add(new TaskFlowItem(task, _taskList.Count));
         }
 
-        public ServiceResult<bool> RunTasks()
+        public ServiceResult<TResult> RunTasks<TResult>()
         {
-            ServiceResult<bool> result = new ServiceResult<bool>();
+            ServiceResult<TResult> result = new ServiceResult<TResult>();
             _transactionBuilder.BeginTransaction();
             try
             {
-                result = ValidateAllTasks();
-                if (result.IsSucceeded)
+               ServiceResult<bool> validationResult = ValidateAllTasks();
+                if (validationResult.IsSucceeded)
                 {
 
                     foreach (var taskItem in _taskList)
                     {
-                        result = taskItem._task.Run<bool>();
+                        result = taskItem._task.Run<TResult>();
                         if (!result.IsSucceeded)
                         {
                             _transactionBuilder.RollbackTransaction();
@@ -47,6 +47,11 @@ namespace AspCore.Business.Task.Concrete
                     {
                         _transactionBuilder.CommitTransaction();
                     }
+                }
+                else
+                {
+                    result.ErrorMessage = validationResult.ErrorMessage;
+                    result.ExceptionMessage = validationResult.ExceptionMessage;
                 }
             }
             catch (Exception ex)
