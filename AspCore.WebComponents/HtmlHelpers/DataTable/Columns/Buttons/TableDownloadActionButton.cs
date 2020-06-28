@@ -19,7 +19,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons
 
         public IDefaultActionButton Visible(bool visible)
         {
-            throw new NotImplementedException();
+            return _instance;
         }
 
         public IDefaultActionButton Hidden<TProperty>(Expression<Func<TModel, TProperty>> expression, object value)
