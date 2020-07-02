@@ -26,18 +26,21 @@ namespace AspCore.DataAccess.EntityFramework
         where TDbContext : CoreDbContext
     {
         protected IServiceProvider ServiceProvider { get; private set; }
-        private TDbContext _context { get; }
+        protected TDbContext Context { get; }
         private DbSet<TEntity> _entities;
         private readonly ICustomMapper _mapper;
 
-        protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = _context.Set<TEntity>());
+        protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = Context.Set<TEntity>());
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
+
+      
+
         public EfEntityRepositoryBase(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
-            _context = ServiceProvider.GetService<TDbContext>();
+            Context = ServiceProvider.GetService<TDbContext>();
             _mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
-            _entities = _context.Set<TEntity>();
+            _entities = Context.Set<TEntity>();
         }
 
         public ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter)
@@ -159,9 +162,9 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (TEntity item in entities)
                 {
-                    _context.Entry(item).State = EntityState.Added;
+                    Context.Entry(item).State = EntityState.Added;
                 }
-                int value = _context.SaveChanges();
+                int value = Context.SaveChanges();
                 if (value > 0)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
@@ -209,10 +212,10 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (var updatedInput in updatedEntityList)
                 {
-                    _context.Attach(updatedInput);
-                    _context.Update(updatedInput);
+                    Context.Attach(updatedInput);
+                    Context.Update(updatedInput);
                 }
-                int value = _context.SaveChanges();
+                int value = Context.SaveChanges();
                 if (value > 0)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
@@ -243,8 +246,8 @@ namespace AspCore.DataAccess.EntityFramework
                 updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
                 foreach (var item in updatedEntityList)
                 {
-                    _context.Attach(item);
-                    _context.Update(item);
+                    Context.Attach(item);
+                    Context.Update(item);
                 }
             }
             ServiceResult<bool> result = ProcessEntityWithState(updatedEntityList?.ToArray());
@@ -263,10 +266,10 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (TEntity item in entities)
                 {
-                    var updatedEntity = _context.Entry(item);
+                    var updatedEntity = Context.Entry(item);
                     updatedEntity.State = EntityState.Deleted;
                 }
-                int value = _context.SaveChanges();
+                int value = Context.SaveChanges();
                 if (value > 0)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
@@ -366,7 +369,7 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     List<TEntity> entities = new List<TEntity>();
 
-                    List<AspCoreAutoHistory> list = await _context.Set<AspCoreAutoHistory>().AsNoTracking().Where(t => t.RowId.Equals(id.ToString())).OrderByDescending(t => t.Changed).ToListAsync();
+                    List<AspCoreAutoHistory> list = await Context.Set<AspCoreAutoHistory>().AsNoTracking().Where(t => t.RowId.Equals(id.ToString())).OrderByDescending(t => t.Changed).ToListAsync();
                     if (list != null && list.Count > 0)
                     {
                         int start = 0;
@@ -570,12 +573,12 @@ namespace AspCore.DataAccess.EntityFramework
                 IDbContextTransaction dbContextTransaction = null;
                 try
                 {
-                    using (dbContextTransaction = _context.Database.BeginTransaction())
+                    using (dbContextTransaction = Context.Database.BeginTransaction())
                     {
                         foreach (var item in entities)
                         {
-                            _context.Set<TEntity>().Add(item);
-                            foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
+                            Context.Set<TEntity>().Add(item);
+                            foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                             {
                                 IEntity entity = entry.Entity;
                                 if (!entity.entityState.HasValue)
@@ -584,7 +587,7 @@ namespace AspCore.DataAccess.EntityFramework
                             }
                         }
 
-                        int value = _context.SaveChanges();
+                        int value = Context.SaveChanges();
                         if (value > 0)
                         {
                             dbContextTransaction.Commit();
@@ -615,7 +618,7 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 _entities.Add(item);
-                foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
+                foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                 {
                     IEntity entity = entry.Entity;
                     if (!entity.entityState.HasValue)
@@ -623,7 +626,7 @@ namespace AspCore.DataAccess.EntityFramework
                     entry.State = GetEntityState(entity.entityState.Value);
                 }
 
-                int value = _context.SaveChanges();
+                int value = Context.SaveChanges();
                 if (value > 0)
                 {
                     result.IsSucceeded = true;
@@ -649,12 +652,12 @@ namespace AspCore.DataAccess.EntityFramework
             IDbContextTransaction dbContextTransaction = null;
             try
             {
-                using (dbContextTransaction = _context.Database.BeginTransaction())
+                using (dbContextTransaction = Context.Database.BeginTransaction())
                 {
                     foreach (var item in items)
                     {
                         _entities.Add(item);
-                        foreach (EntityEntry<IEntity> entry in _context.ChangeTracker.Entries<IEntity>())
+                        foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                         {
                             IEntity entity = entry.Entity;
                             if (!entity.entityState.HasValue)
@@ -663,7 +666,7 @@ namespace AspCore.DataAccess.EntityFramework
                         }
                     }
 
-                    int value = _context.SaveChanges();
+                    int value = Context.SaveChanges();
                     if (value > 0)
                     {
                         dbContextTransaction.Commit();
