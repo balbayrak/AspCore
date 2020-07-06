@@ -4,11 +4,11 @@ using System.Text;
 
 namespace AspCore.Caching.Abstract
 {
-    public class CacheManager
+    public abstract class CacheManager
     {
         protected string uniqueCacheKey { get; private set; }
 
-        public CacheManager()
+        protected CacheManager()
         {
             uniqueCacheKey = Guid.NewGuid().ToString("N");
         }
