@@ -9,6 +9,7 @@ using AspCore.Entities.Configuration;
 using Microsoft.AspNetCore.Http;
 using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Caching.Abstract;
+using System.Net.Http;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -23,14 +24,17 @@ namespace AspCore.Web.Configuration.Options
             BffClientOption bffClientOption = new BffClientOption();
             option(bffClientOption);
 
+            services.AddHttpClient();
+
             services.AddTransient(typeof(IBffApiClient), sp =>
             {
+                var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var tokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
 
-                return new BffApiClient(httpContextAccessor, configurationAccessor, cacheService, tokenHelper, bffClientOption.apiConfigurationKey);
+                return new BffApiClient(httpClientFactory,httpContextAccessor, configurationAccessor, cacheService, tokenHelper, bffClientOption.apiConfigurationKey);
             });
 
             return new ConfigurationBuilderOption(services);

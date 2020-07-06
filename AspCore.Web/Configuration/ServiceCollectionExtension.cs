@@ -1,5 +1,6 @@
 ﻿using AspCore.Dependency.Concrete;
 using AspCore.Entities.Json;
+using AspCore.Extension;
 using AspCore.Utilities.MimeMapping;
 using AspCore.Web.Configuration.Options;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -42,8 +44,19 @@ namespace AspCore.Web.Configuration
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
+            services.AddHeaderPropagation(options =>
+            {
+                options.Headers.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, context =>
+                {
+                    return new StringValues(context.HttpContext.TraceIdentifier.ToString());
+                });
+            });
+
+
             DependencyConfigurationOption configurationHelperOption = new DependencyConfigurationOption(services);
             option(configurationHelperOption);
+
+         
 
             return services;
         }

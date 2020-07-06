@@ -10,6 +10,13 @@ using AspCore.Dependency.Concrete;
 using Microsoft.AspNetCore.Http;
 using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Caching.Abstract;
+using Microsoft.Extensions.Http;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using AspCore.Entities.Constants;
+using System.Net;
+using System.Threading;
+using AspCore.Extension;
 
 namespace AspCore.ApiClient.Configuration
 {
@@ -33,18 +40,7 @@ namespace AspCore.ApiClient.Configuration
         public ApiClientByNameBuilder AddApiClient<TOption>(string apiKey)
        where TOption : class, IApiClientConfiguration, new()
         {
-            _services.AddTransient(typeof(ApiClient<TOption>), sp =>
-            {
-                var httpContextAccessor =  sp.GetRequiredService<IHttpContextAccessor>();
-                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                var cacheService = sp.GetRequiredService<ICacheService>();
-                var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-                return new ApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
-            });
-
-            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
-
-            return this;
+            return AddClient<ApiClient<TOption>>(apiKey);
         }
 
         /// <summary>
@@ -54,19 +50,7 @@ namespace AspCore.ApiClient.Configuration
         /// <returns></returns>
         public ApiClientByNameBuilder AddApiClient(string apiKey)
         {
-            _services.AddTransient(typeof(ApiClient<ApiClientConfiguration>), sp =>
-            {
-                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                var cacheService = sp.GetRequiredService<ICacheService>();
-                var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-
-                return new ApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
-            });
-
-            _registrations.Add(apiKey, typeof(ApiClient<ApiClientConfiguration>));
-
-            return this;
+            return AddClient<ApiClient<ApiClientConfiguration>>(apiKey);
         }
 
         /// <summary>
@@ -78,18 +62,7 @@ namespace AspCore.ApiClient.Configuration
         public ApiClientByNameBuilder AddBearerAuthenticatedClient<TOption>(string apiKey)
           where TOption : class, IApiClientConfiguration, new()
         {
-            _services.AddTransient(typeof(BearerAuthenticatedApiClient<TOption>), sp =>
-            {
-                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                var cacheService = sp.GetRequiredService<ICacheService>();
-                var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-                return new BearerAuthenticatedApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
-            });
-
-            _registrations.Add(apiKey, typeof(BearerAuthenticatedApiClient<TOption>));
-
-            return this;
+            return AddClient<BearerAuthenticatedApiClient<TOption>>(apiKey);
         }
 
         /// <summary>
@@ -99,19 +72,7 @@ namespace AspCore.ApiClient.Configuration
         /// <returns></returns>
         public ApiClientByNameBuilder AddBearerAuthenticatedClient(string apiKey)
         {
-            _services.AddTransient(typeof(BearerAuthenticatedApiClient<ApiClientConfiguration>), sp =>
-            {
-                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                var cacheService = sp.GetRequiredService<ICacheService>();
-                var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-
-                return new BearerAuthenticatedApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
-            });
-
-            _registrations.Add(apiKey, typeof(BearerAuthenticatedApiClient<ApiClientConfiguration>));
-
-            return this;
+            return AddClient<BearerAuthenticatedApiClient<ApiClientConfiguration>>(apiKey);
         }
 
         /// <summary>
@@ -123,19 +84,7 @@ namespace AspCore.ApiClient.Configuration
         public ApiClientByNameBuilder AddJWTAuthenticatedClient<TOption>(string apiKey)
         where TOption : class, IApiClientConfiguration, new()
         {
-            _services.AddTransient(typeof(JWTAuthenticatedApiClient<TOption>), sp =>
-            {
-                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                var cacheService = sp.GetRequiredService<ICacheService>();
-                var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-
-                return new JWTAuthenticatedApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
-            });
-
-            _registrations.Add(apiKey, typeof(JWTAuthenticatedApiClient<TOption>));
-
-            return this;
+            return AddClient<JWTAuthenticatedApiClient<TOption>>(apiKey);
         }
 
         /// <summary>
@@ -145,21 +94,44 @@ namespace AspCore.ApiClient.Configuration
         /// <returns></returns>
         public ApiClientByNameBuilder AddJWTAuthenticatedClient(string apiKey)
         {
-            _services.AddTransient(typeof(JWTAuthenticatedApiClient<ApiClientConfiguration>), sp =>
+
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey);
+
+        }
+
+        private ApiClientByNameBuilder AddClient<T>(string apiKey)
+            where T : class, IApiClient
+        {
+            _services.AddHttpClient(apiKey,client =>
             {
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
+
+            }).AddHeaderPropagation().ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler()
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                };
+            });
+
+
+            _services.AddTransient(typeof(T), sp =>
+            {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
 
-                return new JWTAuthenticatedApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return (T)Activator.CreateInstance(typeof(T), httpClientfactory, httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
 
-            _registrations.Add(apiKey, typeof(JWTAuthenticatedApiClient<ApiClientConfiguration>));
+            _registrations.Add(apiKey, typeof(T));
 
             return this;
         }
-
         public void Build()
         {
             var registrations = _registrations;

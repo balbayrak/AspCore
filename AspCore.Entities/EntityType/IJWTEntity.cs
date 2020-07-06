@@ -6,8 +6,6 @@ namespace AspCore.Entities.EntityType
 {
     public interface IJWTEntity
     {
-        string correlationId { get; set; }
-
         Guid authenticatedUserId { get; set; }
     }
 }

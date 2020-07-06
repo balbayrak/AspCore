@@ -14,7 +14,7 @@ namespace AspCore.ApiClient
     public class BearerAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
                  where TOption : class, IApiClientConfiguration, new()
     {
-        public BearerAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper,apiKey)
+        public BearerAuthenticatedApiClient(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey) : base(httpClientFactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper,apiKey)
         {
 
         }

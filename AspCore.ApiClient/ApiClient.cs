@@ -65,7 +65,9 @@ namespace AspCore.ApiClient
 
         public AuthenticationInfo authenticationInfo { get; set; }
 
-        public ApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey)
+        private HttpClient client { get; set; }
+
+        public ApiClient(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey)
         {
             this.apiKey = apiKey;
             CancellationTokenHelper = cancellationTokenHelper;
@@ -74,8 +76,12 @@ namespace AspCore.ApiClient
             AccessTokenService = cacheService;
 
             _baseAddress = string.Empty;
-            
+
             InitializeBaseAddress(apiKey);
+            client = httpClientFactory.CreateClient(this.apiKey);
+            client.BaseAddress = new Uri(_baseAddress);
+
+
         }
 
         public virtual void AddAuthenticationRoute(string route) { }
@@ -85,48 +91,35 @@ namespace AspCore.ApiClient
               where TPostObject : class
         {
             TResult result = null;
-            using (HttpClientHandler handler = new HttpClientHandler())
+
+            if (headerValues != null && headerValues.Count > 0)
             {
-                handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                using (var client = new CoreHttpClient(handler,TimeSpan.FromMinutes(10)))
+                foreach (var key in headerValues.Keys)
                 {
-
-                    client.BaseAddress = new Uri(_baseAddress);
-
-                    if (headerValues != null && headerValues.Count > 0)
+                    if (!client.DefaultRequestHeaders.Contains(key))
                     {
-                        foreach (var key in headerValues.Keys)
-                        {
-                            if (!client.DefaultRequestHeaders.Contains(key))
-                            {
-                                client.DefaultRequestHeaders.Remove(key);
-                                client.DefaultRequestHeaders.Add(key, headerValues[key]);
-                            }
-                        }
+                        client.DefaultRequestHeaders.Remove(key);
+                        client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
-
-
-                    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
-                    {
-                        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                        if (!string.IsNullOrEmpty(correlationID))
-                        {
-                            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
-                        }
-                    }
-                    var response = await client.GetAsync(_apiUrl,CancellationTokenHelper.Token).ConfigureAwait(false);
-
-                    response.EnsureSuccessStatusCode();
-
-                    await response.Content.ReadAsStringAsync().ContinueWith((Task<string> x) =>
-                    {
-                        if (x.IsFaulted)
-                            throw x.Exception;
-
-                        result = JsonConvert.DeserializeObject<TResult>(x.Result);
-                    });
                 }
             }
+
+
+            CorrelationIdHeaderControl();
+
+            var response = await client.GetAsync(_apiUrl, CancellationTokenHelper.Token).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            await response.Content.ReadAsStringAsync().ContinueWith((Task<string> x) =>
+            {
+                if (x.IsFaulted)
+                    throw x.Exception;
+
+                result = JsonConvert.DeserializeObject<TResult>(x.Result);
+            });
+
+
             return result;
         }
 
@@ -136,63 +129,47 @@ namespace AspCore.ApiClient
         {
             TResult result = null;
 
-            using (HttpClientHandler handler = new HttpClientHandler())
+
+            if (authenticationInfo == null)
+                Authenticate(client, false, false);
+            else
             {
-                handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                if (!authenticationInfo.access_token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
+                    authenticationInfo.access_token = ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER + " " + authenticationInfo.access_token;
 
-                using (var client = new CoreHttpClient(handler,TimeSpan.FromMinutes(10)))
+                client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
+                client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, authenticationInfo.access_token);
+            }
+
+            if (headerValues != null && headerValues.Count > 0)
+            {
+                foreach (var key in headerValues.Keys)
                 {
-                    client.BaseAddress = new Uri(_baseAddress);
-
-                    if (authenticationInfo == null)
-                        Authenticate(client, false, false);
-                    else
+                    if (!client.DefaultRequestHeaders.Contains(key))
                     {
-                        if (!authenticationInfo.access_token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
-                            authenticationInfo.access_token = ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER + " " + authenticationInfo.access_token;
-
-                        client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
-                        client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, authenticationInfo.access_token);
+                        client.DefaultRequestHeaders.Remove(key);
+                        client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
-                
-                    if (headerValues != null && headerValues.Count > 0)
-                    {
-                        foreach (var key in headerValues.Keys)
-                        {
-                            if (!client.DefaultRequestHeaders.Contains(key))
-                            {
-                                client.DefaultRequestHeaders.Remove(key);
-                                client.DefaultRequestHeaders.Add(key, headerValues[key]);
-                            }
-                        }
-                    }
-
-                    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
-                    {
-                        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                        if (!string.IsNullOrEmpty(correlationID))
-                        {
-                            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
-                        }
-                    }
-
-                    JsonContent jsonContent = new JsonContent(postObject);
-                    var response = await client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token);
-                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
-                    {
-                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-
-                        Authenticate(client, true, refreshTokenCnt);
-
-                        response = await client.PostAsync(_apiUrl, jsonContent);
-                    }
-
-                    string responseString = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<TResult>(responseString);
-
-
                 }
-            };
+            }
+
+
+            CorrelationIdHeaderControl();
+
+            JsonContent jsonContent = new JsonContent(postObject);
+            var response = await client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token);
+            if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+            {
+                bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+
+                Authenticate(client, true, refreshTokenCnt);
+
+                response = await client.PostAsync(_apiUrl, jsonContent);
+            }
+
+            string responseString = await response.Content.ReadAsStringAsync();
+            result = JsonConvert.DeserializeObject<TResult>(responseString);
+
 
             return result;
         }
@@ -202,74 +179,57 @@ namespace AspCore.ApiClient
         {
             TResult result = null;
 
-            using (HttpClientHandler handler = new HttpClientHandler())
+
+            if (authenticationInfo == null)
+                Authenticate(client, false, false);
+            else
             {
-                handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                string token = authenticationInfo.access_token;
+                if (!token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
+                    token = ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER + " " + authenticationInfo.access_token;
 
-                using (var client = new CoreHttpClient(handler,TimeSpan.FromMinutes(10)))
+                client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
+                client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, token);
+            }
+
+
+            if (headerValues != null && headerValues.Count > 0)
+            {
+                foreach (var key in headerValues.Keys)
                 {
-                    client.BaseAddress = new Uri(_baseAddress);
-
-                    if (authenticationInfo == null)
-                        Authenticate(client, false, false);
-                    else
+                    if (!client.DefaultRequestHeaders.Contains(key))
                     {
-                        string token = authenticationInfo.access_token;
-                        if (!token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
-                            token = ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER + " " + authenticationInfo.access_token;
-
-                        client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
-                        client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, token);
-                    }
-
-                 
-                    if (headerValues != null && headerValues.Count > 0)
-                    {
-                        foreach (var key in headerValues.Keys)
-                        {
-                            if (!client.DefaultRequestHeaders.Contains(key))
-                            {
-                                client.DefaultRequestHeaders.Remove(key);
-                                client.DefaultRequestHeaders.Add(key, headerValues[key]);
-                            }
-                        }
-                    }
-
-
-                    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
-                    {
-                        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                        if (!string.IsNullOrEmpty(correlationID))
-                        {
-                            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
-                        }
-                    }
-
-                    JsonContent jsonContent = new JsonContent(postObject);
-                    var response = client.PostAsync(_apiUrl, jsonContent,CancellationTokenHelper.Token).Result;
-                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
-                    {
-
-                        bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-                        if (!refreshTokenCnt)
-                        {
-                            string s = response.Headers.WwwAuthenticate.ToString();
-                            refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
-                        }
-
-                        Authenticate(client, true, refreshTokenCnt);
-
-                        response = await client.PostAsync(_apiUrl, jsonContent);
-                    }
-                    if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        string responseString = await response.Content.ReadAsStringAsync();
-
-                        Debug.WriteLine(responseString);
-                        result = JsonConvert.DeserializeObject<TResult>(responseString);
+                        client.DefaultRequestHeaders.Remove(key);
+                        client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
                 }
-            };
+            }
+
+            CorrelationIdHeaderControl();
+
+            JsonContent jsonContent = new JsonContent(postObject);
+            var response = client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token).Result;
+            if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+            {
+
+                bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
+                if (!refreshTokenCnt)
+                {
+                    string s = response.Headers.WwwAuthenticate.ToString();
+                    refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
+                }
+
+                Authenticate(client, true, refreshTokenCnt);
+
+                response = await client.PostAsync(_apiUrl, jsonContent);
+            }
+            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                string responseString = await response.Content.ReadAsStringAsync();
+
+                result = JsonConvert.DeserializeObject<TResult>(responseString);
+            }
+
 
             return result;
         }
@@ -279,29 +239,16 @@ namespace AspCore.ApiClient
         {
             TResult result = null;
 
-            using (var client = new CoreHttpClient(TimeSpan.FromMinutes(10)))
+            CorrelationIdHeaderControl();
+
+            var response = client.PostAsync(_apiUrl, content, CancellationTokenHelper.Token).Result;
+            if (response.IsSuccessStatusCode)
             {
-                client.BaseAddress = new Uri(_baseAddress);
+                string responseString = await response.Content.ReadAsStringAsync();
 
-
-                if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
-                {
-                    string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                    if (!string.IsNullOrEmpty(correlationID))
-                    {
-                        client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
-                    }
-                }
-
-
-                var response = client.PostAsync(_apiUrl, content,CancellationTokenHelper.Token).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseString = await response.Content.ReadAsStringAsync();
-
-                    result = JsonConvert.DeserializeObject<TResult>(responseString);
-                }
+                result = JsonConvert.DeserializeObject<TResult>(responseString);
             }
+
             return result;
         }
 
@@ -325,6 +272,18 @@ namespace AspCore.ApiClient
             }
         }
 
+        private void CorrelationIdHeaderControl()
+        {
+            if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
+            {
+                string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+                if (!string.IsNullOrEmpty(correlationID))
+                {
+                    client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+                }
+            }
+        }
+
         public virtual void ChangeApiSettingsKey(string apiKey)
         {
             InitializeBaseAddress(apiKey);
@@ -335,7 +294,6 @@ namespace AspCore.ApiClient
             _baseAddress = null;
             _apiUrl = null;
         }
-
 
     }
 }

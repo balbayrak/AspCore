@@ -2,6 +2,7 @@
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Json;
+using AspCore.Extension;
 using AspCore.Utilities.DataProtector;
 using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration.Options;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
 
@@ -44,10 +46,20 @@ namespace AspCore.WebApi.Configuration
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
+            services.AddHeaderPropagation(options =>
+            {
+                options.Headers.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, context =>
+                {
+                    return new StringValues(Guid.NewGuid().ToString());
+                });
+            });
+
             DependencyConfigurationOption configurationHelperOption = new DependencyConfigurationOption(services);
             option(configurationHelperOption);
 
             //All configuration completed, resolve initialize all configuration.
+
+           
 
             return services;
         }
@@ -57,7 +69,9 @@ namespace AspCore.WebApi.Configuration
          where TJWTInfo : class, IJWTEntity, new()
         {
             app.UseMiddleware<ExceptionMiddleware>();
-            app.UseMiddleware<CustomHeaderMiddleware<TTokenGenerator, TJWTInfo>>();
+            app.UseMiddleware<ActiveUserHeaderMiddleware<TTokenGenerator, TJWTInfo>>();
+
+            app.UseHeaderPropagation();
 
             ApplicationBuilderOption applicationBuilderOption = new ApplicationBuilderOption();
             option(applicationBuilderOption);

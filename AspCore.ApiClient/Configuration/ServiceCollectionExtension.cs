@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using AspCore.ApiClient.Abstract;
+using System.Net.Http;
 
 namespace AspCore.ApiClient.Configuration
 {
@@ -32,12 +33,13 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(ApiClient<TOption>), sp =>
             {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
 
-                return new ApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return new ApiClient<TOption>(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
         }
 
@@ -50,12 +52,13 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(ApiClient<ApiClientConfiguration>), sp =>
             {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
 
-                return new ApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return new ApiClient<ApiClientConfiguration>(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
 
         }
@@ -73,11 +76,12 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(BearerAuthenticatedApiClient<TOption>), sp =>
             {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-                return new BearerAuthenticatedApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return new BearerAuthenticatedApiClient<TOption>(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
         }
 
@@ -90,11 +94,12 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(BearerAuthenticatedApiClient<ApiClientConfiguration>), sp =>
             {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-                return new BearerAuthenticatedApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return new BearerAuthenticatedApiClient<ApiClientConfiguration>(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
         }
 
@@ -110,11 +115,12 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(JWTAuthenticatedApiClient<TOption>), sp =>
             {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-                return new JWTAuthenticatedApiClient<TOption>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return new JWTAuthenticatedApiClient<TOption>(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
         }
 
@@ -128,11 +134,12 @@ namespace AspCore.ApiClient.Configuration
         {
             services.AddTransient(typeof(JWTAuthenticatedApiClient<ApiClientConfiguration>), sp =>
             {
+                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
                 var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
                 var cacheService = sp.GetRequiredService<ICacheService>();
                 var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-                return new JWTAuthenticatedApiClient<ApiClientConfiguration>(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
+                return new JWTAuthenticatedApiClient<ApiClientConfiguration>(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
             });
         }
     }

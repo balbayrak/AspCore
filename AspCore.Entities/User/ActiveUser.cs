@@ -19,7 +19,6 @@ namespace AspCore.Entities.User
         public string address { get; set; }
         public string telephone { get; set; }
         public List<string> roles { get; set; }
-        public string correlationId { get; set; }
         public Guid authenticatedUserId { get; set; }
 
         public ActiveUser()
@@ -45,7 +44,6 @@ namespace AspCore.Entities.User
                 this.jobCompany = info.jobCompany;
                 this.telephone = info.telephone;
                 this.roles = info.roles;
-                this.correlationId = info.correlationId;
             }
         }
     }

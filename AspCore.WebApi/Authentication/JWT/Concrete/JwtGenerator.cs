@@ -145,10 +145,6 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
                 serviceResult.IsSucceeded = true;
                 serviceResult.Result = GetJWTInfoObject(principal.Claims);
 
-                if (serviceResult.IsSucceeded && serviceResult.Result != null)
-                {
-                    serviceResult.Result.correlationId = principal.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Hash)?.Value;
-                }
             }
             catch (Exception ex)
             {
@@ -162,23 +158,6 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
         {
             IEnumerable<Claim> claims = GetJWTClaims(jwtInfo);
 
-            if (claims != null)
-            {
-                string correlationID = string.Empty;
-                using (var scope = ServiceProvider.CreateScope())
-                {
-                    var httpContextAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-                    correlationID = httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                }
-
-
-                if (string.IsNullOrEmpty(correlationID))
-                {
-                    correlationID = Guid.NewGuid().ToString();
-                }
-
-                claims.ToList().Add(new Claim(ClaimTypes.Hash, correlationID));
-            }
 
             var jwt = new JwtSecurityToken(
                 issuer: TokenOption.Issuer,

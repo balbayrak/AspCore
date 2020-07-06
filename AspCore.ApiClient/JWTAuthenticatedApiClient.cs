@@ -14,7 +14,7 @@ namespace AspCore.ApiClient
     public class JWTAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
            where TOption : class, IApiClientConfiguration, new()
     {
-        public JWTAuthenticatedApiClient(IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService,  ICancellationTokenHelper cancellationTokenHelper,string apiKey) : base(httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey)
+        public JWTAuthenticatedApiClient(IHttpClientFactory httpClientfactory, IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService,  ICancellationTokenHelper cancellationTokenHelper,string apiKey) : base(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey)
         {
 
         }

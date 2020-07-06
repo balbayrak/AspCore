@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
@@ -17,6 +17,13 @@
     <ProjectReference Include="..\AspCore.Caching\AspCore.Caching.csproj" />
     <ProjectReference Include="..\AspCore.ConfigurationAccess\AspCore.ConfigurationAccess.csproj" />
     <ProjectReference Include="..\AspCore.Extension\AspCore.Extension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+
   </ItemGroup>
 
 </Project>

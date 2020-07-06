@@ -17,7 +17,9 @@ namespace AspCore.Web.Configuration
         {
             app.UseMiddleware<WebAuthenticationMiddleware>(authenticationControllerName);
            
-            //app.UseMiddleware<CustomHeaderMiddleware>();
+            app.UseMiddleware<CorrelationIdMiddleware>();
+
+            app.UseHeaderPropagation();
 
             app.UseEndpoints(endpoints =>
             {
@@ -25,6 +27,7 @@ namespace AspCore.Web.Configuration
                     name: "default",
                     pattern: "{controller=" + authenticationControllerName + "}/{action=Login}/{id?}");
             });
+
 
             ApiClientFactory.Init(app.ApplicationServices);
             DataProtectorFactory.Init(app.ApplicationServices.GetRequiredService<IDataProtectorHelper>());
