@@ -4,6 +4,7 @@ using AspCore.Entities.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AspCore.ConfigurationAccess.Configuration
 {
@@ -18,6 +19,11 @@ namespace AspCore.ConfigurationAccess.Configuration
             ConfigurationManagerOption managerOption = new ConfigurationManagerOption();
             option.Invoke(managerOption);
 
+            var memoryCache = services.FirstOrDefault(d => d.ServiceType == typeof(IMemoryCache));
+            if (memoryCache == null)
+            {
+                services.AddMemoryCache();
+            }
 
             if (managerOption.type == EnumConfigurationAccessorType.AppSettingJson)
             {

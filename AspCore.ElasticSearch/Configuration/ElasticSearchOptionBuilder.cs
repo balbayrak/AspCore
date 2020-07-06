@@ -22,6 +22,7 @@ namespace AspCore.ElasticSearch.Configuration
         public ElasticSearchProviderOption AddElasticSearch<TOption>(string configurationKey)
             where TOption : class, IElasticSearchOption, new()
         {
+            
             services.AddSingleton(typeof(IElasticClient), sp =>
             {
                 //configuration helper ile setting

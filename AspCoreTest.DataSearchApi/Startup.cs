@@ -79,7 +79,7 @@ namespace AspCoreTest.DataSearchApi
                 {
                  
                     option.AddElasticSearch<ElasticSearchApiOption>("SearchApiInfo")
-                    .AddElasticSearchIndex<PersonSearchEntity, IPersonSearchEntityService, PersonElasticSearchProvider>("person").services.AddMemoryCache();
+                    .AddElasticSearchIndex<PersonSearchEntity, IPersonSearchEntityService, PersonElasticSearchProvider>("person");
                 });
             }, mvcOption =>
             {
