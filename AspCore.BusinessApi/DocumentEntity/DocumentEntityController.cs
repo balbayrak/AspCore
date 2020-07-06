@@ -1,4 +1,5 @@
-﻿using AspCore.Business.Abstract;
+﻿using System;
+using AspCore.Business.Abstract;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityType;
 
@@ -8,7 +9,7 @@ namespace AspCore.BusinessApi.DocumentEntity
         where TEntityService : IDocumentEntityService<Document, TEntity>
         where TEntity : class, IDocumentEntity, new()
     {
-        public DocumentEntityController(TEntityService entityService) : base(entityService)
+        public DocumentEntityController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }

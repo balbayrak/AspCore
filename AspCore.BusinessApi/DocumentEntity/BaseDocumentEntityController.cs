@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AspCore.Business.Abstract;
 using AspCore.Business.General;
@@ -18,7 +19,7 @@ namespace AspCore.BusinessApi.DocumentEntity
         where TDocumentRequest : class, IDocumentRequest<TDocument>, new()
     {
 
-        public BaseDocumentEntityController(TEntityService entityService) : base(entityService)
+        public BaseDocumentEntityController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }
@@ -40,7 +41,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<TDocument> response = _service.CreateDocument(documentEntityRequest);
+            ServiceResult<TDocument> response = Service.CreateDocument(documentEntityRequest);
             return response.ToHttpResponse();
         }
 
@@ -62,7 +63,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<bool> response = _service.UpdateDocument(documentEntityRequest);
+            ServiceResult<bool> response = Service.UpdateDocument(documentEntityRequest);
             return response.ToHttpResponse();
         }
 
@@ -85,7 +86,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<bool> response = _service.DeleteDocument(documentEntityRequest);
+            ServiceResult<bool> response = Service.DeleteDocument(documentEntityRequest);
             return response.ToHttpResponse();
         }
 
@@ -107,7 +108,7 @@ namespace AspCore.BusinessApi.DocumentEntity
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<TDocument> response = _service.ReadDocument(documentRequest);
+            ServiceResult<TDocument> response = Service.ReadDocument(documentRequest);
             return response.ToHttpResponse();
         }
     }

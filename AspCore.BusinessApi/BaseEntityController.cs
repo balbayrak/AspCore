@@ -13,6 +13,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.WebApi;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspCore.BusinessApi
 {
@@ -20,10 +21,33 @@ namespace AspCore.BusinessApi
         where TEntityService : IEntityService<TEntity>
         where TEntity : class, IEntity, new()
     {
-        protected readonly TEntityService _service;
-        public BaseEntityController(TEntityService entityService)
+        protected IServiceProvider ServiceProvider { get; }
+        protected readonly object ServiceProviderLock = new object();
+
+        protected TService LazyGetRequiredService<TService>(ref TService reference)
+            => LazyGetRequiredService(typeof(TService), ref reference);
+
+        protected TRef LazyGetRequiredService<TRef>(Type serviceType, ref TRef reference)
         {
-            _service = entityService;
+            if (reference == null)
+            {
+                lock (ServiceProviderLock)
+                {
+                    if (reference == null)
+                    {
+                        reference = (TRef)ServiceProvider.GetRequiredService(serviceType);
+                    }
+                }
+            }
+
+            return reference;
+        }
+
+        protected  TEntityService Service => LazyGetRequiredService(ref _service);
+        private TEntityService _service;
+        public BaseEntityController(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
         }
 
         [ActionName(ApiConstants.Urls.LIVENESS)]
@@ -54,7 +78,7 @@ namespace AspCore.BusinessApi
             {
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(id)));
             }
-            ServiceResult<TEntity> readResponse = _service.GetById(new EntityFilter<TEntity>
+            ServiceResult<TEntity> readResponse = Service.GetById(new EntityFilter<TEntity>
             {
                 id = id,
             });
@@ -96,7 +120,7 @@ namespace AspCore.BusinessApi
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<bool> response = _service.Add(entities);
+            ServiceResult<bool> response = Service.Add(entities);
             return response.ToHttpResponse();
         }
 
@@ -119,7 +143,7 @@ namespace AspCore.BusinessApi
                 return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
             }
 
-            ServiceResult<bool> response = _service.Update(entities);
+            ServiceResult<bool> response = Service.Update(entities);
             return response.ToHttpResponse();
         }
 
@@ -137,7 +161,7 @@ namespace AspCore.BusinessApi
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_NULL, nameof(entities)));
             }
 
-            ServiceResult<bool> response = _service.Delete(entities);
+            ServiceResult<bool> response = Service.Delete(entities);
             return response.ToHttpResponse();
 
         }
@@ -149,7 +173,7 @@ namespace AspCore.BusinessApi
         [Authorize()]
         public IActionResult GetAll(EntityFilter<TEntity> entityFilter)
         {
-            ServiceResult<IList<TEntity>> response = _service.GetAll(entityFilter);
+            ServiceResult<IList<TEntity>> response = Service.GetAll(entityFilter);
             return response.ToHttpResponse();
         }
 
@@ -160,7 +184,7 @@ namespace AspCore.BusinessApi
         [Authorize()]
         public async Task<IActionResult> GetAllAsync(EntityFilter<TEntity> filterSetting)
         {
-            ServiceResult<IList<TEntity>> response = await _service.GetAllAsync(filterSetting);
+            ServiceResult<IList<TEntity>> response = await Service.GetAllAsync(filterSetting);
             return response.ToHttpResponse();
         }
 
@@ -175,7 +199,7 @@ namespace AspCore.BusinessApi
             {
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(filterSetting.id)));
             }
-            ServiceResult<TEntity> response = _service.GetById(filterSetting);
+            ServiceResult<TEntity> response = Service.GetById(filterSetting);
             return response.ToHttpResponse();
         }
 
@@ -186,7 +210,7 @@ namespace AspCore.BusinessApi
         [Authorize()]
         public async Task<IActionResult> GetEntityHistoriesAsync(EntityFilter<TEntity> filterSetting)
         {
-            ServiceResult<List<TEntity>> response = await _service.GetHistoriesByIdAsync(filterSetting);
+            ServiceResult<List<TEntity>> response = await Service.GetHistoriesByIdAsync(filterSetting);
             return response.ToHttpResponse();
         }
     }

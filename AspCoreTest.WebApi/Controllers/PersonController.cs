@@ -16,11 +16,9 @@ namespace AspCoreTest.WebApi.Controllers
 {
     public class PersonController : BaseEntityController<Person, IPersonService>
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        public PersonController(IPersonService personService,IServiceProvider serviceProvider) : base(personService)
+    
+        public PersonController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _serviceProvider = serviceProvider;
         }
 
     }
