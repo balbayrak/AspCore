@@ -1,5 +1,6 @@
 ﻿using AspCore.Dependency.Abstract;
 using AspCore.Entities.General;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Task.Abstract
 {
@@ -7,8 +8,8 @@ namespace AspCore.Business.Task.Abstract
     {
         void AddTask(ITask task);
 
-        ServiceResult<TResult> RunTasks<TResult>();
+        Task<BaseServiceResult> RunTasks();
 
-        ServiceResult<bool> ValidateAllTasks();
+        Task<BaseServiceResult> ValidateAllTasks();
     }
 }

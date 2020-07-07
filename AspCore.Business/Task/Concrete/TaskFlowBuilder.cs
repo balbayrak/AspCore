@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using AspCore.Business.Task.Abstract;
+﻿using AspCore.Business.Task.Abstract;
 using AspCore.DataAccess.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.General;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Task.Concrete
 {
@@ -22,19 +22,19 @@ namespace AspCore.Business.Task.Concrete
             _taskList.Add(new TaskFlowItem(task, _taskList.Count));
         }
 
-        public ServiceResult<TResult> RunTasks<TResult>()
+        public async Task<BaseServiceResult> RunTasks()
         {
-            ServiceResult<TResult> result = new ServiceResult<TResult>();
+            BaseServiceResult result = new BaseServiceResult();
             _transactionBuilder.BeginTransaction();
             try
             {
-               ServiceResult<bool> validationResult = ValidateAllTasks();
+                BaseServiceResult validationResult = await ValidateAllTasks();
                 if (validationResult.IsSucceeded)
                 {
 
                     foreach (var taskItem in _taskList)
                     {
-                        result = taskItem._task.Run<TResult>();
+                        result = await taskItem.task.Run();
                         if (!result.IsSucceeded)
                         {
                             _transactionBuilder.RollbackTransaction();
@@ -43,7 +43,7 @@ namespace AspCore.Business.Task.Concrete
                         else continue;
                     }
 
-                    if(result.IsSucceeded)
+                    if (result.IsSucceeded)
                     {
                         _transactionBuilder.CommitTransaction();
                     }
@@ -68,19 +68,22 @@ namespace AspCore.Business.Task.Concrete
             return result;
         }
 
-        public ServiceResult<bool> ValidateAllTasks()
+        public async Task<BaseServiceResult> ValidateAllTasks()
         {
-            ServiceResult<bool> validateResult = new ServiceResult<bool>();
+            BaseServiceResult validateResult = new BaseServiceResult();
             try
             {
                 foreach (var taskItem in _taskList)
                 {
-                    if (!taskItem._task.SkipValidate)
+                    foreach (var validator in taskItem.task.Validators)
                     {
-                        validateResult = taskItem._task.Validate();
+                        validateResult = await validator.Validate();
                         if (!validateResult.IsSucceeded) break;
                         else continue;
                     }
+
+                    if (!validateResult.IsSucceeded) break;
+                    else continue;
                 }
             }
             catch (Exception ex)

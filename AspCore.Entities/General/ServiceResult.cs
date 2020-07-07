@@ -9,16 +9,11 @@ namespace AspCore.Entities.General
         private bool _DisposedValue = false;
 
         private T _Result;
-        private bool _IsSucceeded;
+
         private int _TotalResultCount;
         private int _SearchResultCount;
 
 
-        public bool IsSucceeded
-        {
-            get { return _IsSucceeded; }
-            set { _IsSucceeded = value; }
-        }
 
         public T Result
         {
@@ -43,7 +38,7 @@ namespace AspCore.Entities.General
 
         public bool IsSucceededAndDataIncluded()
         {
-            if (this._IsSucceeded == true && this.Result != null)
+            if (this.IsSucceeded == true && this.Result != null)
             {
                 return true;
             }
@@ -54,7 +49,6 @@ namespace AspCore.Entities.General
 
         public ServiceResult()
         {
-            IsSucceeded = false;
             ExceptionMessage = null;
             ErrorMessage = null;
             WarningMessage = null;

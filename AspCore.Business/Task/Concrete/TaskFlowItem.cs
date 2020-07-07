@@ -5,15 +5,15 @@ using AspCore.Business.Task.Abstract;
 
 namespace AspCore.Business.Task.Concrete
 {
-    internal class TaskFlowItem
+    public class TaskFlowItem
     {
-        public ITask _task { get; set; }
-        public int _order { get; set; }
+        public ITask task { get; set; }
+        public int order { get; set; }
 
         public TaskFlowItem(ITask task,int order)
         {
-            this._task = task;
-            this._order = order;
+            this.task = task;
+            this.order = order;
         }
     }
 }

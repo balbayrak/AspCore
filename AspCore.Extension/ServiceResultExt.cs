@@ -48,9 +48,9 @@ namespace AspCore.Extension
         {
             var status = HttpStatusCode.OK;
 
-            if (!response.IsSucceeded)
+            if (!response.IsSucceeded && !string.IsNullOrEmpty(response.ExceptionMessage))
                 status = HttpStatusCode.InternalServerError;
-            else if (response.Result == null)
+            else if (response.IsSucceeded && response.Result == null)
                 status = HttpStatusCode.NotFound;
 
             return new ObjectResult(response)

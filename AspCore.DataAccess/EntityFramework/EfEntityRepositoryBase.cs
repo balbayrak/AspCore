@@ -33,8 +33,6 @@ namespace AspCore.DataAccess.EntityFramework
         protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = Context.Set<TEntity>());
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
 
-      
-
         public EfEntityRepositoryBase(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
@@ -49,6 +47,23 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 result.Result = Entities.FirstOrDefault(filter);
+                result.IsSucceeded = true;
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            ServiceResult<TEntity> result = new ServiceResult<TEntity>();
+            try
+            {
+                result.Result = await Entities.FirstOrDefaultAsync(filter);
                 result.IsSucceeded = true;
 
             }
@@ -94,31 +109,6 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter()
-        {
-            ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
-            try
-            {
-                var query = Entities.IgnoreQueryFilters().AsQueryable();
-
-                var countTask = query.Count();
-
-                result.Result = query.ToArray();
-
-                result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.SearchResultCount = result.Result.Count();
-
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-
-
         public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page = null, int? pageSize = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
@@ -145,6 +135,54 @@ namespace AspCore.DataAccess.EntityFramework
                 result.Result = resultsTask;
                 result.SearchResultCount = result.Result.Count();
 
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        public ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter()
+        {
+            ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
+            try
+            {
+                var query = Entities.IgnoreQueryFilters().AsQueryable();
+
+                var countTask = query.Count();
+
+                result.Result = query.ToArray();
+
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.SearchResultCount = result.Result.Count();
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<TEntity[]>> GetListWithIgnoreGlobalFilterAsync()
+        {
+            ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
+            try
+            {
+                var query = Entities.IgnoreQueryFilters().AsQueryable();
+
+                var countTask = query.Count();
+
+                result.Result = await query.ToArrayAsync();
+
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.SearchResultCount = result.Result.Count();
 
             }
             catch (Exception ex)
@@ -186,6 +224,37 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public async Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                foreach (TEntity item in entities)
+                {
+                    Context.Entry(item).State = EntityState.Added;
+                }
+                int value = await Context.SaveChangesAsync();
+                if (value > 0)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
+                    result.Result = true;
+                    result.IsSucceeded = true;
+                }
+                else
+                {
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+
+            return result;
+        }
+
         public ServiceResult<bool> AddWithTransaction(params TEntity[] entities)
         {
             foreach (var item in entities)
@@ -194,6 +263,22 @@ namespace AspCore.DataAccess.EntityFramework
             }
 
             ServiceResult<bool> result = ProcessEntityWithState(entities);
+            if (result.IsSucceeded)
+            {
+                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<bool>> AddWithTransactionAsync(params TEntity[] entities)
+        {
+            foreach (var item in entities)
+            {
+                item.entityState = CoreEntityState.Added;
+            }
+
+            ServiceResult<bool> result = await ProcessEntityWithStateAsync(entities);
             if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
@@ -216,6 +301,40 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Update(updatedInput);
                 }
                 int value = Context.SaveChanges();
+                if (value > 0)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                    result.Result = true;
+                    result.IsSucceeded = true;
+                }
+                else
+                {
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+
+            return result;
+        }
+
+        public async Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
+        {
+            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            var updatedEntityList = entitylist.Result;
+            updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                foreach (var updatedInput in updatedEntityList)
+                {
+                    Context.Attach(updatedInput);
+                    Context.Update(updatedInput);
+                }
+                int value = await Context.SaveChangesAsync();
                 if (value > 0)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
@@ -259,6 +378,29 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public async Task<ServiceResult<bool>> UpdateWithTransactionAsync(params TEntity[] entities)
+        {
+            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
+            List<TEntity> updatedEntityList = null;
+            if (entitylist.IsSucceededAndDataIncluded())
+            {
+                updatedEntityList = entitylist.Result;
+                updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
+                foreach (var item in updatedEntityList)
+                {
+                    Context.Attach(item);
+                    Context.Update(item);
+                }
+            }
+            ServiceResult<bool> result = await ProcessEntityWithStateAsync(updatedEntityList?.ToArray());
+            if (result.IsSucceeded)
+            {
+                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+            }
+
+            return result;
+        }
+
         public ServiceResult<bool> Delete(params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -270,6 +412,36 @@ namespace AspCore.DataAccess.EntityFramework
                     updatedEntity.State = EntityState.Deleted;
                 }
                 int value = Context.SaveChanges();
+                if (value > 0)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
+                    result.Result = true;
+                    result.IsSucceeded = true;
+                }
+                else
+                {
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<bool>> DeleteAsync(params TEntity[] entities)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                foreach (TEntity item in entities)
+                {
+                    var updatedEntity = Context.Entry(item);
+                    updatedEntity.State = EntityState.Deleted;
+                }
+                int value = await Context.SaveChangesAsync();
                 if (value > 0)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
@@ -308,6 +480,25 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public async Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entityIds.ToList());
+                if (entitylist.IsSucceededAndDataIncluded())
+                {
+                    result = await DeleteAsync(entitylist.Result.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
         public ServiceResult<bool> DeleteWithTransaction(params Guid[] entityIds)
         {
             ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entityIds.ToList());
@@ -317,6 +508,22 @@ namespace AspCore.DataAccess.EntityFramework
             }
 
             ServiceResult<bool> result = ProcessEntityWithState(entitylist.Result.ToArray());
+            if (result.IsSucceeded)
+            {
+                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
+            }
+            return result;
+        }
+
+        public async Task<ServiceResult<bool>> DeleteWithTransactionAsync(params Guid[] entityIds)
+        {
+            ServiceResult<List<TEntity>> entitylist = await GetByIdListTrackingAsync(entityIds.ToList());
+            if (entitylist.IsSucceededAndDataIncluded())
+            {
+                entitylist.Result.ForEach(t => t.entityState = CoreEntityState.Deleted);
+            }
+
+            ServiceResult<bool> result = await ProcessEntityWithStateAsync(entitylist.Result.ToArray());
             if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
@@ -342,6 +549,24 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public async Task<ServiceResult<TEntity>> FindAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            ServiceResult<TEntity> result = new ServiceResult<TEntity>();
+
+            try
+            {
+                result.Result = await Entities.Where(filter).FirstOrDefaultAsync();
+                result.IsSucceeded = true;
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
         public ServiceResult<TEntity> GetById(Guid id)
         {
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
@@ -349,6 +574,23 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 result.Result = Entities.Find(id);
+                result.IsSucceeded = true;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<TEntity>> GetByIdAsync(Guid id)
+        {
+            ServiceResult<TEntity> result = new ServiceResult<TEntity>();
+
+            try
+            {
+                result.Result = await Entities.FindAsync(id);
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
@@ -443,6 +685,23 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public async Task<ServiceResult<List<TEntity>>> GetByIdListAsync(params Guid[] entityIds)
+        {
+            ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
+
+            try
+            {
+                result.Result = await Entities.Where(t => entityIds.Any(p => p == t.Id)).ToListAsync();
+                result.IsSucceeded = true;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
         private ServiceResult<List<TEntity>> GetByIdListTracking(List<Guid> idList)
         {
             ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
@@ -450,6 +709,23 @@ namespace AspCore.DataAccess.EntityFramework
             try
             {
                 result.Result = Entities.Where(t => idList.Any(p => p == t.Id)).ToList();
+                result.IsSucceeded = true;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        private async Task<ServiceResult<List<TEntity>>> GetByIdListTrackingAsync(List<Guid> idList)
+        {
+            ServiceResult<List<TEntity>> result = new ServiceResult<List<TEntity>>();
+
+            try
+            {
+                result.Result = await Entities.Where(t => idList.Any(p => p == t.Id)).ToListAsync();
                 result.IsSucceeded = true;
             }
             catch (Exception ex)
@@ -588,6 +864,54 @@ namespace AspCore.DataAccess.EntityFramework
                         }
 
                         int value = Context.SaveChanges();
+                        if (value > 0)
+                        {
+                            dbContextTransaction.Commit();
+                            result.IsSucceeded = true;
+                            result.Result = true;
+                        }
+                        else
+                        {
+                            dbContextTransaction.Rollback();
+                            result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    if (dbContextTransaction != null) dbContextTransaction.Rollback();
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+                }
+            }
+
+            return result;
+        }
+
+        public virtual async Task<ServiceResult<bool>> ProcessEntityWithStateAsync(params TEntity[] entities)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+
+            if (entities != null)
+            {
+                IDbContextTransaction dbContextTransaction = null;
+                try
+                {
+                    using (dbContextTransaction = Context.Database.BeginTransaction())
+                    {
+                        foreach (var item in entities)
+                        {
+                            Context.Set<TEntity>().Add(item);
+                            foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
+                            {
+                                IEntity entity = entry.Entity;
+                                if (!entity.entityState.HasValue)
+                                    entity.entityState = CoreEntityState.Unchanged;
+                                entry.State = GetEntityState(entity.entityState.Value);
+                            }
+                        }
+
+                        int value = await Context.SaveChangesAsync();
                         if (value > 0)
                         {
                             dbContextTransaction.Commit();

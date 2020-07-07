@@ -1,13 +1,13 @@
-﻿using System;
-using AspCore.Entities.General;
+﻿using AspCore.Entities.General;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Task.Abstract
 {
     public interface ITask : IDisposable
     {
-        bool SkipValidate { get; }
-        ServiceResult<bool> Validate();
-        ServiceResult<TResult> Run<TResult>();
-        ServiceResult<bool> RollBack();
+        List<ITaskValidator> Validators { get; }
+        Task<BaseServiceResult> Run();
     }
 }

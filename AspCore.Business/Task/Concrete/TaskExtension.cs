@@ -18,5 +18,11 @@ namespace AspCore.Business.Task.Concrete
         {
             list.Add(new ValidationItem(taskValidator, operations));
         }
+
+        public static void TaskErrorMessage(this BaseServiceResult result, Exception ex)
+        {
+            result.ErrorMessage = BusinessConstants.BaseExceptionMessages.TASK_EXCEPTION;
+            result.ExceptionMessage = ex.Message + "---> stacktrace:" + ex.StackTrace;
+        }
     }
 }

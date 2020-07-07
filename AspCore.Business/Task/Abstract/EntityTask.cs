@@ -1,24 +1,49 @@
-﻿using AspCore.Business.Task.Concrete;
+﻿using AspCore.Business.General;
 using AspCore.DataAccess.Abstract;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Task.Abstract
 {
-    public abstract class EntityTask<TEntity, TDAL> : BaseTask<TEntity>
+    public abstract class EntityTask<TEntity, TResult, TDAL> : CoreTask<TEntity, TResult>
         where TEntity : class, IEntity, new()
         where TDAL : IEntityRepository<TEntity>
     {
         public abstract bool RunWithTransaction { get; }
         protected readonly TDAL DataLayer;
-        public EntityTask(IServiceProvider serviceProvider, TaskEntity<TEntity> taskEntity) : base(serviceProvider, taskEntity)
+        protected readonly ITransactionBuilder TransactionBuilder;
+        protected TEntity Entity { get; set; }
+        protected EnumCrudOperation CrudOperation { get; set; }
+
+        protected IServiceProvider ServiceProvider { get; private set; }
+        public EntityTask(IServiceProvider serviceProvider, TEntity entity, EnumCrudOperation enumCrudOperation) : base(entity)
         {
+            ServiceProvider = serviceProvider;
+            Entity = entity;
+            CrudOperation = enumCrudOperation;
+           
             DataLayer = ServiceProvider.GetRequiredService<TDAL>();
+            TransactionBuilder = ServiceProvider.GetRequiredService<ITransactionBuilder>();
         }
 
-        internal virtual ServiceResult<TResult> Create<TResult>()
+        public override async Task<ServiceResult<TResult>> RunTask()
+        {
+            ServiceResult<TResult> serviceResult = new ServiceResult<TResult>();
+
+            if (CrudOperation == EnumCrudOperation.CreateOperation)
+                serviceResult = await CreateAsync();
+            else if (CrudOperation == EnumCrudOperation.UpdateOperation)
+                serviceResult = await UpdateAsync();
+            else if (CrudOperation == EnumCrudOperation.DeleteOperation)
+                serviceResult = await DeleteAsync();
+
+            return serviceResult;
+        }
+
+        public virtual async Task<ServiceResult<TResult>> CreateAsync()
         {
             if (RunWithTransaction)
                 TransactionBuilder.BeginTransaction();
@@ -26,7 +51,7 @@ namespace AspCore.Business.Task.Abstract
             ServiceResult<TResult> result = new ServiceResult<TResult>();
             try
             {
-                ServiceResult<bool> resultDAL = DataLayer.Add(TaskEntity.entity);
+                ServiceResult<bool> resultDAL = await DataLayer.AddAsync(Entity);
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;
@@ -47,7 +72,7 @@ namespace AspCore.Business.Task.Abstract
             return result;
         }
 
-        internal virtual ServiceResult<TResult> Update<TResult>()
+        public virtual async Task<ServiceResult<TResult>> UpdateAsync()
         {
             if (RunWithTransaction)
                 TransactionBuilder.BeginTransaction();
@@ -55,7 +80,7 @@ namespace AspCore.Business.Task.Abstract
             ServiceResult<TResult> result = new ServiceResult<TResult>();
             try
             {
-                ServiceResult<bool> resultDAL = DataLayer.Update(TaskEntity.entity);
+                ServiceResult<bool> resultDAL = await DataLayer.UpdateAsync(Entity);
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;
@@ -76,7 +101,7 @@ namespace AspCore.Business.Task.Abstract
             return result;
         }
 
-        internal virtual ServiceResult<TResult> Delete<TResult>()
+        public virtual async Task<ServiceResult<TResult>> DeleteAsync()
         {
             if (RunWithTransaction)
                 TransactionBuilder.BeginTransaction();
@@ -84,7 +109,7 @@ namespace AspCore.Business.Task.Abstract
             ServiceResult<TResult> result = new ServiceResult<TResult>();
             try
             {
-                ServiceResult<bool> resultDAL = DataLayer.Delete(TaskEntity.entity);
+                ServiceResult<bool> resultDAL = await DataLayer.DeleteAsync(Entity);
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;

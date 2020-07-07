@@ -12,6 +12,7 @@ namespace AspCore.Entities.General
         private string _WarningMessage;
         private string _ExMessage;
         private string _StatusMessage;
+        private bool _IsSucceeded;
 
         public BaseServiceResult()
         {
@@ -20,6 +21,7 @@ namespace AspCore.Entities.General
             _WarningMessage = string.Empty;
             _ExMessage = string.Empty;
             _StatusMessage = string.Empty;
+            _IsSucceeded = false;
         }
         public int StatusCode
         {
@@ -46,6 +48,12 @@ namespace AspCore.Entities.General
         {
             get { return _ExMessage; }
             set { _ExMessage = value; }
+        }
+
+        public bool IsSucceeded
+        {
+            get { return _IsSucceeded; }
+            set { _IsSucceeded = value; }
         }
 
         protected virtual void Dispose(bool disposing)
