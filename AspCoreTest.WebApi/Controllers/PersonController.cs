@@ -1,14 +1,5 @@
-﻿using AspCore.AOP.Abstract;
-using AspCore.Business.Task.Abstract;
-using AspCore.BusinessApi;
-using AspCore.Entities.EntityFilter;
-using AspCore.Entities.General;
-using AspCore.Extension;
-using AspCoreTest.Business.Abstract;
+﻿using AspCore.BusinessApi;
 using AspCoreTest.Entities.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using testbusiness.Abstract;
 

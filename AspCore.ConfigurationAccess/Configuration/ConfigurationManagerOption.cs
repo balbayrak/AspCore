@@ -16,6 +16,7 @@ namespace AspCore.ConfigurationAccess.Configuration
         public void AddConfigurationManager<T>(IServiceCollection services, Action<ConfigurationManagerOption> option)
           where T : class, IConfigurationAccessor, new()
         {
+            
             var configurationHelper = services.FirstOrDefault(d => d.ServiceType == typeof(IConfigurationAccessor));
             if (configurationHelper == null)
             {
