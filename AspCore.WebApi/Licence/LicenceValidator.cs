@@ -1,8 +1,8 @@
-﻿using AspCore.Dependency.Concrete;
+﻿using AspCore.Authentication.JWT.Concrete;
 using AspCore.Entities.General;
 using AspCore.Entities.Licence;
 using AspCore.Extension;
-using AspCore.WebApi.Authentication.JWT.Concrete;
+using AspCore.WebApi.Authentication.General;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Asn1.X9;

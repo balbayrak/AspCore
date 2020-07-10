@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AspCore.WebApi.Authentication.JWT.Concrete
+﻿namespace AspCore.WebApi.Authentication.General
 {
     public class CustomError
     {

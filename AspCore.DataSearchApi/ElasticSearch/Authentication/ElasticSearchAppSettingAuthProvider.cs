@@ -1,11 +1,10 @@
-﻿using AspCore.DataSearchApi.General;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Authentication.JWT.Abstract;
+using AspCore.DataSearchApi.General;
 using AspCore.ElasticSearch.Configuration;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.General;
 using AspCore.Extension;
-using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Authentication.Providers.Concrete;
 using Microsoft.AspNetCore.Http;
@@ -19,11 +18,11 @@ namespace AspCore.DataSearchApi.ElasticSearch.Authentication
     public class ElasticSearchAppSettingAuthProvider : AppSettingsAuthenticationProvider<AuthenticationInfo, ElasticSearchApiJWTInfo, ElasticSearchApiOption>, IAppSettingsApiAuthenticationProvider<AuthenticationInfo, ElasticSearchApiJWTInfo, ElasticSearchApiOption>
     {
         private IHttpContextAccessor _httpContextAccessor;
-        private ITokenGenerator<ElasticSearchApiJWTInfo> _tokenGenerator;
+        private ITokenValidator<ElasticSearchApiJWTInfo> _tokenValidator;
         public ElasticSearchAppSettingAuthProvider(IServiceProvider serviceProvider, string configurationKey, ElasticSearchApiOption option = null) : base(serviceProvider, configurationKey, option)
         {
             _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-            _tokenGenerator = ServiceProvider.GetRequiredService<ITokenGenerator<ElasticSearchApiJWTInfo>>();
+            _tokenValidator = ServiceProvider.GetRequiredService<ITokenValidator<ElasticSearchApiJWTInfo>>();
         }
 
         public override ServiceResult<ElasticSearchApiJWTInfo> AuthenticateClient(AuthenticationInfo input)
@@ -97,10 +96,10 @@ namespace AspCore.DataSearchApi.ElasticSearch.Authentication
                 string jwt = _httpContextAccessor.HttpContext.GetJWTToken();
                 if (!string.IsNullOrEmpty(jwt))
                 {
-                    ServiceResult<ElasticSearchApiJWTInfo> tokenResult = _tokenGenerator.GetJWTInfo(new AuthenticationToken
+                    ServiceResult<ElasticSearchApiJWTInfo> tokenResult = _tokenValidator.Validate(new AuthenticationToken
                     {
                         access_token = jwt
-                    });
+                    }, false);
                     if (tokenResult.IsSucceededAndDataIncluded())
                     {
                         bool authorized = (tokenResult.Result.isAuthorizedAllActions.HasValue && tokenResult.Result.isAuthorizedAllActions.Value) ||

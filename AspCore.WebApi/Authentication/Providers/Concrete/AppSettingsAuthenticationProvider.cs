@@ -1,9 +1,8 @@
-﻿using AspCore.ConfigurationAccess.Abstract;
-using AspCore.Dependency.Concrete;
+﻿using AspCore.Authentication.JWT.Concrete;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Configuration;
 using AspCore.Entities.General;
-using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -32,7 +31,7 @@ namespace AspCore.WebApi.Authentication.Providers.Concrete
                 _option = configurationHelper.GetValueByKey<TOption>(configurationKey);
                 if (_option == null)
                 {
-                    throw new Exception(SecurityConstants.TOKEN_SETTING_OPTIONS.OPTION_KEY_IS_NULL_EXCEPTION);
+                    throw new Exception(AuthenticationConstants.TOKEN_SETTING_OPTIONS.OPTION_KEY_IS_NULL_EXCEPTION);
                 }
             }
             else if (option != null && string.IsNullOrEmpty(configurationKey))

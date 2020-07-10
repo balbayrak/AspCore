@@ -1,7 +1,7 @@
+using AspCore.Authentication.JWT.Concrete;
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.DocumentType;
-using AspCore.RedisClient.Configuration;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
@@ -40,15 +40,22 @@ namespace AspCoreTest.WebUI
                         option.type = EnumConfigurationAccessorType.AppSettingJson;
                     });
                 })
-                .AddAuthenticationProvider(builder =>
+                .AddJWTAuthentication(option =>
                 {
-                    builder.Add("custom", typeof(CustomWebAuthenticationProvider))
-                   .Build();
+                    option.AddAuthenticationProvider(builder =>
+                    {
+                        builder.Add("custom", typeof(CustomWebAuthenticationProvider))
+                       .Build();
+                    })
+                    .AddActiveUserTokenValidator<ActiveUserTokenValidator>(option =>
+                    {
+                        option.configurationKey = "TokenSettingOption";
+                    });
                 })
                 .AddCacheService(option =>
                 {
                     // option.AddRedisCache("RedisInfo");
-                   option.AddCookieCache();
+                    option.AddCookieCache();
                 })
                 .AddBffApiClient(option =>
                 {

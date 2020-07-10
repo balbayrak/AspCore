@@ -7,7 +7,7 @@ using System;
 
 namespace AspCoreTest.WebUI.Controllers
 {
-    public class AccountController : BaseAuthenticationController<AuthenticationInfo,ActiveUser, IAuthenticationBffLayer<AuthenticationInfo, ActiveUser>>
+    public class AccountController : BaseAuthenticationController<AuthenticationInfo, ActiveUser, IAuthenticationBffLayer<AuthenticationInfo, ActiveUser>>
     {
         public AccountController(IServiceProvider serviceProvider) : base(serviceProvider)
         {

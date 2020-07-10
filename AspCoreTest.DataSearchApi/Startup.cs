@@ -1,24 +1,22 @@
+using AspCore.Authentication.JWT.Abstract;
 using AspCore.BusinessApi.Configuration;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.DataSearchApi.Configuration;
 using AspCore.DataSearchApi.ElasticSearch.Authentication;
 using AspCore.ElasticSearch.Configuration;
 using AspCore.Entities.Authentication;
-using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
 using AspCore.WebApi.Filters;
 using AspCoreTest.Business.Abstract;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
 using AspCoreTest.DataSearchApi.ESProviders;
-using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using testbusiness.Abstract;
 
 namespace AspCoreTest.DataSearchApi
 {
@@ -57,7 +55,7 @@ namespace AspCoreTest.DataSearchApi
                     {
                         option.configurationKey = "SearchApiInfo";
                     })
-                    .AddTokenGenerator<ElasticSearchApiJWTInfo, ElasticSearchApiTokenGenerator>(option =>
+                    .AddTokenGenerator<ElasticSearchApiJWTInfo, ElasticSearchApiTokenGenerator, ElasticSearchApiTokenValidator>(option =>
                     {
                         option.configurationKey = "TokenSettingOption";
                     });
@@ -99,7 +97,7 @@ namespace AspCoreTest.DataSearchApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseAspCoreServices<ITokenGenerator<ElasticSearchApiJWTInfo>, ElasticSearchApiJWTInfo>(option =>
+            app.UseAspCoreServices<ITokenValidator<ElasticSearchApiJWTInfo>, ElasticSearchApiJWTInfo>(option =>
             {
                 option.UseAuthentication(app).
                 ConfigureRoutes(app, endpoints =>

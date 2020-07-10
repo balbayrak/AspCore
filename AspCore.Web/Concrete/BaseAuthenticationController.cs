@@ -1,8 +1,10 @@
-﻿using AspCore.BackendForFrontend.Abstract;
+﻿using AspCore.Authentication.JWT.Abstract;
+using AspCore.BackendForFrontend.Abstract;
 using AspCore.Caching.Abstract;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
+using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Web.Authentication.Abstract;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +15,7 @@ namespace AspCore.Web.Concrete
 {
     public abstract class BaseAuthenticationController<TAuthenticationInfo, TAuthenticationResult, TAuthenticatonBff> : Controller
         where TAuthenticationInfo : AuthenticationInfo
-        where TAuthenticationResult : class, new()
+        where TAuthenticationResult : class, IJWTEntity, new()
         where TAuthenticatonBff : IAuthenticationBffLayer<TAuthenticationInfo, TAuthenticationResult>
     {
         public IServiceProvider ServiceProvider { get; set; }
@@ -71,10 +73,12 @@ namespace AspCore.Web.Concrete
         protected IWebAuthenticationProvider<TAuthenticationInfo> AuthenticationProvider => LazyGetRequiredServiceByName(ref _authenticationProvider, AuthenticationProviderName);
         private IWebAuthenticationProvider<TAuthenticationInfo> _authenticationProvider;
 
+        private ITokenValidator<TAuthenticationResult> _tokenValidator;
 
         public BaseAuthenticationController(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
+            _tokenValidator = ServiceProvider.GetRequiredService<ITokenValidator<TAuthenticationResult>>();
         }
         private void Authenticate(TAuthenticationInfo authenticationInfo = null)
         {
@@ -101,7 +105,16 @@ namespace AspCore.Web.Concrete
                 {
                     AuthenticationBffLayer.SetAuthenticationToken(tokenKey, authenticationResult.Result);
 
-                    ServiceResult<TAuthenticationResult> userResult = AuthenticationBffLayer.GetClientInfo(authenticationResult.Result).Result;
+
+                    ServiceResult<TAuthenticationResult> userResult = null;
+
+                    if (_tokenValidator.ValidatePublicKey)
+                        userResult = _tokenValidator.Validate(authenticationResult.Result, false);
+                    else
+                    {
+                        userResult = AuthenticationBffLayer.GetClientInfo(authenticationResult.Result).Result;
+                    }
+
 
                     if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
                     {

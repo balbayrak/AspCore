@@ -1,10 +1,9 @@
 ﻿using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Dependency.Concrete;
+using AspCore.Authentication.JWT.Abstract;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Json;
 using AspCore.Extension;
 using AspCore.Utilities.DataProtector;
-using AspCore.WebApi.Authentication.Abstract;
 using AspCore.WebApi.Configuration.Options;
 using AspCore.WebApi.Middlewares;
 using Microsoft.AspNetCore.Builder;
@@ -64,12 +63,12 @@ namespace AspCore.WebApi.Configuration
             return services;
         }
 
-        public static IApplicationBuilder UseAspCoreServices<TTokenGenerator, TJWTInfo>(this IApplicationBuilder app, Action<ApplicationBuilderOption> option)
-         where TTokenGenerator : ITokenGenerator<TJWTInfo>
+        public static IApplicationBuilder UseAspCoreServices<TTokenValidator, TJWTInfo>(this IApplicationBuilder app, Action<ApplicationBuilderOption> option)
+         where TTokenValidator : ITokenValidator<TJWTInfo>
          where TJWTInfo : class, IJWTEntity, new()
         {
             app.UseMiddleware<ExceptionMiddleware>();
-            app.UseMiddleware<ActiveUserHeaderMiddleware<TTokenGenerator, TJWTInfo>>();
+            app.UseMiddleware<ActiveUserHeaderMiddleware<TJWTInfo>>();
 
             app.UseHeaderPropagation();
 

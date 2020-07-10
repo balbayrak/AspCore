@@ -1,39 +1,30 @@
-﻿using AspCore.ConfigurationAccess.Abstract;
-using AspCore.WebApi.Configuration.Options;
+﻿using AspCore.Authentication.JWT.Abstract;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AspCore.WebApi.Authentication.JWT.Concrete
+namespace AspCore.Authentication.JWT.Concrete
 {
     public class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
     {
-        private readonly JwtAuthorizationOption jwtAuthorization;
-        public ConfigureJwtBearerOptions(JwtAuthorizationOption jwtAuthorization)
+        private IJwtHandler _jwtHandler;
+        public ConfigureJwtBearerOptions(IJwtHandler jwtHandler)
         {
-            this.jwtAuthorization = jwtAuthorization;
+            _jwtHandler = jwtHandler;
         }
 
         public void Configure(string name, JwtBearerOptions options)
         {
             if (name == JwtBearerDefaults.AuthenticationScheme)
             {
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ClockSkew = TimeSpan.Zero,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = jwtAuthorization._tokenSettingOption.Issuer ?? string.Empty,
-                    ValidAudience = jwtAuthorization._tokenSettingOption.Audience ?? string.Empty,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtAuthorization._tokenSettingOption.SecurityKey))
-                };
 
+                options.TokenValidationParameters = _jwtHandler.Parameters;
                 options.Events = new JwtBearerEvents()
                 {
                     OnAuthenticationFailed = (context) =>
@@ -50,10 +41,12 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
                     OnTokenValidated = (context) =>
                     {
                         return Task.CompletedTask;
-                    }
+                    },
+                    
                 };
             }
         }
+        
 
         public void Configure(JwtBearerOptions options)
         {
@@ -61,3 +54,4 @@ namespace AspCore.WebApi.Authentication.JWT.Concrete
         }
     }
 }
+

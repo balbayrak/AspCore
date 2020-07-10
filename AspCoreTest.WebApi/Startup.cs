@@ -1,10 +1,10 @@
+using AspCore.Authentication.JWT.Abstract;
+using AspCore.Authentication.JWT.Concrete;
 using AspCore.BusinessApi.Configuration;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.User;
-using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Configuration;
 using AspCore.WebApi.Configuration.Swagger.Concrete;
-using AspCore.WebApi.Security.Abstract;
 using AspCoreTest.Authentication.Concrete;
 using AspCoreTest.DataAccess.Concrete.EntityFramework;
 using AspCoreTest.Entities.SearchableEntities;
@@ -63,7 +63,7 @@ namespace AspCoreTest.WebApi
                         builder.Add(typeof(CustomApiAuthenticationProvider))
                          .Build();
                     })
-                    .AddActiveUserTokenGenerator<ActiveUserJwtGenerator>(option =>
+                    .AddActiveUserTokenGenerator<ActiveUserJwtGenerator,ActiveUserTokenValidator>(option =>
                     {
                         option.configurationKey = "TokenSettingOption";
                     });
@@ -114,7 +114,7 @@ namespace AspCoreTest.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseAspCoreServices<IActiveUserTokenGenerator, ActiveUser>(option =>
+            app.UseAspCoreServices<ITokenValidator<ActiveUser>, ActiveUser>(option =>
             {
                 option.UseAuthentication(app).
                 ConfigureRoutes(app, endpoints =>

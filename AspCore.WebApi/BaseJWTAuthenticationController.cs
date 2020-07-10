@@ -1,11 +1,11 @@
-﻿using AspCore.Dependency.Concrete;
+﻿using AspCore.Authentication.JWT.Abstract;
+using AspCore.Authentication.JWT.Concrete;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
-using AspCore.WebApi.Authentication.Abstract;
-using AspCore.WebApi.Authentication.JWT.Concrete;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,22 +14,25 @@ using System;
 
 namespace AspCore.WebApi
 {
-    public abstract class BaseJWTAuthenticationController<TAuthenticationProvider, TTokenGenerator, TInput, TOutput> : BaseController
+    public abstract class BaseJWTAuthenticationController<TAuthenticationProvider, TInput, TOutput> : BaseController
           where TInput : AuthenticationInfo
           where TOutput : class, IJWTEntity, new()
-          where TTokenGenerator : ITokenGenerator<TOutput>
           where TAuthenticationProvider : IApiAuthenticationProvider<TInput, TOutput>
     {
         public virtual string authenticationProviderName { get; }
         protected TAuthenticationProvider AuthenticationProvider { get; private set; }
 
-        private TTokenGenerator _tokenGenerator;
+        private ITokenGenerator<TOutput> _tokenGenerator;
+
+        private ITokenValidator<TOutput> _tokenValidator;
 
         protected IServiceProvider ServiceProvider { get; private set; }
         public BaseJWTAuthenticationController(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
-            _tokenGenerator = ServiceProvider.GetRequiredService<TTokenGenerator>();
+            _tokenGenerator = ServiceProvider.GetRequiredService<ITokenGenerator<TOutput>>();
+            _tokenValidator = ServiceProvider.GetRequiredService<ITokenValidator<TOutput>>();
+
             AuthenticationProvider = (TAuthenticationProvider)ServiceProvider.GetService(typeof(TAuthenticationProvider));
         }
 
@@ -86,12 +89,12 @@ namespace AspCore.WebApi
                 }
                 catch (Exception ex)
                 {
-                    serviceResult.ErrorMessage(SecurityConstants.TOKEN_SETTING_OPTIONS.TOKEN_CREATE_EXCEPTION, ex);
+                    serviceResult.ErrorMessage(AuthenticationConstants.TOKEN_SETTING_OPTIONS.TOKEN_CREATE_EXCEPTION, ex);
                 }
             }
             else
             {
-                serviceResult.ErrorMessage = SecurityConstants.TOKEN_SETTING_OPTIONS.AUTHENTICATION_PROVIDER_NOT_FOUND;
+                serviceResult.ErrorMessage = AuthenticationConstants.TOKEN_SETTING_OPTIONS.AUTHENTICATION_PROVIDER_NOT_FOUND;
             }
 
 
@@ -132,7 +135,7 @@ namespace AspCore.WebApi
             }
             catch (Exception ex)
             {
-                serviceResult.ErrorMessage(SecurityConstants.TOKEN_SETTING_OPTIONS.REFRESH_TOKEN__CREATE_EXCEPTION, ex);
+                serviceResult.ErrorMessage(AuthenticationConstants.TOKEN_SETTING_OPTIONS.REFRESH_TOKEN__CREATE_EXCEPTION, ex);
             }
             return serviceResult.ToHttpResponse();
         }
@@ -142,7 +145,7 @@ namespace AspCore.WebApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize]
-        public IActionResult GetClientInfo([FromBody]AuthenticationToken authenticationToken)
+        public IActionResult GetClientInfo([FromBody] AuthenticationToken authenticationToken)
         {
             ServiceResult<TOutput> serviceResult = new ServiceResult<TOutput>();
 
@@ -150,16 +153,16 @@ namespace AspCore.WebApi
             {
                 try
                 {
-                    serviceResult = _tokenGenerator.GetJWTInfo(new AuthenticationToken
+                    serviceResult = _tokenValidator.Validate(new AuthenticationToken
                     {
                         access_token = authenticationToken.access_token,
                         expires = authenticationToken.expires,
                         refresh_token = authenticationToken.refresh_token
-                    });
+                    },false);
                 }
                 catch (Exception ex)
                 {
-                    serviceResult.ErrorMessage(SecurityConstants.TOKEN_SETTING_OPTIONS.REFRESH_TOKEN__CREATE_EXCEPTION, ex);
+                    serviceResult.ErrorMessage(AuthenticationConstants.TOKEN_SETTING_OPTIONS.TOKEN_VALIDATE_EXCEPTION, ex);
                 }
             }
             else

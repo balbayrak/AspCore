@@ -1,10 +1,10 @@
-﻿using AspCore.Entities.Authentication;
+﻿using AspCore.Authentication.JWT.Abstract;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Entities.User;
 using AspCore.Extension;
-using AspCore.WebApi.Authentication.Abstract;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -12,16 +12,15 @@ using System.Threading.Tasks;
 
 namespace AspCore.WebApi.Middlewares
 {
-    public class ActiveUserHeaderMiddleware<TTokenGenerator, TJWTInfo>
-        where TTokenGenerator : ITokenGenerator<TJWTInfo>
+    public class ActiveUserHeaderMiddleware<TJWTInfo>
          where TJWTInfo : class, IJWTEntity, new()
     {
         private readonly RequestDelegate _next;
 
-        private readonly TTokenGenerator _tokenGenerator;
-        public ActiveUserHeaderMiddleware(RequestDelegate next, TTokenGenerator tokenGenerator)
+        private readonly ITokenValidator<TJWTInfo> _tokenValidator;
+        public ActiveUserHeaderMiddleware(RequestDelegate next, ITokenValidator<TJWTInfo> tokenValidator)
         {
-            _tokenGenerator = tokenGenerator ?? throw new ArgumentNullException(nameof(tokenGenerator));
+            _tokenValidator = tokenValidator ?? throw new ArgumentNullException(nameof(tokenValidator));
             _next = next ?? throw new ArgumentNullException(nameof(next));
         }
         public async Task InvokeAsync(HttpContext httpContext)
@@ -32,10 +31,10 @@ namespace AspCore.WebApi.Middlewares
                 var token = httpContext.Request.Headers[ApiConstants.Api_Keys.API_AUTHORIZATION][0]
                     .Substring("Bearer ".Length);
 
-                ServiceResult<TJWTInfo> jwtInfoResult = _tokenGenerator.GetJWTInfo(new AuthenticationToken
+                ServiceResult<TJWTInfo> jwtInfoResult = _tokenValidator.Validate(new AuthenticationToken
                 {
                     access_token = token
-                });
+                },false);
 
 
                 if (jwtInfoResult.IsSucceededAndDataIncluded())

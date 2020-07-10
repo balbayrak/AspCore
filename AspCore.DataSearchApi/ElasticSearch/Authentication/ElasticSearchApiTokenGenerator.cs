@@ -1,16 +1,15 @@
-﻿using AspCore.WebApi.Authentication.Abstract;
-using AspCore.WebApi.Authentication.JWT.Concrete;
+﻿using AspCore.Authentication.JWT.Abstract;
+using AspCore.Authentication.JWT.Concrete;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 
 namespace AspCore.DataSearchApi.ElasticSearch.Authentication
 {
     public class ElasticSearchApiTokenGenerator : JwtGenerator<ElasticSearchApiJWTInfo>, ITokenGenerator<ElasticSearchApiJWTInfo>
     {
-        public ElasticSearchApiTokenGenerator(IServiceProvider serviceProvider, string configurationKey, TokenSettingOption tokenOption = null) : base(serviceProvider,configurationKey, tokenOption)
+        public ElasticSearchApiTokenGenerator(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 
@@ -21,18 +20,6 @@ namespace AspCore.DataSearchApi.ElasticSearch.Authentication
             claims.Add(new Claim(ClaimTypes.UserData, JsonConvert.SerializeObject(jwtInfo)));
 
             return claims;
-        }
-
-        public override ElasticSearchApiJWTInfo GetJWTInfoObject(IEnumerable<Claim> claims)
-        {
-            string clientData = claims.FirstOrDefault(t => t.Type == ClaimTypes.UserData)?.Value;
-
-            if (!string.IsNullOrEmpty(clientData))
-            {
-                return JsonConvert.DeserializeObject<ElasticSearchApiJWTInfo>(clientData);
-            }
-
-            return null;
         }
     }
 }

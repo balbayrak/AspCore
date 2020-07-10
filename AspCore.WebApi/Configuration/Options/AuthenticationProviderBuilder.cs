@@ -1,4 +1,5 @@
-﻿using AspCore.Dependency.Concrete;
+﻿using AspCore.Authentication.JWT.Concrete;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Configuration;
 using AspCore.WebApi.Authentication.Providers.Abstract;
@@ -14,16 +15,16 @@ namespace AspCore.WebApi.Configuration.Options
         {
         }
 
-        public AuthenticationOption AddAuthenticationProvider<TInput, TOutput, TAuthenticationProvider>()
+        public TokenGeneratorOption AddAuthenticationProvider<TInput, TOutput, TAuthenticationProvider>()
             where TAuthenticationProvider : class, IApiAuthenticationProvider<TInput, TOutput>
             where TInput : AuthenticationInfo
             where TOutput : class, new()
         {
             services.AddSingleton<IApiAuthenticationProvider<TInput, TOutput>, TAuthenticationProvider>();
-            return new AuthenticationOption(services);
+            return new TokenGeneratorOption(services);
         }
 
-        public AuthenticationOption AddAppSettingAuthenticationProvider<TInput, TOutput, TOption, TAuthenticationProvider>(Action<AppSettingsAuthProviderOption<TOption>> option)
+        public TokenGeneratorOption AddAppSettingAuthenticationProvider<TInput, TOutput, TOption, TAuthenticationProvider>(Action<AppSettingsAuthProviderOption<TOption>> option)
          where TAuthenticationProvider : AppSettingsAuthenticationProvider<TInput, TOutput, TOption>
          where TInput : AuthenticationInfo
          where TOutput : class, new()
@@ -50,15 +51,15 @@ namespace AspCore.WebApi.Configuration.Options
                 });
             }
 
-            return new AuthenticationOption(services);
+            return new TokenGeneratorOption(services);
         }
 
-        public AuthenticationOption AddAuthenticationProvider(Action<ServicesByNameBuilder<IActiveUserAuthenticationProvider>> builder)
+        public TokenGeneratorOption AddAuthenticationProvider(Action<ServicesByNameBuilder<IActiveUserAuthenticationProvider>> builder)
         {
             ServicesByNameBuilder<IActiveUserAuthenticationProvider> servicesByNameBuilder = new ServicesByNameBuilder<IActiveUserAuthenticationProvider>(services, ServiceLifetime.Transient);
             builder(servicesByNameBuilder);
 
-            return new AuthenticationOption(services);
+            return new TokenGeneratorOption(services);
         }
 
     }

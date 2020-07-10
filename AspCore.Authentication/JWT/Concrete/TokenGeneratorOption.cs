@@ -1,12 +1,8 @@
-﻿using AspCore.ConfigurationAccess.Abstract;
-using AspCore.ConfigurationAccess.Concrete;
+﻿using AspCore.Authentication.JWT.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Entities.Configuration;
-using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.User;
-using AspCore.WebApi.Authentication.Abstract;
-using AspCore.WebApi.Authentication.JWT.Concrete;
-using AspCore.WebApi.Security.Abstract;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,20 +10,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 
-namespace AspCore.WebApi.Configuration.Options
+namespace AspCore.Authentication.JWT.Concrete
 {
-    public class AuthenticationOption : ConfigurationOption
+    public class TokenGeneratorOption : ConfigurationOption
     {
-        public AuthenticationOption(IServiceCollection services) : base(services)
+        public TokenGeneratorOption(IServiceCollection services) : base(services)
         {
         }
 
-        public void AddTokenGenerator<TJWTInfo, TTokenGenerator>(Action<TokenConfigurationOption> option)
+        public void AddTokenGenerator<TJWTInfo, TTokenGenerator, TTokenValidator>(Action<TokenConfigurationOption> option)
             where TJWTInfo : class, IJWTEntity, new()
             where TTokenGenerator : JwtGenerator<TJWTInfo>, ITokenGenerator<TJWTInfo>
+            where TTokenValidator : JwtValidator<TJWTInfo>, ITokenValidator<TJWTInfo>
         {
             TokenConfigurationOption tokenConfigurationOption = new TokenConfigurationOption();
             option(tokenConfigurationOption);
@@ -38,14 +34,13 @@ namespace AspCore.WebApi.Configuration.Options
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
-            if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
+      
+
+            services.AddSingleton(typeof(IJwtHandler), sp =>
             {
-                services.AddSingleton(typeof(JwtAuthorizationOption), sp =>
-                {
-                    var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                    return new JwtAuthorizationOption(configurationAccessor, tokenConfigurationOption.configurationKey);
-                });
-            }
+                return new JwtHandler(sp.GetRequiredService<IConfigurationAccessor>(), tokenConfigurationOption);
+
+            });
 
             services.AddSingleton(typeof(ITokenGenerator<TJWTInfo>), sp =>
             {
@@ -53,23 +48,41 @@ namespace AspCore.WebApi.Configuration.Options
 
                 if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
                 {
-                    implementation = (ITokenGenerator<TJWTInfo>)Activator.CreateInstance(typeof(TTokenGenerator), sp, tokenConfigurationOption.configurationKey, null);
+                    implementation = (TTokenGenerator)Activator.CreateInstance(typeof(TTokenGenerator), sp);
                 }
                 else
                 {
-                    implementation = (TTokenGenerator)Activator.CreateInstance(typeof(TTokenGenerator), sp, null, tokenConfigurationOption.tokenSettingOption);
+                    implementation = (TTokenGenerator)Activator.CreateInstance(typeof(TTokenGenerator), sp);
                 }
 
                 return implementation;
             });
 
-           
-                AddAuthenticationSetting();
+             services.AddSingleton(typeof(ITokenValidator<TJWTInfo>), sp =>
+            {
+                TTokenValidator implementation = null;
+
+                if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
+                {
+                    implementation = (TTokenValidator)Activator.CreateInstance(typeof(TTokenValidator), sp);
+                }
+                else
+                {
+                    implementation = (TTokenValidator)Activator.CreateInstance(typeof(TTokenValidator), sp);
+                }
+
+                return implementation;
+            });
+
+
+            AddAuthenticationSetting();
+
             services.ConfigureOptions<ConfigureJwtBearerOptions>();
         }
 
-        public void AddActiveUserTokenGenerator<TImplementation>(Action<TokenConfigurationOption> option)
+        public void AddActiveUserTokenGenerator<TImplementation, TImplementationValidator>(Action<TokenConfigurationOption> option)
             where TImplementation : JwtGenerator<ActiveUser>
+            where TImplementationValidator : JwtValidator<ActiveUser>
         {
             TokenConfigurationOption tokenConfigurationOption = new TokenConfigurationOption();
             option(tokenConfigurationOption);
@@ -80,35 +93,47 @@ namespace AspCore.WebApi.Configuration.Options
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             }
 
-            if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
+            services.AddSingleton(typeof(IJwtHandler), sp =>
             {
-                services.AddSingleton(typeof(JwtAuthorizationOption), sp =>
-                {
-                    var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                    return new JwtAuthorizationOption(configurationAccessor, tokenConfigurationOption.configurationKey);
-                });
-            }
+                return new JwtHandler(sp.GetRequiredService<IConfigurationAccessor>(), tokenConfigurationOption);
 
-            services.AddSingleton(typeof(IActiveUserTokenGenerator), sp =>
+            });
+
+            services.AddSingleton(typeof(ITokenGenerator<ActiveUser>), sp =>
             {
                 TImplementation implementation = null;
 
                 if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
                 {
-                    implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), sp, tokenConfigurationOption.configurationKey, null);
+                    implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), sp);
                 }
                 else
                 {
-                    implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), sp, null, tokenConfigurationOption.tokenSettingOption);
+                    implementation = (TImplementation)Activator.CreateInstance(typeof(TImplementation), sp);
+                }
+
+                return implementation;
+            });
+
+            services.AddSingleton(typeof(ITokenValidator<ActiveUser>), sp =>
+            {
+                TImplementationValidator implementation = null;
+
+                if (!string.IsNullOrEmpty(tokenConfigurationOption.configurationKey))
+                {
+                    implementation = (TImplementationValidator)Activator.CreateInstance(typeof(TImplementationValidator), sp);
+                }
+                else
+                {
+                    implementation = (TImplementationValidator)Activator.CreateInstance(typeof(TImplementationValidator), sp);
                 }
 
                 return implementation;
             });
 
 
-        
-           AddAuthenticationSetting();
-            
+            AddAuthenticationSetting();
+
 
             services.ConfigureOptions<ConfigureJwtBearerOptions>();
         }

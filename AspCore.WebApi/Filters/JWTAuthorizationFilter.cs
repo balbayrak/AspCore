@@ -1,7 +1,8 @@
-﻿using AspCore.Entities.Authentication;
+﻿using AspCore.Authentication.JWT.Concrete;
+using AspCore.Entities.Authentication;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
-using AspCore.WebApi.Authentication.JWT.Concrete;
+using AspCore.WebApi.Authentication.General;
 using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Configuration.Options;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -31,7 +32,7 @@ namespace AspCore.WebApi.Filters
 
             if (!result.IsSucceeded)
             {
-                context.Result = new CustomUnauthorizedResult(SecurityConstants.AUTHORIZATION.NOT_AUTHORIZE_ACTION);
+                context.Result = new CustomUnauthorizedResult(AuthenticationConstants.AUTHORIZATION.NOT_AUTHORIZE_ACTION);
             }
         }
     }

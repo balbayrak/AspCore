@@ -1,4 +1,5 @@
-﻿using AspCore.Dependency.Concrete;
+﻿using AspCore.Authentication.JWT.Concrete;
+using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Configuration;
 using AspCore.Web.Authentication.Abstract;
@@ -13,22 +14,22 @@ namespace AspCore.Web.Configuration.Options
         {
         }
 
-        public CacheOptionConfiguration AddCustomAuthenticationProvider<TInput, TAuthenticationProvider>(Action<ServicesByNameBuilder<TAuthenticationProvider>> builder)
+        public TokenValidatorOption AddCustomAuthenticationProvider<TInput, TAuthenticationProvider>(Action<ServicesByNameBuilder<TAuthenticationProvider>> builder)
         where TAuthenticationProvider : IWebAuthenticationProvider<TInput>
         where TInput : AuthenticationInfo
         {
             ServicesByNameBuilder<TAuthenticationProvider> servicesByNameBuilder = new ServicesByNameBuilder<TAuthenticationProvider>(services, ServiceLifetime.Transient);
             builder(servicesByNameBuilder);
 
-            return new CacheOptionConfiguration(services);
+            return new TokenValidatorOption(services);
         }
 
-        public CacheOptionConfiguration AddAuthenticationProvider(Action<ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>>> builder)
+        public TokenValidatorOption AddAuthenticationProvider(Action<ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>>> builder)
         {
             ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>> servicesByNameBuilder = new ServicesByNameBuilder<IWebAuthenticationProvider<AuthenticationInfo>>(services, ServiceLifetime.Transient);
             builder(servicesByNameBuilder);
 
-            return new CacheOptionConfiguration(services);
+            return new TokenValidatorOption(services);
         }
     }
 }
