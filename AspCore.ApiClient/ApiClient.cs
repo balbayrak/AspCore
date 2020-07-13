@@ -80,8 +80,6 @@ namespace AspCore.ApiClient
             InitializeBaseAddress(apiKey);
             client = httpClientFactory.CreateClient(this.apiKey);
             client.BaseAddress = new Uri(_baseAddress);
-
-
         }
 
         public virtual void AddAuthenticationRoute(string route) { }

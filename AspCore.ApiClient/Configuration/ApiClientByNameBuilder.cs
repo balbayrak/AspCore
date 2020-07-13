@@ -1,22 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.ApiClient.Abstract;
+﻿using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Entities;
 using AspCore.ApiClient.Entities.Abstract;
+using AspCore.Caching.Abstract;
+using AspCore.ConfigurationAccess.Abstract;
 using AspCore.Dependency.Abstract;
 using AspCore.Dependency.Concrete;
+using AspCore.Entities.Constants;
 using Microsoft.AspNetCore.Http;
-using AspCore.ConfigurationAccess.Abstract;
-using AspCore.Caching.Abstract;
-using Microsoft.Extensions.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
+using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using AspCore.Entities.Constants;
-using System.Net;
-using System.Threading;
-using AspCore.Extension;
+
 
 namespace AspCore.ApiClient.Configuration
 {
@@ -31,90 +30,112 @@ namespace AspCore.ApiClient.Configuration
             _services = services;
         }
 
+
         /// <summary>
         /// Configuration must be defined in configuration file or configuration storage. Configuration must be "IApiClientConfiguration" type.
         /// </summary>
-        /// <typeparam name="TOption"></typeparam>
-        /// <param name="apiKey"></param>
+        /// <typeparam name="TOption">IApiClientConfiguration type</typeparam>
+        /// <param name="apiKey">configuration key</param>
+        /// <param name="timeout">HttpClient timeout value(minutes)</param>
+        /// <param name="retryCount">Retry Count for unsuccessful request</param>
+        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
         /// <returns></returns>
-        public ApiClientByNameBuilder AddApiClient<TOption>(string apiKey)
+        public ApiClientByNameBuilder AddApiClient<TOption>(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
        where TOption : class, IApiClientConfiguration, new()
         {
-            return AddClient<ApiClient<TOption>>(apiKey);
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
         }
 
         /// <summary>
         /// Configuration must be defined in configuration file or configuration storage. Configuration must be "ApiClientConfiguration" type.
         /// </summary>
-        /// <param name="apiKey"></param>
+        /// <param name="apiKey">configuration key</param>
+        /// <param name="timeout">HttpClient timeout value(minutes)</param>
+        /// <param name="retryCount">Retry Count for unsuccessful request</param>
+        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
         /// <returns></returns>
-        public ApiClientByNameBuilder AddApiClient(string apiKey)
+        public ApiClientByNameBuilder AddApiClient(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
         {
-            return AddClient<ApiClient<ApiClientConfiguration>>(apiKey);
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
         }
 
         /// <summary>
         /// Configuration must be defined in configuration file or configuration storage. Configuration must be "IApiClientConfiguration" type.
         /// </summary>
         /// <typeparam name="TOption"></typeparam>
-        /// <param name="apiKey"></param>
+        /// <param name="apiKey">configuration key</param>
+        /// <param name="timeout">HttpClient timeout value(minutes)</param>
+        /// <param name="retryCount">Retry Count for unsuccessful request</param>
+        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
         /// <returns></returns>
-        public ApiClientByNameBuilder AddBearerAuthenticatedClient<TOption>(string apiKey)
+        public ApiClientByNameBuilder AddBearerAuthenticatedClient<TOption>(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
           where TOption : class, IApiClientConfiguration, new()
         {
-            return AddClient<BearerAuthenticatedApiClient<TOption>>(apiKey);
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
         }
 
         /// <summary>
         /// Configuration must be defined in configuration file or configuration storage. Configuration must be "ApiClientConfiguration" type.
         /// </summary>
-        /// <param name="apiKey"></param>
+        /// <param name="apiKey">configuration key</param>
+        /// <param name="timeout">HttpClient timeout value(minutes)</param>
+        /// <param name="retryCount">Retry Count for unsuccessful request</param>
+        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
         /// <returns></returns>
-        public ApiClientByNameBuilder AddBearerAuthenticatedClient(string apiKey)
+        public ApiClientByNameBuilder AddBearerAuthenticatedClient(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
         {
-            return AddClient<BearerAuthenticatedApiClient<ApiClientConfiguration>>(apiKey);
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
         }
 
         /// <summary>
         /// Configuration must be defined in configuration file or configuration storage. Configuration must be "IApiClientConfiguration" type.
         /// </summary>
         /// <typeparam name="TOption"></typeparam>
-        /// <param name="apiKey"></param>
+        /// <param name="apiKey">configuration key</param>
+        /// <param name="timeout">HttpClient timeout value(minutes)</param>
+        /// <param name="retryCount">Retry Count for unsuccessful request</param>
+        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
         /// <returns></returns>
-        public ApiClientByNameBuilder AddJWTAuthenticatedClient<TOption>(string apiKey)
+        public ApiClientByNameBuilder AddJWTAuthenticatedClient<TOption>(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
         where TOption : class, IApiClientConfiguration, new()
         {
-            return AddClient<JWTAuthenticatedApiClient<TOption>>(apiKey);
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
         }
 
         /// <summary>
         /// Configuration must be defined in configuration file or configuration storage. Configuration must be "ApiClientConfiguration" type.
         /// </summary>
-        /// <param name="apiKey"></param>
+        /// <param name="apiKey">configuration key</param>
+        /// <param name="timeout">HttpClient timeout value(minutes)</param>
+        /// <param name="retryCount">Retry Count for unsuccessful request</param>
+        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
         /// <returns></returns>
-        public ApiClientByNameBuilder AddJWTAuthenticatedClient(string apiKey)
+        public ApiClientByNameBuilder AddJWTAuthenticatedClient(string apiKey,  int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
         {
-
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey);
-
+            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
         }
 
-        private ApiClientByNameBuilder AddClient<T>(string apiKey)
+        private ApiClientByNameBuilder AddClient<T>(string apiKey, int timeout = 2, int retryCount = 3,int circuitbreakerCount = 5)
             where T : class, IApiClient
         {
-            _services.AddHttpClient(apiKey,client =>
-            {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
+            _services.AddHttpClient(apiKey, client =>
+             {
+                 client.DefaultRequestHeaders.Accept.Clear();
+                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
+                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
 
-            }).AddHeaderPropagation().ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                return new HttpClientHandler()
-                {
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                };
-            });
+             })
+             .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMinutes(timeout)))
+             .AddPolicyHandler(GetRetryPolicy(retryCount))
+             .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(circuitbreakerCount, TimeSpan.FromSeconds(30)))
+             .AddHeaderPropagation().ConfigurePrimaryHttpMessageHandler(() =>
+             {
+                 return new HttpClientHandler()
+                 {
+                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                 };
+             });
+
 
 
             _services.AddTransient(typeof(T), sp =>
@@ -132,6 +153,21 @@ namespace AspCore.ApiClient.Configuration
 
             return this;
         }
+
+        private IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(int retryCount)
+        {
+            return HttpPolicyExtensions
+              // Handle HttpRequestExceptions, 408 and 5xx status codes
+              .HandleTransientHttpError()
+              // Handle 404 not found
+              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+              // Handle 401 Unauthorized
+              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+              // What to do if any of the above erros occur:
+              // Retry 3 times, each time wait 5,10 and 20 seconds before retrying.
+              .WaitAndRetryAsync(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(10, retryAttempt)));
+        }
+
         public void Build()
         {
             var registrations = _registrations;
