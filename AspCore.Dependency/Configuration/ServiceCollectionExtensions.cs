@@ -13,7 +13,7 @@ namespace AspCore.Dependency.Configuration
         /// <param name="services"></param>
         /// <param name="option"></param>
         /// <returns></returns>
-        public static IServiceCollection AutoBind(this IServiceCollection services, Action<DependencyOption> option = null)
+        public static IServiceCollection AutoBind(this IServiceCollection services, Action<DependencyOption> option)
         {
             using (DependencyOptionBuilder builder = new DependencyOptionBuilder(services))
             {
@@ -22,7 +22,7 @@ namespace AspCore.Dependency.Configuration
             }
         }
 
-        public static IServiceCollection Bind<TInterface>(this IServiceCollection services, Action<DependencyOption> option = null)
+        public static IServiceCollection Bind<TInterface>(this IServiceCollection services, Action<DependencyOption> option)
         {
             using (DependencyOptionBuilder builder = new DependencyOptionBuilder(services))
             {
@@ -39,7 +39,7 @@ namespace AspCore.Dependency.Configuration
         /// <param name="services"></param>
         /// <param name="option"></param>
         /// <returns></returns>
-        public static IServiceCollection BindType<TInterface, TConcrete>(this IServiceCollection services, Action<DependencyOption> option = null)
+        public static IServiceCollection BindType<TInterface, TConcrete>(this IServiceCollection services, Action<DependencyOption> option)
         {
             using (DependencyOptionBuilder builder = new DependencyOptionBuilder(services))
             {

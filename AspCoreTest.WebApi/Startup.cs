@@ -49,10 +49,10 @@ namespace AspCoreTest.WebApi
                     option.AddMemoryCache()
                     .AddApiClients(option =>
                     {
-                        option.AddBearerAuthenticatedClient("YetkiApi")
-                        .AddBearerAuthenticatedClient("DocumentApi")
-                        .AddBearerAuthenticatedClient("ViewerApi")
-                        .AddJWTAuthenticatedClient("DataSearchApi")
+                        option.AddBearerAuthenticatedClient(option => { option.apiKey = "YetkiApi"; })
+                        .AddBearerAuthenticatedClient(option => { option.apiKey = "DocumentApi"; })
+                        .AddBearerAuthenticatedClient(option => { option.apiKey = "ViewerApi"; })
+                        .AddJWTAuthenticatedClient(option => { option.apiKey = "DataSearchApi"; })
                         .Build();
                     });
                 })
@@ -63,10 +63,10 @@ namespace AspCoreTest.WebApi
                         builder.Add(typeof(CustomApiAuthenticationProvider))
                          .Build();
                     })
-                    .AddActiveUserTokenGenerator<ActiveUserJwtGenerator,ActiveUserTokenValidator>(option =>
-                    {
-                        option.configurationKey = "TokenSettingOption";
-                    });
+                    .AddActiveUserTokenGenerator<ActiveUserJwtGenerator, ActiveUserTokenValidator>(option =>
+                     {
+                         option.configurationKey = "TokenSettingOption";
+                     });
                 })
                 .AddSwaggerSetting(option =>
                 {
@@ -84,6 +84,8 @@ namespace AspCoreTest.WebApi
                 .AddDataProtectorHelper(option =>
                 {
                     option.dataProtectorKey = "tsesecretkey";
+                    option.persistFileSytemPath = @"bin\debug\configuration";
+                    option.lifeTime = 10;
                 })
                 .AddDataSearchAccessLayer("DataSearchApi", option =>
                  {

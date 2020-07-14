@@ -30,142 +30,60 @@ namespace AspCore.ApiClient.Configuration
             _services = services;
         }
 
-
-        /// <summary>
-        /// Configuration must be defined in configuration file or configuration storage. Configuration must be "IApiClientConfiguration" type.
-        /// </summary>
-        /// <typeparam name="TOption">IApiClientConfiguration type</typeparam>
-        /// <param name="apiKey">configuration key</param>
-        /// <param name="timeout">HttpClient timeout value(minutes)</param>
-        /// <param name="retryCount">Retry Count for unsuccessful request</param>
-        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
-        /// <returns></returns>
-        public ApiClientByNameBuilder AddApiClient<TOption>(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
+        public ApiClientByNameBuilder AddApiClient<TOption>(Action<ApiClientOption> clientOption)
        where TOption : class, IApiClientConfiguration, new()
         {
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
-        }
+            string apiKey = _services.AddApiClient(clientOption);
 
-        /// <summary>
-        /// Configuration must be defined in configuration file or configuration storage. Configuration must be "ApiClientConfiguration" type.
-        /// </summary>
-        /// <param name="apiKey">configuration key</param>
-        /// <param name="timeout">HttpClient timeout value(minutes)</param>
-        /// <param name="retryCount">Retry Count for unsuccessful request</param>
-        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
-        /// <returns></returns>
-        public ApiClientByNameBuilder AddApiClient(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
-        {
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
-        }
-
-        /// <summary>
-        /// Configuration must be defined in configuration file or configuration storage. Configuration must be "IApiClientConfiguration" type.
-        /// </summary>
-        /// <typeparam name="TOption"></typeparam>
-        /// <param name="apiKey">configuration key</param>
-        /// <param name="timeout">HttpClient timeout value(minutes)</param>
-        /// <param name="retryCount">Retry Count for unsuccessful request</param>
-        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
-        /// <returns></returns>
-        public ApiClientByNameBuilder AddBearerAuthenticatedClient<TOption>(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
-          where TOption : class, IApiClientConfiguration, new()
-        {
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
-        }
-
-        /// <summary>
-        /// Configuration must be defined in configuration file or configuration storage. Configuration must be "ApiClientConfiguration" type.
-        /// </summary>
-        /// <param name="apiKey">configuration key</param>
-        /// <param name="timeout">HttpClient timeout value(minutes)</param>
-        /// <param name="retryCount">Retry Count for unsuccessful request</param>
-        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
-        /// <returns></returns>
-        public ApiClientByNameBuilder AddBearerAuthenticatedClient(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
-        {
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
-        }
-
-        /// <summary>
-        /// Configuration must be defined in configuration file or configuration storage. Configuration must be "IApiClientConfiguration" type.
-        /// </summary>
-        /// <typeparam name="TOption"></typeparam>
-        /// <param name="apiKey">configuration key</param>
-        /// <param name="timeout">HttpClient timeout value(minutes)</param>
-        /// <param name="retryCount">Retry Count for unsuccessful request</param>
-        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
-        /// <returns></returns>
-        public ApiClientByNameBuilder AddJWTAuthenticatedClient<TOption>(string apiKey, int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
-        where TOption : class, IApiClientConfiguration, new()
-        {
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
-        }
-
-        /// <summary>
-        /// Configuration must be defined in configuration file or configuration storage. Configuration must be "ApiClientConfiguration" type.
-        /// </summary>
-        /// <param name="apiKey">configuration key</param>
-        /// <param name="timeout">HttpClient timeout value(minutes)</param>
-        /// <param name="retryCount">Retry Count for unsuccessful request</param>
-        /// <param name="circuitbreakerCount">Cicuit after unsuccessful request count</param>
-        /// <returns></returns>
-        public ApiClientByNameBuilder AddJWTAuthenticatedClient(string apiKey,  int timeout = 2, int retryCount = 3, int circuitbreakerCount = 5)
-        {
-            return AddClient<JWTAuthenticatedApiClient<ApiClientConfiguration>>(apiKey, timeout, retryCount, circuitbreakerCount);
-        }
-
-        private ApiClientByNameBuilder AddClient<T>(string apiKey, int timeout = 2, int retryCount = 3,int circuitbreakerCount = 5)
-            where T : class, IApiClient
-        {
-            _services.AddHttpClient(apiKey, client =>
-             {
-                 client.DefaultRequestHeaders.Accept.Clear();
-                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
-                 client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
-
-             })
-             .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMinutes(timeout)))
-             .AddPolicyHandler(GetRetryPolicy(retryCount))
-             .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(circuitbreakerCount, TimeSpan.FromSeconds(30)))
-             .AddHeaderPropagation().ConfigurePrimaryHttpMessageHandler(() =>
-             {
-                 return new HttpClientHandler()
-                 {
-                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                 };
-             });
-
-
-
-            _services.AddTransient(typeof(T), sp =>
-            {
-                var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
-                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
-                var cacheService = sp.GetRequiredService<ICacheService>();
-                var cancellationTokenHelper = sp.GetRequiredService<ICancellationTokenHelper>();
-
-                return (T)Activator.CreateInstance(typeof(T), httpClientfactory, httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey);
-            });
-
-            _registrations.Add(apiKey, typeof(T));
+           _registrations.Add(apiKey, typeof(ApiClient<TOption>));
 
             return this;
         }
 
-        private IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(int retryCount)
+        public ApiClientByNameBuilder AddApiClient(Action<ApiClientOption> clientOption)
         {
-            return HttpPolicyExtensions
-              // Handle HttpRequestExceptions, 408 and 5xx status codes
-              .HandleTransientHttpError()
-              // Handle 404 not found
-              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-              // Handle 401 Unauthorized
-              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-              // What to do if any of the above erros occur:
-              // Retry 3 times, each time wait 5,10 and 20 seconds before retrying.
-              .WaitAndRetryAsync(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(10, retryAttempt)));
+            string apiKey = _services.AddApiClient(clientOption);
+
+            _registrations.Add(apiKey, typeof(ApiClient<ApiClientConfiguration>));
+
+            return this;
+        }
+
+        public ApiClientByNameBuilder AddBearerAuthenticatedClient<TOption>(Action<ApiClientOption> clientOption)
+          where TOption : class, IApiClientConfiguration, new()
+        {
+            string apiKey = _services.AddBearerAuthenticatedClient<TOption>(clientOption);
+
+            _registrations.Add(apiKey, typeof(BearerAuthenticatedApiClient<TOption>));
+
+            return this;
+        }
+
+        public ApiClientByNameBuilder AddBearerAuthenticatedClient(Action<ApiClientOption> clientOption)
+        {
+            string apiKey = _services.AddBearerAuthenticatedClient(clientOption);
+
+            _registrations.Add(apiKey, typeof(BearerAuthenticatedApiClient<ApiClientConfiguration>));
+
+            return this;
+        }
+
+        public ApiClientByNameBuilder AddJWTAuthenticatedClient<TOption>(Action<ApiClientOption> clientOption)
+        where TOption : class, IApiClientConfiguration, new()
+        {
+            string apiKey = _services.AddJWTAuthenticatedClient<TOption>(clientOption);
+
+            _registrations.Add(apiKey, typeof(JWTAuthenticatedApiClient<TOption>));
+
+            return this;
+        }
+
+        public ApiClientByNameBuilder AddJWTAuthenticatedClient(Action<ApiClientOption> clientOption)
+        {
+            string apiKey = _services.AddJWTAuthenticatedClient(clientOption);
+            _registrations.Add(apiKey, typeof(JWTAuthenticatedApiClient<ApiClientConfiguration>));
+
+            return this;
         }
 
         public void Build()

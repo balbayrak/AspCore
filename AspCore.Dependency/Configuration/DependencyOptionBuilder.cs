@@ -31,6 +31,19 @@ namespace AspCore.Dependency.Configuration
             BindType<ISingletonType>(ServiceLifetime.Singleton, nameSpaceStr);
         }
 
+        public void AutoBindModules()
+        {
+            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<IDependencyModule>(AppDomain.CurrentDomain.GetAssemblies());
+
+            foreach (var typeMap in maps)
+            {
+                var implementationType = typeMap.ImplementationType;
+
+                var module = (AspCoreDependencyModule)Activator.CreateInstance(implementationType, services);
+                module.ConfigureServices();
+            }
+        }
+
         public void Bind<TInterface>(Action<DependencyOption> option)
         {
             DependencyOption dependencyOption = new DependencyOption();
@@ -52,7 +65,7 @@ namespace AspCore.Dependency.Configuration
                 services.Remove(oldDescription);
             }
 
-            var oldDescriptionImp = services.FirstOrDefault(t => t.ImplementationType.Equals(typeof(TConcrete)));
+            var oldDescriptionImp = services.FirstOrDefault(t => (t.ImplementationType != null && t.ImplementationType.Equals(typeof(TConcrete))));
             if (oldDescriptionImp != null)
             {
                 services.Remove(oldDescriptionImp);
@@ -61,13 +74,20 @@ namespace AspCore.Dependency.Configuration
             services.Add(descriptor);
         }
 
+        public void AddDependencyModule<T>()
+            where T : AspCoreDependencyModule
+        {
+            var module = (T)Activator.CreateInstance(typeof(T), services);
+            module.ConfigureServices();
+        }
+
         private void BindType<TInterface>(ServiceLifetime lifeTime = ServiceLifetime.Scoped, string namespaceStr = null)
         {
-            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr,true);
+            IEnumerable<TypeMap> maps = TypeMapHelper.GetTypeMaps<TInterface>(AppDomain.CurrentDomain.GetAssemblies(), namespaceStr, true);
 
             foreach (var typeMap in maps)
             {
-               
+
                 if (!typeMap.ExposedTypes.Any())
                 {
                     foreach (var serviceType in typeMap.ServiceTypes)

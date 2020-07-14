@@ -7,6 +7,7 @@ using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Authentication.Concrete;
 using AspCoreTest.Entities.SearchableEntities;
+using AspCoreTest.WebUI.DependencyModules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,8 @@ namespace AspCoreTest.WebUI
                 option.AddDependencyResolver(option =>
                 {
                     option.AutoBind();
+                    option.AutoBindModules();
+                    option.AddDependencyModule<WebDependencyModule2>();
                 })
                 .AddConfigurationManager(option =>
                 {
@@ -57,10 +60,7 @@ namespace AspCoreTest.WebUI
                     // option.AddRedisCache("RedisInfo");
                     option.AddCookieCache();
                 })
-                .AddBffApiClient(option =>
-                {
-                    option.apiConfigurationKey = "Base";
-                })
+                .AddBffApiClient(option => { option.apiKey = "Base"; })
                 .AddNotifierSetting(option =>
                 {
                     option.AddAlertViewComponent(option =>
@@ -79,10 +79,12 @@ namespace AspCoreTest.WebUI
                     option.viewerRoute = "DocumentViewer";
                     option.signerRoute = "";
                 })
-                .AddDataProtectorHelper(option =>
-                {
-                    option.dataProtectorKey = "tsesecretkey";
-                })
+                 .AddDataProtectorHelper(option =>
+                 {
+                     option.dataProtectorKey = "tsesecretkey";
+                     option.persistFileSytemPath = @"bin\debug\configuration";
+                     option.lifeTime = 10;
+                 })
                 .AddMimeTypeService(option =>
                 {
                     option.Build();
@@ -91,7 +93,7 @@ namespace AspCoreTest.WebUI
                 {
                     option.AddApiClients("DataSearchApi", option =>
                     {
-                        option.AddJWTAuthenticatedClient("DataSearchApi")
+                        option.AddJWTAuthenticatedClient(option => { option.apiKey = "DataSearchApi"; })
                         .Build();
                     }).AddDataSearchEngine<PersonSearchEntity>("api/PersonCache")
                     .ElasticSearchAdmins(option =>

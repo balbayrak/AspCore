@@ -1,4 +1,5 @@
-﻿using AspCore.Dependency.Abstract;
+﻿using AspCore.ApiClient.Abstract;
+using AspCore.Dependency.Abstract;
 using AspCore.Entities.Authentication;
 using System;
 

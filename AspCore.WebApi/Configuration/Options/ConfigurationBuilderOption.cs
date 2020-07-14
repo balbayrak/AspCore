@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace AspCore.WebApi.Configuration.Options
@@ -103,20 +104,7 @@ namespace AspCore.WebApi.Configuration.Options
 
         public ConfigurationBuilderOption AddDataProtectorHelper(Action<DataProtectorOption> option)
         {
-            var dataProtectorOption = new DataProtectorOption();
-            option(dataProtectorOption);
-
-            if (!string.IsNullOrEmpty(dataProtectorOption.dataProtectorKey))
-            {
-                services.AddDataProtection();
-
-                services.AddSingleton(typeof(IDataProtectorHelper), sp =>
-                {
-                    var dataProtectionProvider = sp.GetRequiredService<IDataProtectionProvider>();
-                    return new DataProtectorHelper(dataProtectionProvider, dataProtectorOption.dataProtectorKey);
-                });
-            }
-
+            services.AddDataProtector(option);
             return this;
         }
 

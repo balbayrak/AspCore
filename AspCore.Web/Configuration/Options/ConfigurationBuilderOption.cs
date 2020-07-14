@@ -10,6 +10,7 @@ using AspCore.WebComponents.ViewComponents.Alert.Configuration;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -46,22 +47,10 @@ namespace AspCore.Web.Configuration.Options
 
         public ConfigurationBuilderOption AddDataProtectorHelper(Action<DataProtectorOption> option)
         {
-            var dataProtectorOption = new DataProtectorOption();
-            option(dataProtectorOption);
-
-            if (!string.IsNullOrEmpty(dataProtectorOption.dataProtectorKey))
-            {
-                services.AddDataProtection();
-
-                services.AddSingleton(typeof(IDataProtectorHelper), sp =>
-                {
-                    var dataProtectionProvider = sp.GetRequiredService<IDataProtectionProvider>();
-                    return new DataProtectorHelper(dataProtectionProvider, dataProtectorOption.dataProtectorKey);
-                });
-            }
-
+            services.AddDataProtector(option);
             return this;
         }
+
 
         public ConfigurationBuilderOption AddMimeTypeService(Action<MimeTypeBuilder> builder)
         {
