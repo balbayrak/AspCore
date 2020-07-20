@@ -22,7 +22,7 @@ namespace AspCore.Business.Concrete
         protected ICustomMapper Mapper { get; private set; }
         private readonly TDataSearchEngine _dataSearchEngine;
 
-        public BaseComplexSearchableEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
+        protected BaseComplexSearchableEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             Mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
             _dataSearchEngine = ServiceProvider.GetService<TDataSearchEngine>();
@@ -70,12 +70,12 @@ namespace AspCore.Business.Concrete
 
         public override ServiceResult<bool> Add(params TEntity[] entities)
         {
-            _transactionBuilder.BeginTransaction();
+            TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataAccess.Add(entities);
+                ServiceResult<bool> resultDAL = DataAccess.Add(entities);
                 if (resultDAL.IsSucceeded)
                 {
                     ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities);
@@ -85,7 +85,7 @@ namespace AspCore.Business.Concrete
                         ServiceResult<bool> resultCache = _dataSearchEngine.Create(entityResult.Result.ToArray());
                         if (resultCache.IsSucceeded)
                         {
-                            _transactionBuilder.CommitTransaction();
+                            TransactionBuilder.CommitTransaction();
                             result.IsSucceeded = true;
                             result.StatusMessage = resultDAL.StatusMessage;
                         }
@@ -109,11 +109,11 @@ namespace AspCore.Business.Concrete
             }
             catch
             {
-                _transactionBuilder.RollbackTransaction();
+                TransactionBuilder.RollbackTransaction();
             }
             finally
             {
-                _transactionBuilder.DisposeTransaction();
+                TransactionBuilder.DisposeTransaction();
             }
 
             return result;
@@ -121,12 +121,12 @@ namespace AspCore.Business.Concrete
 
         public override ServiceResult<bool> Update(params TEntity[] entities)
         {
-            _transactionBuilder.BeginTransaction();
+            TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataAccess.Update(entities);
+                ServiceResult<bool> resultDAL = DataAccess.Update(entities);
                 if (resultDAL.IsSucceeded)
                 {
                     ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities);
@@ -135,7 +135,7 @@ namespace AspCore.Business.Concrete
                         ServiceResult<bool> resultCache = _dataSearchEngine.Update(entityResult.Result.ToArray());
                         if (resultCache.IsSucceeded)
                         {
-                            _transactionBuilder.CommitTransaction();
+                            TransactionBuilder.CommitTransaction();
                             result.IsSucceeded = true;
                             result.StatusMessage = resultDAL.StatusMessage;
                         }
@@ -159,11 +159,11 @@ namespace AspCore.Business.Concrete
             }
             catch
             {
-                _transactionBuilder.RollbackTransaction();
+                TransactionBuilder.RollbackTransaction();
             }
             finally
             {
-                _transactionBuilder.DisposeTransaction();
+                TransactionBuilder.DisposeTransaction();
             }
 
             return result;
@@ -171,25 +171,25 @@ namespace AspCore.Business.Concrete
 
         public override ServiceResult<bool> Delete(params Guid[] entityIds)
         {
-            _transactionBuilder.BeginTransaction();
+            TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<List<TEntity>> entityListResult = _dataAccess.GetByIdList(entityIds);
+                ServiceResult<List<TEntity>> entityListResult = DataAccess.GetByIdList(entityIds);
 
                 if (entityListResult.IsSucceededAndDataIncluded())
                 {
                     ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entityListResult.Result.ToArray());
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
-                        ServiceResult<bool> resultDAL = _dataAccess.Delete(entityIds);
+                        ServiceResult<bool> resultDAL = DataAccess.Delete(entityIds);
                         if (resultDAL.IsSucceeded)
                         {
                             ServiceResult<bool> resultCache = _dataSearchEngine.Delete(entityResult.Result.ToArray());
                             if (resultCache.IsSucceeded)
                             {
-                                _transactionBuilder.CommitTransaction();
+                                TransactionBuilder.CommitTransaction();
                                 result.IsSucceeded = true;
                                 result.StatusMessage = resultDAL.StatusMessage;
                             }
@@ -219,11 +219,11 @@ namespace AspCore.Business.Concrete
             }
             catch
             {
-                _transactionBuilder.RollbackTransaction();
+                TransactionBuilder.RollbackTransaction();
             }
             finally
             {
-                _transactionBuilder.DisposeTransaction();
+                TransactionBuilder.DisposeTransaction();
             }
 
             return result;

@@ -23,18 +23,18 @@ namespace AspCore.Business.Concrete
 
         public override ServiceResult<bool> Add(params TSearchableEntity[] entities)
         {
-            _transactionBuilder.BeginTransaction();
+            TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataAccess.Add(entities);
+                ServiceResult<bool> resultDAL = DataAccess.Add(entities);
                 if (resultDAL.IsSucceeded)
                 {
                     ServiceResult<bool> resultCache = _dataSearchEngine.Create(entities);
                     if (resultCache.IsSucceeded)
                     {
-                        _transactionBuilder.CommitTransaction();
+                        TransactionBuilder.CommitTransaction();
                         result.IsSucceeded = true;
                     }
                     else
@@ -51,11 +51,11 @@ namespace AspCore.Business.Concrete
             }
             catch
             {
-                _transactionBuilder.RollbackTransaction();
+                TransactionBuilder.RollbackTransaction();
             }
             finally
             {
-                _transactionBuilder.DisposeTransaction();
+                TransactionBuilder.DisposeTransaction();
             }
 
             return result;
@@ -63,18 +63,18 @@ namespace AspCore.Business.Concrete
 
         public override ServiceResult<bool> Update(params TSearchableEntity[] entities)
         {
-            _transactionBuilder.BeginTransaction();
+            TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = _dataAccess.Update(entities);
+                ServiceResult<bool> resultDAL = DataAccess.Update(entities);
                 if (resultDAL.IsSucceeded)
                 {
                     ServiceResult<bool> resultCache = _dataSearchEngine.Update(entities);
                     if (resultCache.IsSucceeded)
                     {
-                        _transactionBuilder.CommitTransaction();
+                        TransactionBuilder.CommitTransaction();
                         result.IsSucceeded = true;
                     }
                     else
@@ -91,11 +91,11 @@ namespace AspCore.Business.Concrete
             }
             catch
             {
-                _transactionBuilder.RollbackTransaction();
+                TransactionBuilder.RollbackTransaction();
             }
             finally
             {
-                _transactionBuilder.DisposeTransaction();
+                TransactionBuilder.DisposeTransaction();
             }
 
             return result;
@@ -103,22 +103,22 @@ namespace AspCore.Business.Concrete
 
         public override ServiceResult<bool> Delete(params Guid[] entityIds)
         {
-            _transactionBuilder.BeginTransaction();
+            TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<List<TSearchableEntity>> entityListResult = _dataAccess.GetByIdList(entityIds);
+                ServiceResult<List<TSearchableEntity>> entityListResult = DataAccess.GetByIdList(entityIds);
 
                 if (entityListResult.IsSucceededAndDataIncluded())
                 {
-                    ServiceResult<bool> resultDAL = _dataAccess.Delete(entityIds);
+                    ServiceResult<bool> resultDAL = DataAccess.Delete(entityIds);
                     if (resultDAL.IsSucceeded)
                     {
                         ServiceResult<bool> resultCache = _dataSearchEngine.Delete(entityListResult.Result.ToArray());
                         if (resultCache.IsSucceeded)
                         {
-                            _transactionBuilder.CommitTransaction();
+                            TransactionBuilder.CommitTransaction();
                             result.IsSucceeded = true;
                         }
                         else
@@ -141,11 +141,11 @@ namespace AspCore.Business.Concrete
             }
             catch
             {
-                _transactionBuilder.RollbackTransaction();
+                TransactionBuilder.RollbackTransaction();
             }
             finally
             {
-                _transactionBuilder.DisposeTransaction();
+                TransactionBuilder.DisposeTransaction();
             }
 
             return result;

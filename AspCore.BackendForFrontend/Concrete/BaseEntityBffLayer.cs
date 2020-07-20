@@ -35,14 +35,14 @@ namespace AspCore.BackendForFrontend.Concrete
         }
         public async Task<ServiceResult<bool>> Add(List<TViewModel> entities)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.ADD;
+            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.ADDAsync;
             var listEntities = entities.Select(t => t.dataEntity);
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(listEntities);
             return result;
         }
         public async Task<ServiceResult<bool>> Update(List<TViewModel> entities)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.UPDATE;
+            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.UPDATEAsync;
             var listEntities = entities.Select(t => t.dataEntity);
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(listEntities);
             return result;
@@ -56,7 +56,7 @@ namespace AspCore.BackendForFrontend.Concrete
         }
         public async Task<ServiceResult<bool>> DeleteWithIDs(List<Guid> entityIds)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETE_WITH_IDs;
+            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETEAsync;
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entityIds.ToArray());
             return result;
         }

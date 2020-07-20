@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AspCore.WebComponents.HtmlHelpers.Extensions;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Http;
@@ -36,10 +37,25 @@ namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
             return default(T);
         }
 
+        public async Task<T> GetObjectAsync<T>(string key)
+        {
+            var data = await Task.Run(() => GetObject<T>(key));
+            return data;
+        }
+
+
+        public async Task<bool> SetObjectAsync<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        {
+            var data = await Task.Run(() => SetObject(key, obj, expires, sameSiteStrict));
+            return data;
+        }
+
         public void Keep(string key)
         {
             TempData.Keep(key);
         }
+
+      
 
         public bool Remove(string key)
         {

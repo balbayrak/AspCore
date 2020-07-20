@@ -4,6 +4,7 @@ using AspCore.Utilities.DataProtector;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
+using System.Threading.Tasks;
 
 namespace AspCore.RedisClient
 {
@@ -57,6 +58,20 @@ namespace AspCore.RedisClient
             return default(T);
         }
 
+        public async Task<T> GetObjectAsync<T>(string key)
+        {
+            var data = await Task.Run((() => GetObject<T>(key)));
+            return data;
+        }
+
+
+        public async Task<bool> SetObjectAsync<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        {
+            var data = await Task.Run((() => SetObject(key, obj, expires, sameSiteStrict)));
+            return data;
+
+        }
+
         public bool Remove(string key)
         {
             if (!string.IsNullOrEmpty(key))
@@ -64,6 +79,7 @@ namespace AspCore.RedisClient
                 key = $"{uniqueCacheKey}_{key}";
                 using (IRedisClient redis = _redisClientsManager.GetClient())
                 {
+                  
                     return redis.Remove(key);
                 }
             }

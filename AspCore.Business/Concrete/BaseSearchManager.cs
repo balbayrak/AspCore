@@ -18,7 +18,8 @@ namespace AspCore.Business.Concrete
         protected ICustomMapper Mapper { get; private set; }
         protected TDataAccess DataAccess;
         protected IServiceProvider ServiceProvider;
-        public BaseSearchManager(IServiceProvider serviceProvider)
+
+        protected BaseSearchManager(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
             DataAccess = ServiceProvider.GetRequiredService<TDataAccess>();

@@ -19,7 +19,7 @@ namespace AspCore.Business.Task.Abstract
         protected EnumCrudOperation CrudOperation { get; set; }
 
         protected IServiceProvider ServiceProvider { get; private set; }
-        public EntityTask(IServiceProvider serviceProvider, TEntity entity, EnumCrudOperation enumCrudOperation) : base(entity)
+        protected EntityTask(IServiceProvider serviceProvider, TEntity entity, EnumCrudOperation enumCrudOperation) : base(entity)
         {
             ServiceProvider = serviceProvider;
             Entity = entity;

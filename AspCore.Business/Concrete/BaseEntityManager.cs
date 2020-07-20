@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AspCore.Business.Specifications.Abstract;
 
 namespace AspCore.Business.Concrete
 {
@@ -17,43 +18,67 @@ namespace AspCore.Business.Concrete
       where TDataAccess : IEntityRepository<TEntity>
       where TEntity : class, IEntity, new()
     {
-        protected IServiceProvider ServiceProvider { get; private set; }
-        protected readonly TDataAccess _dataAccess;
-        protected ITransactionBuilder _transactionBuilder;
+        protected IServiceProvider ServiceProvider { get; }
+        protected readonly TDataAccess DataAccess;
+        protected ITransactionBuilder TransactionBuilder;
         public BaseEntityManager(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
-            _dataAccess = ServiceProvider.GetRequiredService<TDataAccess>(); ;
-            _transactionBuilder = ServiceProvider.GetRequiredService<ITransactionBuilder>();
+            DataAccess = ServiceProvider.GetRequiredService<TDataAccess>();
+            TransactionBuilder = ServiceProvider.GetRequiredService<ITransactionBuilder>();
         }
 
         public virtual ServiceResult<bool> Add(params TEntity[] entities)
         {
             if (entities.Length > 1)
-                return _dataAccess.AddWithTransaction(entities);
+                return DataAccess.AddWithTransaction(entities);
             else
-                return _dataAccess.Add(entities);
+                return DataAccess.Add(entities);
         }
 
         public virtual ServiceResult<bool> Update(params TEntity[] entities)
         {
             if (entities.Length > 1)
-                return _dataAccess.UpdateWithTransaction(entities);
+                return DataAccess.UpdateWithTransaction(entities);
             else
-                return _dataAccess.Update(entities);
+                return DataAccess.Update(entities);
         }
 
         public virtual ServiceResult<bool> Delete(params Guid[] entityIds)
         {
             if (entityIds.Length > 1)
-                return _dataAccess.DeleteWithTransaction(entityIds);
+                return DataAccess.DeleteWithTransaction(entityIds);
             else
-                return _dataAccess.Delete(entityIds);
+                return DataAccess.Delete(entityIds);
+        }
+
+        public Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
+        {
+            if (entities.Length > 1)
+                return DataAccess.AddWithTransactionAsync(entities);
+            else
+                return DataAccess.AddAsync(entities);
+        }
+
+        public Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
+        {
+            if (entities.Length > 1)
+                return DataAccess.UpdateWithTransactionAsync(entities);
+            else
+                return DataAccess.UpdateAsync(entities);
+        }
+
+        public Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)
+        {
+            if (entityIds.Length > 1)
+                return DataAccess.DeleteWithTransactionAsync(entityIds);
+            else
+                return DataAccess.DeleteAsync(entityIds);
         }
 
         public ServiceResult<TEntity> GetById(EntityFilter<TEntity> setting)
         {
-            return _dataAccess.GetById(setting.id);
+            return DataAccess.GetById(setting.id);
         }
 
         public ServiceResult<IList<TEntity>> GetAll(EntityFilter<TEntity> setting)
@@ -76,13 +101,13 @@ namespace AspCore.Business.Concrete
                 List<SortingExpression<TEntity>> sorters = null;
                 if (setting.sorters != null)
                 {
-                    sorters = setting.sorters.ToSortingExpressionList<TEntity>();
+                    sorters = setting.sorters.ToSortingExpressionList();
                 }
-                return _dataAccess.FindList(expression, sorters, setting.page, setting.pageSize);
+                return DataAccess.FindList(expression, sorters, setting.page, setting.pageSize);
             }
             else
             {
-                return _dataAccess.GetList(expression, setting.page, setting.pageSize);
+                return DataAccess.GetList(expression, setting.page, setting.pageSize);
             }
         }
 
@@ -106,19 +131,24 @@ namespace AspCore.Business.Concrete
                 List<SortingExpression<TEntity>> sorters = null;
                 if (setting.sorters != null)
                 {
-                    sorters = setting.sorters.ToSortingExpressionList<TEntity>();
+                    sorters = setting.sorters.ToSortingExpressionList();
                 }
-                return _dataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
+                return DataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
             }
             else
             {
-                return _dataAccess.GetListAsync(expression, setting.page, setting.pageSize);
+                return DataAccess.GetListAsync(expression, setting.page, setting.pageSize);
             }
         }
 
         public Task<ServiceResult<List<TEntity>>> GetHistoriesByIdAsync(EntityFilter<TEntity> setting)
         {
-            return _dataAccess.GetHistoriesById(setting.id, setting.page, setting.pageSize);
+            return DataAccess.GetHistoriesById(setting.id, setting.page, setting.pageSize);
+        }
+
+        public Task<ServiceResult<IList<TEntity>>> GetAllAsync(ISpecification<TEntity> specification)
+        {
+            return DataAccess.GetListAsync(specification.ToExpression());
         }
     }
 }

@@ -1,19 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Business.Abstract;
+﻿using AspCore.Business.Abstract;
 using AspCore.Business.General;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.WebApi;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AspCore.BusinessApi
 {
@@ -124,6 +122,28 @@ namespace AspCore.BusinessApi
             return response.ToHttpResponse();
         }
 
+        [ActionName(ApiConstants.Urls.ADDAsync)]
+        [HttpPost]
+        [ProducesResponseType(typeof(ServiceResult<bool>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public async Task<IActionResult> AddAsync([FromBody] TEntity[] entities)
+        {
+            if (entities == null)
+            {
+                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_NULL, nameof(entities)));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
+            }
+
+            ServiceResult<bool> response = await Service.AddAsync(entities);
+            return response.ToHttpResponse();
+        }
+
 
         [ActionName(ApiConstants.Urls.UPDATE)]
         [HttpPost]
@@ -146,6 +166,27 @@ namespace AspCore.BusinessApi
             ServiceResult<bool> response = Service.Update(entities);
             return response.ToHttpResponse();
         }
+        [ActionName(ApiConstants.Urls.UPDATEAsync)]
+        [HttpPost]
+        [ProducesResponseType(typeof(ServiceResult<bool>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public async Task<IActionResult> UpdateAsync([FromBody] TEntity[] entities)
+        {
+            if (entities == null)
+            {
+                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_NULL, nameof(entities)));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
+            }
+
+            ServiceResult<bool> response =await Service.UpdateAsync(entities);
+            return response.ToHttpResponse();
+        }
 
 
         [ActionName(ApiConstants.Urls.DELETE_WITH_IDs)]
@@ -154,7 +195,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public IActionResult Delete([FromBody]Guid[] entities)
+        public IActionResult Delete([FromBody] Guid[] entities)
         {
             if (entities == null)
             {
@@ -166,6 +207,23 @@ namespace AspCore.BusinessApi
 
         }
 
+        [ActionName(ApiConstants.Urls.DELETEAsync)]
+        [HttpPost]
+        [ProducesResponseType(typeof(ServiceResult<bool>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public async Task<IActionResult> DeleteAsync([FromBody] Guid[] entities)
+        {
+            if (entities == null)
+            {
+                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_NULL, nameof(entities)));
+            }
+
+            ServiceResult<bool> response = await Service.DeleteAsync(entities);
+            return response.ToHttpResponse();
+
+        }
 
         [ActionName(ApiConstants.Urls.GET_ALL)]
         [HttpPost]

@@ -11,8 +11,11 @@ namespace AspCore.Entities.Constants
             public const string LIVENESS = "Liveness";
             public const string READINESS = "Readiness";
             public const string ADD = "Add";
+            public const string ADDAsync = "AddAsync";
             public const string UPDATE = "Update";
+            public const string UPDATEAsync = "UpdateAsync";
             public const string DELETE = "Delete";
+            public const string DELETEAsync = "DeleteAsync";
             public const string DELETE_WITH_IDs = "DeleteWithIDs";
             public const string GET_ALL = "GetAll";
             public const string GET_ALL_ASYNC = "GetAllAsync";

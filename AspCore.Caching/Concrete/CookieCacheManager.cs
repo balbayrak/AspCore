@@ -4,13 +4,12 @@ using AspCore.Utilities.DataProtector;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Linq; 
+using System.Threading.Tasks;
 
 namespace AspCore.Caching.Concrete
 {
-    public class CookieCacheManager : CacheManager, ICacheService, ICookieService
+    public class CookieCacheManager : CacheManager, ICookieService
     {
         private readonly IHttpContextAccessor _contextAccessor;
 
@@ -39,7 +38,18 @@ namespace AspCore.Caching.Concrete
             }
             return default(T);
         }
+        public async Task<T> GetObjectAsync<T>(string key)
+        {
+            var data = await Task.Run(() => GetObject<T>(key));
+            return data;
+        }
 
+
+        public async Task<bool> SetObjectAsync<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        {
+            var data = await Task.Run(() => SetObject(key, obj, expires, sameSiteStrict));
+            return data;
+        }
         public bool Remove(string key)
         {
             if (!string.IsNullOrEmpty(key))

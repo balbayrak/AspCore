@@ -2,6 +2,7 @@ using AspCore.Authentication.JWT.Concrete;
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.DocumentType;
+using AspCore.RedisClient.Configuration;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
@@ -57,7 +58,7 @@ namespace AspCoreTest.WebUI
                 })
                 .AddCacheService(option =>
                 {
-                    // option.AddRedisCache("RedisInfo");
+                    option.AddRedisCache("RedisInfo");
                     option.AddCookieCache();
                 })
                 .AddBffApiClient(option => { option.apiKey = "Base"; })

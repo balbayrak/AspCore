@@ -8,6 +8,7 @@ using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AspCore.Business.General;
 using testbusiness.Abstract;
 
 namespace testbusiness.Concrete
@@ -30,16 +31,16 @@ namespace testbusiness.Concrete
         public override ServiceResult<bool> Add(params Person[] entities)
         {
             
-            ITask personTask = new PersonTask(ServiceProvider, entities[0], AspCore.Business.General.EnumCrudOperation.CreateOperation);
+            ITask personTask = new PersonTask(ServiceProvider, entities[0], EnumCrudOperation.CreateOperation);
             
-            ITask personTask1 = new PersonTask(ServiceProvider, entities[0], AspCore.Business.General.EnumCrudOperation.CreateOperation);
+            ITask personTask1 = new PersonTask(ServiceProvider, entities[0],EnumCrudOperation.CreateOperation);
             var res1 = personTask.Run().Result;
 
-            //var taskBuilder = ServiceProvider.GetRequiredService<ITaskFlowBuilder>();
-            //taskBuilder.AddTask(personTask);
-            //taskBuilder.AddTask(personTask1);
+            var taskBuilder = ServiceProvider.GetRequiredService<ITaskFlowBuilder>();
+            taskBuilder.AddTask(personTask);
+            taskBuilder.AddTask(personTask1);
 
-            //var res = taskBuilder.RunTasks().Result;
+            var res = taskBuilder.RunTasks().Result;
             return (ServiceResult<bool>)res1;
         }
     }

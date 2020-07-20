@@ -1,6 +1,7 @@
 ﻿using AspCore.Caching.Abstract;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Threading.Tasks;
 using AspCore.Caching.Extension;
 
 namespace AspCore.Caching.Concrete
@@ -23,6 +24,19 @@ namespace AspCore.Caching.Concrete
         {
             key = $"{uniqueCacheKey}_{key}";
             return _MemCache.GetValue<T>(key);
+        }
+
+       public async Task<T> GetObjectAsync<T>(string key)
+        {
+            var data = await Task.Run(() => GetObject<T>(key));
+            return data;
+        }
+
+
+        public async Task<bool> SetObjectAsync<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        {
+            var data = await Task.Run(() => SetObject(key, obj, expires, sameSiteStrict));
+            return data;
         }
 
         public bool Remove(string key)

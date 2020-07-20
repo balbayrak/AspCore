@@ -35,12 +35,13 @@ namespace AspCore.Business.Task.Concrete
                     foreach (var taskItem in _taskList)
                     {
                         result = await taskItem.task.Run();
-                        if (!result.IsSucceeded)
+                        if (result.IsSucceeded)
                         {
-                            _transactionBuilder.RollbackTransaction();
-                            break;
+                            continue;
                         }
-                        else continue;
+                        _transactionBuilder.RollbackTransaction();
+                        break;
+                       
                     }
 
                     if (result.IsSucceeded)

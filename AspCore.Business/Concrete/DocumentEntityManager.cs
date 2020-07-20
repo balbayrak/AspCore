@@ -31,7 +31,7 @@ namespace AspCore.Business.Concrete
                 if (result.IsSucceededAndDataIncluded())
                 {
                     documentRequest.entity.DocumentUrl = result.Result.url;
-                    ServiceResult<bool> dataAccessResult = _dataAccess.Add(documentRequest.entity);
+                    ServiceResult<bool> dataAccessResult = DataAccess.Add(documentRequest.entity);
                     if (!dataAccessResult.IsSucceeded)
                     {
                         result.IsSucceeded = false;
@@ -66,7 +66,7 @@ namespace AspCore.Business.Concrete
                 {
                     if (documentRequest.deleteEntityWithDocument)
                     {
-                        result = _dataAccess.Delete(documentRequest.entity);
+                        result = DataAccess.Delete(documentRequest.entity);
                     }
                 }
             }

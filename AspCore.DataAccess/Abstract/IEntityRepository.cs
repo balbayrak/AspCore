@@ -15,6 +15,7 @@ namespace AspCore.DataAccess.Abstract
         ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter);
         ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize);
         Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize);
+        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter);
         ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter();
         Task<ServiceResult<TEntity[]>> GetListWithIgnoreGlobalFilterAsync();
 
