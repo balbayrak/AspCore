@@ -15,8 +15,12 @@ namespace AspCore.Caching.Abstract
 
         bool Remove(string key);
 
+        Task<bool> RemoveAsync(string key);
+
         bool ExpireEntryIn(string key, TimeSpan timeSpan);
 
-        void RemoveAll();
+        bool RemoveAll();
+
+        Task<bool> RemoveAllAsync();
     }
 }

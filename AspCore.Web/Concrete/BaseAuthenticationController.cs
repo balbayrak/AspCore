@@ -97,7 +97,7 @@ namespace AspCore.Web.Concrete
             {
                 string tokenKey = Guid.NewGuid().ToString("N");
 
-                CookieService.SetObject(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY, tokenKey, DateTime.Now.AddDays(1), false);
+                CookieService.SetObjectAsync(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY, tokenKey, DateTime.Now.AddDays(1), false);
 
                 ServiceResult<AuthenticationToken> authenticationResult = AuthenticationBffLayer.AuthenticateClient((TAuthenticationInfo)serviceResult.Result).Result;
 
@@ -120,13 +120,13 @@ namespace AspCore.Web.Concrete
                     {
                         string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.APPLICATION_USER + "_" + tokenKey;
 
-                        CacheService.SetObject(activeUserUId, userResult.Result, DateTime.Now.AddDays(1), false);
+                        CacheService.SetObjectAsync(activeUserUId, userResult.Result, DateTime.Now.AddDays(1), false);
 
                         Response.Redirect(AuthenticationProvider.mainPageUrl);
                     }
                     else
                     {
-                        CacheService.RemoveAll();
+                        CacheService.RemoveAllAsync();
                         Response.Redirect(AuthenticationProvider.loginPageUrl);
                     }
                 }
@@ -158,8 +158,9 @@ namespace AspCore.Web.Concrete
         {
             try
             {
-                CacheService.RemoveAll();
-                CookieService.RemoveAll();
+                CookieService.RemoveAllAsync();
+                CacheService.RemoveAllAsync();
+                 
             }
             catch
             {

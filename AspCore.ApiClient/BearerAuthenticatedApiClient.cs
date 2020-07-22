@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using AspCore.ApiClient.Abstract;
+using System.Threading.Tasks;
 
 namespace AspCore.ApiClient
 {
@@ -24,7 +25,7 @@ namespace AspCore.ApiClient
 
         public override string AuthenticationRefreshController { get; set; }
 
-        public override AuthenticationToken AuthenticateClient(AuthenticationInfo input, Func<AuthenticationToken, AuthenticationToken> func, bool forceAuthentication, bool refreshToken)
+        public override async Task<AuthenticationToken> AuthenticateClient(AuthenticationInfo input, Func<AuthenticationToken, AuthenticationToken> func, bool forceAuthentication, bool refreshToken)
         {
 
             string oldApiBaseAddress = this.baseAddress;
@@ -42,7 +43,7 @@ namespace AspCore.ApiClient
             var content = new FormUrlEncodedContent(pairs);
 
 
-            AuthenticationToken response = this.PostRequest<AuthenticationToken>(content).Result;
+            AuthenticationToken response = await this.PostRequest<AuthenticationToken>(content);
 
             this.baseAddress = oldApiBaseAddress;
             this.apiUrl = oldApiUrl;
@@ -51,9 +52,9 @@ namespace AspCore.ApiClient
 
         }
 
-        public override AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public override async Task<AuthenticationToken> Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
-            AuthenticationToken tokenResponse = base.Authenticate(client, forceAuthentication, refreshToken);
+            AuthenticationToken tokenResponse = await base.Authenticate(client, forceAuthentication, refreshToken);
 
             if (tokenResponse != null && !string.IsNullOrEmpty(tokenResponse.access_token))
             {

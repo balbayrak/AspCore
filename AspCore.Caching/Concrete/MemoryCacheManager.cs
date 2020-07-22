@@ -20,26 +20,13 @@ namespace AspCore.Caching.Concrete
             return true;
         }
 
-        public T GetObject<T>(string key)
+        public override T GetObject<T>(string key)
         {
             key = $"{uniqueCacheKey}_{key}";
             return _MemCache.GetValue<T>(key);
         }
 
-       public async Task<T> GetObjectAsync<T>(string key)
-        {
-            var data = await Task.Run(() => GetObject<T>(key));
-            return data;
-        }
-
-
-        public async Task<bool> SetObjectAsync<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
-        {
-            var data = await Task.Run(() => SetObject(key, obj, expires, sameSiteStrict));
-            return data;
-        }
-
-        public bool Remove(string key)
+        public override bool Remove(string key)
         {
             try
             {
@@ -56,9 +43,9 @@ namespace AspCore.Caching.Concrete
 
         }
 
-        public void RemoveAll()
+        public override bool RemoveAll()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         /// <summary>
@@ -70,7 +57,7 @@ namespace AspCore.Caching.Concrete
         /// <param name="timeSpan"></param>
         /// <returns></returns>
 
-        public bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        public override bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
         {
             try
             {
@@ -92,5 +79,6 @@ namespace AspCore.Caching.Concrete
             }
             return false;
         }
+
     }
 }

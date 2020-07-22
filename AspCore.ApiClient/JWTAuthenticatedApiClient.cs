@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Net.Http;
 using AspCore.ApiClient.Abstract;
+using System.Threading.Tasks;
 
 namespace AspCore.ApiClient
 {
     public class JWTAuthenticatedApiClient<TOption> : AuthenticatedApiClient<AuthenticationToken, TOption>
            where TOption : class, IApiClientConfiguration, new()
     {
-        public JWTAuthenticatedApiClient(IHttpClientFactory httpClientfactory, IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService,  ICancellationTokenHelper cancellationTokenHelper,string apiKey) : base(httpClientfactory,httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey)
+        public JWTAuthenticatedApiClient(IHttpClientFactory httpClientfactory, IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey) : base(httpClientfactory, httpContextAccessor, configurationAccessor, cacheService, cancellationTokenHelper, apiKey)
         {
 
         }
@@ -24,7 +25,7 @@ namespace AspCore.ApiClient
 
         public override string AuthenticationRefreshController { get; set; }
 
-        public override AuthenticationToken AuthenticateClient(AuthenticationInfo input, Func<AuthenticationToken, AuthenticationToken> func, bool forceAuthentication, bool refreshToken)
+        public override async Task<AuthenticationToken> AuthenticateClient(AuthenticationInfo input, Func<AuthenticationToken, AuthenticationToken> func, bool forceAuthentication, bool refreshToken)
         {
             string oldApiBaseAddress = this.baseAddress;
             string oldApiUrl = this.apiUrl;
@@ -34,17 +35,17 @@ namespace AspCore.ApiClient
             ServiceResult<AuthenticationToken> response = null;
             if (refreshToken)
             {
-                AuthenticationToken token = AccessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
+                AuthenticationToken token = await AccessTokenService.GetObjectAsync<AuthenticationToken>(tokenStorageKey);
                 if (token != null)
                 {
                     this.apiUrl = AuthenticationRefreshController;
-                    response = this.PostRequest<ServiceResult<AuthenticationToken>>(token).Result;
+                    response = await this.PostRequest<ServiceResult<AuthenticationToken>>(token);
                 }
             }
             else
             {
                 this.apiUrl = AuthenticationController;
-                response = this.PostRequest<ServiceResult<AuthenticationToken>>(input).Result;
+                response = await this.PostRequest<ServiceResult<AuthenticationToken>>(input);
             }
 
 
@@ -55,9 +56,9 @@ namespace AspCore.ApiClient
 
         }
 
-        public override AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public override async Task<AuthenticationToken> Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
-            AuthenticationToken tokenResponse = base.Authenticate(client, forceAuthentication, refreshToken);
+            AuthenticationToken tokenResponse = await base.Authenticate(client, forceAuthentication, refreshToken);
 
             if (tokenResponse != null && !string.IsNullOrEmpty(tokenResponse.access_token))
             {

@@ -4,7 +4,7 @@ using AspCore.Utilities.DataProtector;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
-using System.Linq; 
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AspCore.Caching.Concrete
@@ -23,7 +23,7 @@ namespace AspCore.Caching.Concrete
             throw new NotImplementedException();
         }
 
-        public T GetObject<T>(string key)
+        public override T GetObject<T>(string key)
         {
             if (!string.IsNullOrEmpty(key))
             {
@@ -38,39 +38,30 @@ namespace AspCore.Caching.Concrete
             }
             return default(T);
         }
-        public async Task<T> GetObjectAsync<T>(string key)
-        {
-            var data = await Task.Run(() => GetObject<T>(key));
-            return data;
-        }
 
-
-        public async Task<bool> SetObjectAsync<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
-        {
-            var data = await Task.Run(() => SetObject(key, obj, expires, sameSiteStrict));
-            return data;
-        }
-        public bool Remove(string key)
+        public override bool Remove(string key)
         {
             if (!string.IsNullOrEmpty(key))
             {
                 //key = $"{uniqueCacheKey}_{key}";
-                _contextAccessor.HttpContext.Response.Cookies.Delete(key);
+                if (_contextAccessor.HttpContext != null)
+                    _contextAccessor.HttpContext.Response.Cookies.Delete(key);
                 return true;
             }
             return false;
 
         }
 
-        public void RemoveAll()
+        public override bool RemoveAll()
         {
             foreach (var cookie in _contextAccessor.HttpContext.Request.Cookies.Keys.Where(t => t.StartsWith(uniqueCacheKey)))
             {
                 Remove(cookie);
             }
+            return true;
         }
 
-        public bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        public override bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
         {
             key = $"{uniqueCacheKey}_{key}";
             Remove(key);

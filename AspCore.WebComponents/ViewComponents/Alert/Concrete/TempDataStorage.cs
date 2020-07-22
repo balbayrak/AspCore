@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AspCore.Caching.Abstract;
 using AspCore.WebComponents.HtmlHelpers.Extensions;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Http;
@@ -54,9 +55,6 @@ namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
         {
             TempData.Keep(key);
         }
-
-      
-
         public bool Remove(string key)
         {
             return TempData.ContainsKey(key) && TempData.Remove(key);
@@ -68,9 +66,21 @@ namespace AspCore.WebComponents.ViewComponents.Alert.Concrete
             return true;
         }
 
-        public void RemoveAll()
+        public async Task<bool> RemoveAsync(string key)
         {
-            throw new NotImplementedException();
+            var data = await Task.Run(() => Remove(key));
+            return data;
+        }
+
+        public async Task<bool> RemoveAllAsync()
+        {
+            var data = await Task.Run(() => RemoveAll());
+            return data;
+        }
+
+        public bool RemoveAll()
+        {
+            return true;
         }
     }
 }

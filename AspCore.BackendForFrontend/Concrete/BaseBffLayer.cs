@@ -92,7 +92,7 @@ namespace AspCore.BackendForFrontend.Concrete
                 }
             }
 
-            CacheService.SetObject(key, authenticationToken, expire, false);
+            CacheService.SetObjectAsync(key, authenticationToken, expire, false);
 
         }
     }

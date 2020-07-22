@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Entities.Abstract;
 using AspCore.ApiClient.Entities.Concrete;
@@ -42,20 +43,20 @@ namespace AspCore.ApiClient
 
         public abstract AuthenticationToken GetTokenResponse(TOutput outputObj);
 
-        public abstract AuthenticationToken AuthenticateClient(AuthenticationInfo input, Func<TOutput, AuthenticationToken> func, bool forceAuthentication, bool refreshToken);
+        public abstract Task<AuthenticationToken> AuthenticateClient(AuthenticationInfo input, Func<TOutput, AuthenticationToken> func, bool forceAuthentication, bool refreshToken);
 
-        public override AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public override async Task<AuthenticationToken> Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
             AuthenticationToken tokenResponse = null;
 
 
             if (!forceAuthentication)
             {
-                tokenResponse = AccessTokenService.GetObject<AuthenticationToken>(tokenStorageKey);
+                tokenResponse = await AccessTokenService.GetObjectAsync<AuthenticationToken>(tokenStorageKey);
             }
             else
             {
-                tokenResponse = AuthenticateClient(authenticationInfo, GetTokenResponse, forceAuthentication, refreshToken);
+                tokenResponse = await AuthenticateClient(authenticationInfo, GetTokenResponse, forceAuthentication, refreshToken);
 
                 if (tokenResponse != null && !string.IsNullOrEmpty(tokenResponse.access_token))
                 {
@@ -81,7 +82,7 @@ namespace AspCore.ApiClient
                         }
                     }
 
-                    AccessTokenService.SetObject(tokenStorageKey, tokenResponse, tokenStrorageExpireTime);
+                    await AccessTokenService.SetObjectAsync(tokenStorageKey, tokenResponse, tokenStrorageExpireTime);
                 }
             }
 

@@ -125,11 +125,11 @@ namespace AspCore.ApiClient
               where TResult : class, new()
               where TPostObject : class
         {
-            TResult result = null;
+            TResult result;
 
 
             if (authenticationInfo == null)
-                Authenticate(client, false, false);
+                await Authenticate(client, false, false);
             else
             {
                 if (!authenticationInfo.access_token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
@@ -160,7 +160,7 @@ namespace AspCore.ApiClient
             {
                 bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
 
-                Authenticate(client, true, refreshTokenCnt);
+                await Authenticate(client, true, refreshTokenCnt);
 
                 response = await client.PostAsync(_apiUrl, jsonContent);
             }
@@ -179,7 +179,7 @@ namespace AspCore.ApiClient
 
 
             if (authenticationInfo == null)
-                Authenticate(client, false, false);
+                await Authenticate(client, false, false);
             else
             {
                 string token = authenticationInfo.access_token;
@@ -217,7 +217,7 @@ namespace AspCore.ApiClient
                     refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
                 }
 
-                Authenticate(client, true, refreshTokenCnt);
+                await Authenticate(client, true, refreshTokenCnt);
 
                 response = await client.PostAsync(_apiUrl, jsonContent);
             }
@@ -239,7 +239,7 @@ namespace AspCore.ApiClient
 
             CorrelationIdHeaderControl();
 
-            var response = client.PostAsync(_apiUrl, content, CancellationTokenHelper.Token).Result;
+            var response = await client.PostAsync(_apiUrl, content, CancellationTokenHelper.Token);
             if (response.IsSuccessStatusCode)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
@@ -250,7 +250,7 @@ namespace AspCore.ApiClient
             return result;
         }
 
-        public virtual AuthenticationToken Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
+        public virtual async Task<AuthenticationToken> Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
         {
             return null;
         }
