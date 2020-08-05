@@ -17,6 +17,8 @@
     <ProjectReference Include="..\AspCore.DataAccess\AspCore.DataAccess.csproj" />
     <ProjectReference Include="..\AspCore.DataSearch\AspCore.DataSearch.csproj" />
     <ProjectReference Include="..\AspCore.DocumentAccess\AspCore.DocumentAccess.csproj" />
+    <ProjectReference Include="..\AspCore.Dtos\AspCore.Dtos.csproj" />
+    <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
   </ItemGroup>
 
 </Project>

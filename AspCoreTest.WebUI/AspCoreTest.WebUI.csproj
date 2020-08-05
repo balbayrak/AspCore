@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -18,7 +18,12 @@
     <ProjectReference Include="..\AspCore.WebComponents\AspCore.WebComponents.csproj" />
     <ProjectReference Include="..\AspCore.Web\AspCore.Web.csproj" />
     <ProjectReference Include="..\AspCoreTest.DataSearch\AspCoreTest.DataSearch.csproj" />
+    <ProjectReference Include="..\AspCoreTest.Dtos\AspCoreTest.Dtos.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

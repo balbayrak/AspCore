@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
+using AspCore.Mapper.Configuration;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -36,6 +37,7 @@ namespace AspCore.Web.Configuration.Options
             var documentHelperOption = new DocumentHelperOption();
             option(documentHelperOption);
 
+
             services.AddTransient(typeof(IDocumentBffLayer<TDocument>), sp =>
             {
                 IDocumentBffLayer<TDocument> implementation = (IDocumentBffLayer<TDocument>)Activator.CreateInstance(typeof(TDocumentHelper), sp, documentHelperOption.uploaderRoute, documentHelperOption.viewerRoute, documentHelperOption.signerRoute);
@@ -50,7 +52,11 @@ namespace AspCore.Web.Configuration.Options
             services.AddDataProtector(option);
             return this;
         }
-
+        public ConfigurationBuilderOption AddAutoMapper()
+        {
+            var mapperBuilder=new MapperConfigurationBuilder(services);
+            return this;
+        }
 
         public ConfigurationBuilderOption AddMimeTypeService(Action<MimeTypeBuilder> builder)
         {

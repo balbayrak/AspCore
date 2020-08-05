@@ -8,6 +8,7 @@
     <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
     <ProjectReference Include="..\AspCoreTest.DataAccess\AspCoreTest.DataAccess.csproj" />
     <ProjectReference Include="..\AspCoreTest.DataSearch\AspCoreTest.DataSearch.csproj" />
+    <ProjectReference Include="..\AspCoreTest.Dtos\AspCoreTest.Dtos.csproj" />
     <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
   </ItemGroup>
 

@@ -66,4 +66,6 @@ namespace AspCore.Entities.General
         }
 
     }
+
+
 }

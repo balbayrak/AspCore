@@ -1,10 +1,9 @@
 ﻿using AspCore.Web.Abstract;
-using AspCoreTest.Entities.Models;
-using AspCoreTest.WebUI.Models.ViewModels;
+using AspCoreTest.Dtos.Dtos;
 
 namespace AspCoreTest.Bffs.Abstract
 {
-    public interface IPersonBff : IDatatableEntityBffLayer<PersonViewModel, Person>
+    public interface IPersonBff : IDatatableEntityBffLayer<PersonDto>
     {
     }
 }

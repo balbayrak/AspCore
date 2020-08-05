@@ -9,8 +9,7 @@ namespace AspCore.Extension
 {
     public static class EntityFilterExt
     {
-        public static List<SearchInfo> GetSearchInfo<TEntity>(this EntityFilter<TEntity> filter)
-                where TEntity : class, IEntity, new()
+        public static List<SearchInfo> GetSearchInfo(this EntityFilter filter)
         {
             List<SearchInfo> searchInfo = null;
             

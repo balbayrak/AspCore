@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
+    <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
     <ProjectReference Include="..\AspCore.WebApi\AspCore.WebApi.csproj" />
   </ItemGroup>
 

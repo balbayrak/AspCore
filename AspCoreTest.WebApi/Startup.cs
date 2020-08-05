@@ -29,68 +29,63 @@ namespace AspCoreTest.WebApi
         {
             services.ConfigureAspCoreServices(option =>
             {
-                option.AddDependencyResolver(option =>
-                {
-                    option.AutoBind();
-                })
-                .AddConfigurationManager(option =>
-                {
-                    option.AddConfigurationHelper(option =>
+                option.AddDependencyResolver(option => { option.AutoBind(); })
+                    .AddConfigurationManager(option =>
                     {
-                        option.type = EnumConfigurationAccessorType.AppSettingJson;
-                    });
-                })
-                .AddDataAccessLayer(option =>
-                {
-                    option.ConfigureDataAccessLayer<AspCoreTestDbContext>("DataAccessLayerInfo");
-                })
-                .AddApiClientSetting(option =>
-                {
-                    option.AddMemoryCache()
-                    .AddApiClients(option =>
-                    {
-                        option.AddBearerAuthenticatedClient(option => { option.apiKey = "YetkiApi"; })
-                        .AddBearerAuthenticatedClient(option => { option.apiKey = "DocumentApi"; })
-                        .AddBearerAuthenticatedClient(option => { option.apiKey = "ViewerApi"; })
-                        .AddJWTAuthenticatedClient(option => { option.apiKey = "DataSearchApi"; })
-                        .Build();
-                    });
-                })
-                .AddJWTAuthentication(option =>
-                {
-                    option.AddAuthenticationProvider(builder =>
-                    {
-                        builder.Add(typeof(CustomApiAuthenticationProvider))
-                         .Build();
+                        option.AddConfigurationHelper(option =>
+                        {
+                            option.type = EnumConfigurationAccessorType.AppSettingJson;
+                        });
                     })
-                    .AddActiveUserTokenGenerator<ActiveUserJwtGenerator, ActiveUserTokenValidator>(option =>
-                     {
-                         option.configurationKey = "TokenSettingOption";
-                     });
-                })
-                .AddSwaggerSetting(option =>
-                {
-                    option.swaggerDoc = new SwaggerDoc
+                    .AddDataAccessLayer(option =>
                     {
-                        title = "Service API",
-                        version = "1.0",
-                        description = "Service API Description",
-                        contactName = "Bilal ALBAYRAK",
-                        contactUrl = "http.google.com.tr",
-                        apiVersion = "v1",
-                        contactEmail = "balbayrak87@gmail.com"
-                    };
-                })
-                .AddDataProtectorHelper(option =>
-                {
-                    option.dataProtectorKey = "tsesecretkey";
-                    option.persistFileSytemPath = @"bin\debug\configuration";
-                    option.lifeTime = 10;
-                })
-                .AddDataSearchAccessLayer("DataSearchApi", option =>
-                 {
-                     option.AddDataSearchEngine<PersonSearchEntity>("api/PersonCache");
-                 });
+                        option.ConfigureDataAccessLayer<AspCoreTestDbContext>("DataAccessLayerInfo");
+                    })
+                    .AddApiClientSetting(option =>
+                    {
+                        option.AddMemoryCache()
+                            .AddApiClients(option =>
+                            {
+                                option.AddBearerAuthenticatedClient(option => { option.apiKey = "YetkiApi"; })
+                                    .AddBearerAuthenticatedClient(option => { option.apiKey = "DocumentApi"; })
+                                    .AddBearerAuthenticatedClient(option => { option.apiKey = "ViewerApi"; })
+                                    .AddJWTAuthenticatedClient(option => { option.apiKey = "DataSearchApi"; })
+                                    .Build();
+                            });
+                    })
+                    .AddJWTAuthentication(option =>
+                    {
+                        option.AddAuthenticationProvider(builder =>
+                            {
+                                builder.Add(typeof(CustomApiAuthenticationProvider))
+                                    .Build();
+                            })
+                            .AddActiveUserTokenGenerator<ActiveUserJwtGenerator, ActiveUserTokenValidator>(option =>
+                            {
+                                option.configurationKey = "TokenSettingOption";
+                            });
+                    })
+                    .AddSwaggerSetting(option =>
+                    {
+                        option.swaggerDoc = new SwaggerDoc
+                        {
+                            title = "Service API",
+                            version = "1.0",
+                            description = "Service API Description",
+                            contactName = "Bilal ALBAYRAK",
+                            contactUrl = "http.google.com.tr",
+                            apiVersion = "v1",
+                            contactEmail = "balbayrak87@gmail.com"
+                        };
+                    })
+                    .AddDataProtectorHelper(option =>
+                    {
+                        option.dataProtectorKey = "tsesecretkey";
+                        option.persistFileSytemPath = @"bin\debug\configuration";
+                        option.lifeTime = 10;
+                    })
+                    .AddDataSearchAccessLayer("DataSearchApi",
+                        option => { option.AddDataSearchEngine<PersonSearchEntity>("api/PersonCache"); }).AddAutoMapper();
                 //.AddDocumentAccessLayer(option =>
                 //{
                 //    option.AddDocumentUploader<Document, TseDocumentUploaderOption, TseDocumentUploader, TseDocumentValidator>(option =>

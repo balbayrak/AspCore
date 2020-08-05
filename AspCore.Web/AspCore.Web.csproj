@@ -21,6 +21,7 @@
     <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
     <ProjectReference Include="..\AspCore.Authentication\AspCore.Authentication.csproj" />
     <ProjectReference Include="..\AspCore.BackendForFrontend\AspCore.BackendForFrontend.csproj" />
+    <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
     <ProjectReference Include="..\AspCore.RedisClient\AspCore.RedisClient.csproj" />
     <ProjectReference Include="..\AspCore.WebComponents\AspCore.WebComponents.csproj" />
   </ItemGroup>

@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using AspCore.Dtos.Dto;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace AspCore.Extension
 {
@@ -26,8 +27,8 @@ namespace AspCore.Extension
             return includes;
         }
 
-        public static List<SortingExpression<TEntity>> ToSortingExpressionList<TEntity>(this List<SortingType<TEntity>> list)
-         where TEntity : class, IEntity, new()
+        public static List<SortingExpression<TEntity>> ToSortingExpressionList<TEntity>(this List<SortingType> list)
+        
         {
             List<SortingExpression<TEntity>> sorters = new List<SortingExpression<TEntity>>();
             foreach (var item in list)
@@ -36,6 +37,8 @@ namespace AspCore.Extension
             }
             return sorters;
         }
+
+        
 
     }
 }

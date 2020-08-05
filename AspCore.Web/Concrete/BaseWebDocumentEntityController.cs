@@ -6,13 +6,13 @@ using AspCore.Web.Abstract;
 using AspCore.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using AspCore.Dtos.Dto;
 
 namespace AspCore.Web.Concrete
 {
-    public abstract class BaseWebDocumentEntityController<TEntity, TViewModel, TBffLayer> : BaseWebEntityController<TEntity, TViewModel, TBffLayer>
-        where TEntity : class, IDocumentEntity, new()
-        where TViewModel : BaseViewModel<TEntity>, new()
-        where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>
+    public abstract class BaseWebDocumentEntityController<TEntityDto, TBffLayer> : BaseWebEntityController<TEntityDto, TBffLayer>
+        where TBffLayer : IDatatableEntityBffLayer<TEntityDto>
+        where TEntityDto : class,IDocumentEntityDto,new()
     {
         public BaseWebDocumentEntityController(IServiceProvider serviceProvider, TBffLayer bffLayer) : base(serviceProvider, bffLayer)
         {
@@ -24,14 +24,14 @@ namespace AspCore.Web.Concrete
         {
             if (!string.IsNullOrEmpty(id))
             {
-                ServiceResult<TViewModel> entityResult = BffLayer.GetById(new EntityFilter<TEntity>
+                ServiceResult<TEntityDto> entityResult = BffLayer.GetById(new EntityFilter
                 {
                     id = new Guid(id)
                 }).Result;
 
                 if (entityResult.IsSucceededAndDataIncluded())
                 {
-                    return DownloadDocument(entityResult.Result.dataEntity.DocumentUrl);
+                    return DownloadDocument(entityResult.Result.DocumentUrl);
                 }
             }
             return BadRequest(string.Format(FrontEndConstants.ERROR_MESSAGES.PARAMETER_IS_NULL, nameof(id)));

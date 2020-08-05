@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
 {
     public class DatatableStorageObject<TEntity>
-    where TEntity : class
+ 
     {
         #region Public Properties
 

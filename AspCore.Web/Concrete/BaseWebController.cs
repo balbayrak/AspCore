@@ -61,11 +61,7 @@ namespace AspCore.Web.Concrete
             ServiceProvider = serviceProvider;
         }
 
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            base.OnActionExecuting(context);
-        }
-
+  
         [HttpGet]
         public IActionResult DownloadDocument(string documentUrl)
         {

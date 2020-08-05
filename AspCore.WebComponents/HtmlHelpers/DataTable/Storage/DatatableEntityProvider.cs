@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
 {
-    public class DatatableEntityProvider<TEntity> where TEntity : class
+    public class DatatableEntityProvider<TEntity>
     {
         #region Fields
 

@@ -8,16 +8,16 @@ namespace AspCore.WebComponents.HtmlHelpers.Extensions
 {
     public static class JQueryDataTablesModelExt
     {
-        public static EntityFilter<TEntity> ToEntityFilter<TEntity>(this JQueryDataTablesModel model, string searchableColumns = null) where TEntity : class, IEntity, new()
+        public static EntityFilter ToEntityFilter(this JQueryDataTablesModel model, string searchableColumns = null) 
         {
-            List<SortingType<TEntity>> sortings = null;
+            List<SortingType> sortings = null;
             ReadOnlyCollection<SortingColumn> sorterColumns = model.GetSortedColumns();
             if (sorterColumns != null && sorterColumns.Count > 0)
             {
-                sortings = new List<SortingType<TEntity>>();
+                sortings = new List<SortingType>();
                 foreach (var item in sorterColumns)
                 {
-                    sortings.Add(new SortingType<TEntity>(item.propertyName, item.sortDirection));
+                    sortings.Add(new SortingType(item.propertyName, item.sortDirection));
                 }
             }
             SearchType searchType = null;
@@ -31,7 +31,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Extensions
                 };
             }
 
-            return new EntityFilter<TEntity>
+            return new EntityFilter
             {
                 page = model.iDisplayStart != 0 ? model.iDisplayStart / model.iDisplayLength : 0,
                 pageSize = model.iDisplayLength,

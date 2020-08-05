@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AspCore.BackendForFrontend.Abstract;
+using AspCore.Dtos.Dto;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Mapper.Abstract;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public abstract class BaseDocumentEntityBffLayer<TViewModel, TEntity, TDocument> : BaseEntityBffLayer<TViewModel, TEntity>, IDocumentEntityBffLayer<TViewModel, TEntity, TDocument>
-        where TViewModel : BaseViewModel<TEntity>, new()
+    public abstract class BaseDocumentEntityBffLayer<TEntityDto, TEntity, TDocument> : BaseEntityBffLayer<TEntityDto>, IDocumentEntityBffLayer<TEntityDto, TEntity, TDocument>
+        
         where TEntity : class, IDocumentEntity, new()
         where TDocument : class, IDocument, new()
+        where TEntityDto : class,IEntityDto,new()
     {
         public BaseDocumentEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {

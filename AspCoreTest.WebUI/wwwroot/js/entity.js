@@ -3,6 +3,7 @@
     Init: function (entity,
         formid,
         tableid,
+        primaryKey,
         submitClass = ".entitysubmit",
         successTitle = null,
         errorTitle = null) {
@@ -11,7 +12,7 @@
             function (e) {
                 e.preventDefault();
                 var $btn = $(this);
-                Entity.AddOrEdit($btn, entity, formid, tableid, successTitle, errorTitle);
+                Entity.AddOrEdit($btn, entity, primaryKey, formid, tableid, successTitle, errorTitle);
 
             });
 
@@ -27,14 +28,26 @@
     },
     AddOrEdit: function (btnRef,
         entity,
+        primaryKey,
         formid,
         tableid = null,
         successTitle = null,
         errorTitle = null) {
         if (this.Validate(formid)) {
             var formData = $('#' + formid).serialize();
+            var idVal = "";
+            var url;
+            if (primaryKey===undefined||primaryKey==="") {
+                primaryKey = "EncryptedId";
+            }
+            idVal = $('#' + formid + ' input[id="' + primaryKey + '"]').val();
+            if (idVal === undefined || idVal === "") {
+                url = "Add";
+            } else {
+                url = "Edit";
+            }
             $.ajax({
-                url: "/" + entity + "/AddOrEdit",
+                url: "/" + entity + "/" + url,
                 type: "POST",
                 data: formData,
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
