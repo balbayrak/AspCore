@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>1.0.6</Version>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <Company>AspCore.Authentication</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

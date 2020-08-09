@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
+    <Company>AspCore.Storage</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
