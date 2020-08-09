@@ -1,6 +1,6 @@
-﻿using AspCore.Caching.Abstract;
-using AspCore.Caching.Concrete;
-using AspCore.Entities.Configuration;
+﻿using AspCore.Entities.Configuration;
+using AspCore.Storage.Abstract;
+using AspCore.Storage.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,36 +14,11 @@ namespace AspCore.ApiClient.Configuration
         public ApiClientCacheBuilder(IServiceCollection services) : base(services)
         {}
 
-        public ApiClientOptionBuilder AddMemoryCache()
+
+        public ApiClientOptionBuilder AddCacheService(Action<CacheOptionBuilder> builder)
         {
-            var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
-            if (httpContextAccessor == null)
-            {
-                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            }
-
-            services.AddMemoryCache();
-            services.AddSingleton<ICacheService, MemoryCacheManager>();
-
-            return new ApiClientOptionBuilder(services);
-        }
-
-        public ApiClientOptionBuilder AddCustomCacheService<T>()
-        where T : class, ICacheService, new()
-        {
-            var httpContextAccessor = services.FirstOrDefault(d => d.ServiceType == typeof(IHttpContextAccessor));
-            if (httpContextAccessor == null)
-            {
-                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            }
-
-            var accessTokenService = services.FirstOrDefault(d => d.ServiceType == typeof(ICacheService));
-            if (accessTokenService == null)
-            {
-                services.Remove(accessTokenService);
-            }
-
-            services.AddSingleton<ICacheService, T>();
+            CacheOptionBuilder cacheOptionBuilder = new CacheOptionBuilder(services);
+            builder(cacheOptionBuilder);
 
             return new ApiClientOptionBuilder(services);
         }

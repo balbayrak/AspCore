@@ -31,7 +31,7 @@ namespace AspCore.WebApi.Middlewares
                 var token = httpContext.Request.Headers[ApiConstants.Api_Keys.API_AUTHORIZATION][0]
                     .Substring("Bearer ".Length);
 
-                ServiceResult<TJWTInfo> jwtInfoResult = _tokenValidator.Validate(new AuthenticationToken
+                ServiceResult<TJWTInfo> jwtInfoResult = _tokenValidator.Validate(new AuthenticationTicketInfo
                 {
                     access_token = token
                 },false);

@@ -52,7 +52,7 @@ namespace AspCore.Business.Concrete
                 return DataAccess.Delete(entityIds);
         }
 
-        public Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
+        public virtual Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
         {
             if (entities.Length > 1)
                 return DataAccess.AddWithTransactionAsync(entities);
@@ -60,7 +60,7 @@ namespace AspCore.Business.Concrete
                 return DataAccess.AddAsync(entities);
         }
 
-        public Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
+        public virtual Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
         {
             if (entities.Length > 1)
                 return DataAccess.UpdateWithTransactionAsync(entities);
@@ -68,12 +68,17 @@ namespace AspCore.Business.Concrete
                 return DataAccess.UpdateAsync(entities);
         }
 
-        public Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)
+        public virtual Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)
         {
             if (entityIds.Length > 1)
                 return DataAccess.DeleteWithTransactionAsync(entityIds);
             else
                 return DataAccess.DeleteAsync(entityIds);
+        }
+
+        public Task<ServiceResult<TEntity>> GetByIdAsync(EntityFilter<TEntity> setting)
+        {
+            return DataAccess.GetByIdAsync(setting.id);
         }
 
         public ServiceResult<TEntity> GetById(EntityFilter<TEntity> setting)

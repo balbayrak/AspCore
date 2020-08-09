@@ -1,10 +1,9 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
-using AspCore.Caching.Abstract;
 using AspCore.ConfigurationAccess.Abstract;
-using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
+using AspCore.Storage.Concrete;
 using AspCore.Utilities.MimeMapping;
 using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using Microsoft.AspNetCore.Mvc;
@@ -40,12 +39,8 @@ namespace AspCore.Web.Concrete
             return reference;
         }
 
-
-        private ICookieService CookieService => LazyGetRequiredService(ref _cookieService);
-        private ICookieService _cookieService;
-
-        protected ICacheService CacheService => LazyGetRequiredService(ref _cacheService);
-        private ICacheService _cacheService;
+        public StorageService StorageManager => LazyGetRequiredService(ref _storageService);
+        private StorageService _storageService;
 
         protected IAlertService AlertService => LazyGetRequiredService(ref _alertService);
         private IAlertService _alertService;

@@ -1,13 +1,13 @@
-﻿@using Microsoft.AspNetCore.Http;
-@using AspCore.Web.Abstract;
-@using AspCore.BackendForFrontend.Abstract;
-@using AspCore.Entities.User;
+﻿@using AspCore.BackendForFrontend.Concrete.Security.User;
 
-@inject IApplicationCachedClient _applicationCacheClient;
+@inject ICurrentUser _currentUser;
 
 @{
-    var currentUser = _applicationCacheClient.GetAuthenticatedUser<ActiveUser>();
-    var userName = currentUser.name + " " + currentUser.surname;
+    var userName = string.Empty;
+    if(_currentUser.IsAuthenticated)
+    {
+        userName = _currentUser.UserName;
+    }
 }
 
 <div class="page-header-inner ">

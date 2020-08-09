@@ -1,8 +1,5 @@
-﻿using AspCore.Caching.Abstract;
-using AspCore.Caching.Concrete;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
+﻿using AspCore.ApiClient.Handlers;
+using System;
 
 namespace AspCore.ApiClient.Configuration
 {
@@ -24,5 +21,6 @@ namespace AspCore.ApiClient.Configuration
         /// Cicuit after unsuccessful request count
         /// </summary>
         public int circuitbreakerCount { get; set; } = 5;
+
     }
 }

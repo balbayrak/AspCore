@@ -32,9 +32,9 @@ namespace AspCore.Authentication.JWT.Abstract
             _tokenValidator = ServiceProvider.GetRequiredService<ITokenValidator<TJWTInfo>>();
         }
 
-        public ServiceResult<AuthenticationToken> CreateToken(TJWTInfo jwtInfo)
+        public ServiceResult<AuthenticationTicketInfo> CreateToken(TJWTInfo jwtInfo)
         {
-            ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
+            ServiceResult<AuthenticationTicketInfo> serviceResult = new ServiceResult<AuthenticationTicketInfo>();
             try
             {
 
@@ -44,7 +44,7 @@ namespace AspCore.Authentication.JWT.Abstract
 
 
                 serviceResult.IsSucceeded = true;
-                serviceResult.Result = new AuthenticationToken();
+                serviceResult.Result = new AuthenticationTicketInfo();
                 serviceResult.Result.access_token = token;
                 serviceResult.Result.expires = _accessTokenExpiration;
                 serviceResult.Result.refresh_token = EncryptionHelper.Encrypt(token, _jwtHandler.SettingOption.PrivateKey).Substring(0, 10);
@@ -58,9 +58,9 @@ namespace AspCore.Authentication.JWT.Abstract
             return serviceResult;
         }
 
-        public ServiceResult<AuthenticationToken> RefreshToken(AuthenticationToken token)
+        public ServiceResult<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo token)
         {
-            ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
+            ServiceResult<AuthenticationTicketInfo> serviceResult = new ServiceResult<AuthenticationTicketInfo>();
             try
             {
                 var cnt = EncryptionHelper.Encrypt(token.access_token, _jwtHandler.SettingOption.PrivateKey).Substring(0, 10);

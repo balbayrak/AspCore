@@ -2,7 +2,7 @@
 
 namespace AspCore.BackendForFrontend.Abstract
 {
-    public interface IBffApiClient : IAuthenticatedApiClient
+    public interface IBffApiClient : IApiClient
     {
         string apiClientKey { get; set; }
     }

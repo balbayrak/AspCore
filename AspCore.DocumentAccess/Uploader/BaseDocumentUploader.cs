@@ -1,6 +1,5 @@
 ﻿using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Dependency.Concrete;
+using AspCore.ApiClient.Entities;
 using AspCore.DocumentManagement.Validator;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
@@ -12,7 +11,7 @@ namespace AspCore.DocumentManagement.Uploader
          where TOption : class, IUploaderOption, new()
     {
         protected IDocumentValidator<TDocument, TOption> _documentValidator;
-        protected IAuthenticatedApiClient _apiClient { get; private set; }
+        protected IApiClient _apiClient { get; private set; }
         protected string _apiControllerRoute { get; private set; }
 
         public BaseDocumentUploader(IDocumentValidator<TDocument, TOption> documentValidator, string uploaderKey, string apiControllerRoute)

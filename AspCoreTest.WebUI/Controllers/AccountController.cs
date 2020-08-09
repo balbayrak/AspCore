@@ -31,10 +31,5 @@ namespace AspCoreTest.WebUI.Controllers
 
             return View();
         }
-
-        public void AuthenticationTicket(string ticket)
-        {
-
-        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
+using AspCore.ApiClient.Entities;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
@@ -12,7 +12,7 @@ namespace AspCore.ElasticSearchApiClient
     public class ReadOnlyElasticClient<T> : IReadOnlyElasticClient<T>
         where T : class, ISearchableEntity, new()
     {
-        protected IAuthenticatedApiClient _apiClient { get; set; }
+        protected IApiClient _apiClient { get; set; }
         protected string _elasticApiRoute { get; }
 
         public ReadOnlyElasticClient(string apiClientKey, string elasticApiRoute)

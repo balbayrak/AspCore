@@ -1,20 +1,11 @@
 ﻿using AspCore.ApiClient.Abstract;
 using AspCore.ApiClient.Entities;
-using AspCore.ApiClient.Entities.Abstract;
-using AspCore.Caching.Abstract;
-using AspCore.ConfigurationAccess.Abstract;
+using AspCore.ApiClient.Handlers;
 using AspCore.Dependency.Abstract;
 using AspCore.Dependency.Concrete;
-using AspCore.Entities.Constants;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using Polly.Extensions.Http;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
 
 namespace AspCore.ApiClient.Configuration
@@ -33,55 +24,85 @@ namespace AspCore.ApiClient.Configuration
         public ApiClientByNameBuilder AddApiClient<TOption>(Action<ApiClientOption> clientOption)
        where TOption : class, IApiClientConfiguration, new()
         {
-            string apiKey = _services.AddApiClient(clientOption);
+            string apiKey = _services.AddApiClient<TOption>(clientOption,true);
 
-           _registrations.Add(apiKey, typeof(ApiClient<TOption>));
+            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
+
+            return this;
+        }
+
+        public ApiClientByNameBuilder AddApiClient<T, TConcrete, TOption>(Action<ApiClientOption> clientOption)
+           where T : IApiClient
+           where TConcrete : ApiClient<TOption>, IApiClient
+           where TOption : class, IApiClientConfiguration, new()
+        {
+            string apiKey = _services.AddApiClient<T, TConcrete, TOption>(clientOption,true);
+
+            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
 
             return this;
         }
 
         public ApiClientByNameBuilder AddApiClient(Action<ApiClientOption> clientOption)
         {
-            string apiKey = _services.AddApiClient(clientOption);
+            string apiKey = _services.AddApiClient<ApiClientConfiguration>(clientOption,true);
 
             _registrations.Add(apiKey, typeof(ApiClient<ApiClientConfiguration>));
 
             return this;
         }
 
-        public ApiClientByNameBuilder AddBearerAuthenticatedClient<TOption>(Action<ApiClientOption> clientOption)
+        public ApiClientByNameBuilder AddAuthenticatedApiClient<TOption>(Action<AuthenticatedApiClientOption> clientOption)
           where TOption : class, IApiClientConfiguration, new()
         {
-            string apiKey = _services.AddBearerAuthenticatedClient<TOption>(clientOption);
+            string apiKey = _services.AddAuthenticatedApiClient<TOption>(clientOption,true);
 
-            _registrations.Add(apiKey, typeof(BearerAuthenticatedApiClient<TOption>));
-
-            return this;
-        }
-
-        public ApiClientByNameBuilder AddBearerAuthenticatedClient(Action<ApiClientOption> clientOption)
-        {
-            string apiKey = _services.AddBearerAuthenticatedClient(clientOption);
-
-            _registrations.Add(apiKey, typeof(BearerAuthenticatedApiClient<ApiClientConfiguration>));
+            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
 
             return this;
         }
 
-        public ApiClientByNameBuilder AddJWTAuthenticatedClient<TOption>(Action<ApiClientOption> clientOption)
-        where TOption : class, IApiClientConfiguration, new()
+        public ApiClientByNameBuilder AddAuthenticatedApiClient<T, TConcrete, TOption>(Action<AuthenticatedApiClientOption> clientOption)
+            where T : IApiClient
+            where TConcrete : ApiClient<TOption>, IApiClient
+            where TOption : class, IApiClientConfiguration, new()
         {
-            string apiKey = _services.AddJWTAuthenticatedClient<TOption>(clientOption);
+            string apiKey = _services.AddAuthenticatedApiClient<T, TConcrete, TOption>(clientOption,true);
 
-            _registrations.Add(apiKey, typeof(JWTAuthenticatedApiClient<TOption>));
+            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
+
+            return this;
+        }
+        
+        public ApiClientByNameBuilder AddAuthenticatedApiClient<T, TConcrete, TOption, TAuthenticationHandler>(Action<AuthenticatedApiClientOption> clientOption)
+           where T : IApiClient
+           where TConcrete : ApiClient<TOption>, IApiClient
+           where TOption : class, IApiClientConfiguration, new()
+             where TAuthenticationHandler : AspCoreAuthenticationHandler<TOption>
+        {
+            string apiKey = _services.AddAuthenticatedApiClient<T, TConcrete, TOption, TAuthenticationHandler>(clientOption,true);
+
+            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
 
             return this;
         }
 
-        public ApiClientByNameBuilder AddJWTAuthenticatedClient(Action<ApiClientOption> clientOption)
+        public ApiClientByNameBuilder AddAuthenticatedApiClient<TOption, TAuthenticationHandler>(Action<AuthenticatedApiClientOption> clientOption)
+            where TOption : class, IApiClientConfiguration, new()
+            where TAuthenticationHandler : AspCoreAuthenticationHandler<TOption>
         {
-            string apiKey = _services.AddJWTAuthenticatedClient(clientOption);
-            _registrations.Add(apiKey, typeof(JWTAuthenticatedApiClient<ApiClientConfiguration>));
+            string apiKey = _services.AddAuthenticatedApiClient<TOption, TAuthenticationHandler>(clientOption,true);
+
+            _registrations.Add(apiKey, typeof(ApiClient<TOption>));
+
+            return this;
+        }
+
+        public ApiClientByNameBuilder AddAuthenticatedApiClient(Action<AuthenticatedApiClientOption> clientOption)
+        {
+            string apiKey = _services.AddAuthenticatedApiClient(clientOption,true);
+
+            _registrations.Add(apiKey, typeof(ApiClient<ApiClientConfiguration>));
 
             return this;
         }
@@ -89,7 +110,7 @@ namespace AspCore.ApiClient.Configuration
         public void Build()
         {
             var registrations = _registrations;
-            _services.AddTransient<IServiceByNameFactory<IAuthenticatedApiClient>>(s => new ServiceByNameFactory<IAuthenticatedApiClient>(registrations));
+            _services.AddTransient<IServiceByNameFactory<IApiClient>>(s => new ServiceByNameFactory<IApiClient>(registrations));
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AspCore.Entities.EntityType
 {
-    public class CoreEntity : IEntity
+    public abstract class CoreEntity : IEntity
     {
         [NotMapped]
         public CoreEntityState? entityState { get; set; }

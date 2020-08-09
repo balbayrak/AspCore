@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -33,7 +34,7 @@ namespace AspCore.Authentication.JWT.Abstract
             }
         }
 
-        public ServiceResult<TJWTInfo> Validate(AuthenticationToken token, bool isExpiredToken)
+        public ServiceResult<TJWTInfo> Validate(AuthenticationTicketInfo token, bool isExpiredToken)
         {
             ServiceResult<TJWTInfo> serviceResult = new ServiceResult<TJWTInfo>();
             try
@@ -48,7 +49,27 @@ namespace AspCore.Authentication.JWT.Abstract
             return serviceResult;
         }
 
-        private ServiceResult<TJWTInfo> GetClaimsFromExpiredToken(AuthenticationToken token, bool isExpiredToken)
+        public ServiceResult<List<Claim>> GetClaims(AuthenticationTicketInfo token)
+        {
+            ServiceResult<List<Claim>> serviceResult = new ServiceResult<List<Claim>>();
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                SecurityToken securityToken;
+                ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(token.access_token, _jwtHandler.RefreshParameters, out securityToken);
+                serviceResult.Result = claimsPrincipal.Claims.ToList();
+                serviceResult.IsSucceeded = true;
+                tokenHandler = null;
+            }
+            catch (Exception ex)
+            {
+                serviceResult.ErrorMessage(AuthenticationConstants.TOKEN_SETTING_OPTIONS.TOKEN_VALIDATE_EXCEPTION, ex);
+            }
+
+            return serviceResult;
+        }
+
+        private ServiceResult<TJWTInfo> GetClaimsFromExpiredToken(AuthenticationTicketInfo token, bool isExpiredToken)
         {
             ServiceResult<TJWTInfo> serviceResult = new ServiceResult<TJWTInfo>();
             try

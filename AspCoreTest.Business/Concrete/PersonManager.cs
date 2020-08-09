@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using AspCore.Business.General;
 using testbusiness.Abstract;
+using System.Threading.Tasks;
 
 namespace testbusiness.Concrete
 {
@@ -19,7 +20,7 @@ namespace testbusiness.Concrete
         {
 
         }
-        public override ServiceResult<PersonSearchEntity> GetComplexEntity(Person entity)
+        public override async Task<ServiceResult<PersonSearchEntity>> GetComplexEntity(Person entity)
         {
             return new ServiceResult<PersonSearchEntity>
             {

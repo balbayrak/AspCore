@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Concrete
 {
@@ -28,9 +29,9 @@ namespace AspCore.Business.Concrete
             _dataSearchEngine = ServiceProvider.GetService<TDataSearchEngine>();
         }
 
-        public abstract ServiceResult<TSearchableEntity> GetComplexEntity(TEntity entity);
+        public abstract Task<ServiceResult<TSearchableEntity>> GetComplexEntity(TEntity entity);
 
-        private ServiceResult<TSearchableEntity[]> GetComplexEntities(TEntity[] entities)
+        private async Task<ServiceResult<TSearchableEntity[]>> GetComplexEntities(TEntity[] entities)
         {
             ServiceResult<TSearchableEntity[]> serviceResult = new ServiceResult<TSearchableEntity[]>();
             try
@@ -38,7 +39,7 @@ namespace AspCore.Business.Concrete
                 List<TSearchableEntity> list = new List<TSearchableEntity>();
                 foreach (var item in entities)
                 {
-                    ServiceResult<TSearchableEntity> entityResult = GetComplexEntity(item);
+                    ServiceResult<TSearchableEntity> entityResult = await GetComplexEntity(item);
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
                         list.Add(entityResult.Result);
@@ -78,7 +79,58 @@ namespace AspCore.Business.Concrete
                 ServiceResult<bool> resultDAL = DataAccess.Add(entities);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities);
+                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities).Result;
+                    if (entityResult.IsSucceededAndDataIncluded())
+                    {
+
+                        ServiceResult<bool> resultCache = _dataSearchEngine.Create(entityResult.Result.ToArray());
+                        if (resultCache.IsSucceeded)
+                        {
+                            TransactionBuilder.CommitTransaction();
+                            result.IsSucceeded = true;
+                            result.StatusMessage = resultDAL.StatusMessage;
+                        }
+                        else
+                        {
+                            result.ErrorMessage = resultCache.ErrorMessage;
+                            result.ExceptionMessage = resultCache.ExceptionMessage;
+                        }
+                    }
+                    else
+                    {
+                        result.ErrorMessage = entityResult.ErrorMessage;
+                        result.ExceptionMessage = entityResult.ExceptionMessage;
+                    }
+                }
+                else
+                {
+                    result.ErrorMessage = resultDAL.ErrorMessage;
+                    result.ExceptionMessage = resultDAL.ExceptionMessage;
+                }
+            }
+            catch
+            {
+                TransactionBuilder.RollbackTransaction();
+            }
+            finally
+            {
+                TransactionBuilder.DisposeTransaction();
+            }
+
+            return result;
+        }
+
+        public override async Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
+        {
+            TransactionBuilder.BeginTransaction();
+
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                ServiceResult<bool> resultDAL = await DataAccess.AddAsync(entities);
+                if (resultDAL.IsSucceeded)
+                {
+                    ServiceResult<TSearchableEntity[]> entityResult = await GetComplexEntities(entities);
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
 
@@ -129,7 +181,57 @@ namespace AspCore.Business.Concrete
                 ServiceResult<bool> resultDAL = DataAccess.Update(entities);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities);
+                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities).Result;
+                    if (entityResult.IsSucceededAndDataIncluded())
+                    {
+                        ServiceResult<bool> resultCache = _dataSearchEngine.Update(entityResult.Result.ToArray());
+                        if (resultCache.IsSucceeded)
+                        {
+                            TransactionBuilder.CommitTransaction();
+                            result.IsSucceeded = true;
+                            result.StatusMessage = resultDAL.StatusMessage;
+                        }
+                        else
+                        {
+                            result.ErrorMessage = resultCache.ErrorMessage;
+                            result.ExceptionMessage = resultCache.ExceptionMessage;
+                        }
+                    }
+                    else
+                    {
+                        result.ErrorMessage = entityResult.ErrorMessage;
+                        result.ExceptionMessage = entityResult.ExceptionMessage;
+                    }
+                }
+                else
+                {
+                    result.ErrorMessage = resultDAL.ErrorMessage;
+                    result.ExceptionMessage = resultDAL.ExceptionMessage;
+                }
+            }
+            catch
+            {
+                TransactionBuilder.RollbackTransaction();
+            }
+            finally
+            {
+                TransactionBuilder.DisposeTransaction();
+            }
+
+            return result;
+        }
+
+        public override async Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
+        {
+            TransactionBuilder.BeginTransaction();
+
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                ServiceResult<bool> resultDAL = await DataAccess.UpdateAsync(entities);
+                if (resultDAL.IsSucceeded)
+                {
+                    ServiceResult<TSearchableEntity[]> entityResult = await GetComplexEntities(entities);
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
                         ServiceResult<bool> resultCache = _dataSearchEngine.Update(entityResult.Result.ToArray());
@@ -180,10 +282,70 @@ namespace AspCore.Business.Concrete
 
                 if (entityListResult.IsSucceededAndDataIncluded())
                 {
-                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entityListResult.Result.ToArray());
+                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entityListResult.Result.ToArray()).Result;
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
                         ServiceResult<bool> resultDAL = DataAccess.Delete(entityIds);
+                        if (resultDAL.IsSucceeded)
+                        {
+                            ServiceResult<bool> resultCache = _dataSearchEngine.Delete(entityResult.Result.ToArray());
+                            if (resultCache.IsSucceeded)
+                            {
+                                TransactionBuilder.CommitTransaction();
+                                result.IsSucceeded = true;
+                                result.StatusMessage = resultDAL.StatusMessage;
+                            }
+                            else
+                            {
+                                result.ErrorMessage = resultCache.ErrorMessage;
+                                result.ExceptionMessage = resultCache.ExceptionMessage;
+                            }
+                        }
+                        else
+                        {
+                            result.ErrorMessage = resultDAL.ErrorMessage;
+                            result.ExceptionMessage = resultDAL.ExceptionMessage;
+                        }
+                    }
+                    else
+                    {
+                        result.ErrorMessage = entityResult.ErrorMessage;
+                        result.ExceptionMessage = entityResult.ExceptionMessage;
+                    }
+                }
+                else
+                {
+                    result.ErrorMessage = entityListResult.ErrorMessage;
+                    result.ExceptionMessage = entityListResult.ExceptionMessage;
+                }
+            }
+            catch
+            {
+                TransactionBuilder.RollbackTransaction();
+            }
+            finally
+            {
+                TransactionBuilder.DisposeTransaction();
+            }
+
+            return result;
+        }
+
+        public override  async Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)
+        {
+            TransactionBuilder.BeginTransaction();
+
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+                ServiceResult<List<TEntity>> entityListResult = await DataAccess.GetByIdListAsync(entityIds);
+
+                if (entityListResult.IsSucceededAndDataIncluded())
+                {
+                    ServiceResult<TSearchableEntity[]> entityResult = await GetComplexEntities(entityListResult.Result.ToArray());
+                    if (entityResult.IsSucceededAndDataIncluded())
+                    {
+                        ServiceResult<bool> resultDAL = await DataAccess.DeleteAsync(entityIds);
                         if (resultDAL.IsSucceeded)
                         {
                             ServiceResult<bool> resultCache = _dataSearchEngine.Delete(entityResult.Result.ToArray());

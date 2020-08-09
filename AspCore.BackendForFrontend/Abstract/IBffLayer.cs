@@ -9,10 +9,5 @@ namespace AspCore.BackendForFrontend.Abstract
     {
         IBffApiClient ApiClient { get; }
 
-        void SetApiClientTokenStorageKey(string tokenStorageKey);
-
-        void SetApiClientTokenStorageExpireTime(DateTime expireTime);
-
-        void SetAuthenticationToken(string key, AuthenticationToken authenticationToken);
     }
 }

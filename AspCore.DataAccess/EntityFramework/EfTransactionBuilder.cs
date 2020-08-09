@@ -34,6 +34,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             }
         }
+
         public void Dispose()
         {
             DisposeTransaction();

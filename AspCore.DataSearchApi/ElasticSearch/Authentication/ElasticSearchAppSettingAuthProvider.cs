@@ -96,7 +96,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Authentication
                 string jwt = _httpContextAccessor.HttpContext.GetJWTToken();
                 if (!string.IsNullOrEmpty(jwt))
                 {
-                    ServiceResult<ElasticSearchApiJWTInfo> tokenResult = _tokenValidator.Validate(new AuthenticationToken
+                    ServiceResult<ElasticSearchApiJWTInfo> tokenResult = _tokenValidator.Validate(new AuthenticationTicketInfo
                     {
                         access_token = jwt
                     }, false);

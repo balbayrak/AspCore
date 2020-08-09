@@ -1,9 +1,9 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
-using AspCore.Caching.Abstract;
-using AspCore.Dependency.Concrete;
+using AspCore.BackendForFrontend.Concrete.Security.User;
 using AspCore.Entities.Constants;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
+using AspCore.Storage.Abstract;
 using AspCore.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,9 +15,9 @@ namespace AspCore.BackendForFrontend.Concrete
         where TDocument : class, IDocument, new()
         where TViewRequest : class, IDocumentApiViewRequest<TDocument,ViewerToolbarSetting>, new()
     {
-        protected IApplicationCachedClient ApplicationCachedClient;
-        protected IBffApiClient ApiClient { get; private set; }
-        protected ICacheService Cache { get; set; }
+        protected readonly ICurrentUser CurrentUser;
+        protected readonly IBffApiClient ApiClient;
+        protected readonly ICacheService Cache;
         private string _uploaderRoute { get; set; }
         private string _viewerRoute { get; set; }
         private string _signerRoute { get; set; }
@@ -31,9 +31,7 @@ namespace AspCore.BackendForFrontend.Concrete
 
             Cache = ServiceProvider.GetRequiredService<ICacheService>();
 
-            ApplicationCachedClient = ServiceProvider.GetRequiredService<IApplicationCachedClient>();
-
-            ApiClient.tokenStorageKey = ApplicationCachedClient.ApplicationUserKey;
+            CurrentUser = ServiceProvider.GetRequiredService<ICurrentUser>();
 
             _uploaderRoute = uploaderRoute;
             _viewerRoute = viewerRoute;

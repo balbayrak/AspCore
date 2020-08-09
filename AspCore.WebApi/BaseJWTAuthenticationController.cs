@@ -39,13 +39,13 @@ namespace AspCore.WebApi
         [AllowAnonymous]
         [HttpPost]
         [ActionName(ApiConstants.Urls.AUTHENTICATE_CLIENT)]
-        [ProducesResponseType(typeof(ServiceResult<AuthenticationToken>), 200)]
+        [ProducesResponseType(typeof(ServiceResult<AuthenticationTicketInfo>), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public IActionResult AuthenticateClient([FromBody]TInput authenticationInput)
         {
 
-            ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
+            ServiceResult<AuthenticationTicketInfo> serviceResult = new ServiceResult<AuthenticationTicketInfo>();
 
             if (AuthenticationProvider == null)
             {
@@ -65,12 +65,12 @@ namespace AspCore.WebApi
 
                     if (userInfoResult.IsSucceededAndDataIncluded())
                     {
-                        ServiceResult<AuthenticationToken> authenticationTokenResult = _tokenGenerator.CreateToken(userInfoResult.Result);
+                        ServiceResult<AuthenticationTicketInfo> authenticationTokenResult = _tokenGenerator.CreateToken(userInfoResult.Result);
 
                         if (authenticationTokenResult.IsSucceededAndDataIncluded())
                         {
                             serviceResult.IsSucceeded = true;
-                            serviceResult.Result = new AuthenticationToken();
+                            serviceResult.Result = new AuthenticationTicketInfo();
                             serviceResult.Result.access_token = authenticationTokenResult.Result.access_token;
                             serviceResult.Result.refresh_token = authenticationTokenResult.Result.refresh_token;
                             serviceResult.Result.expires = authenticationTokenResult.Result.expires;
@@ -104,15 +104,15 @@ namespace AspCore.WebApi
         [AllowAnonymous]
         [HttpPost]
         [ActionName(ApiConstants.Urls.REFRESH_TOKEN)]
-        [ProducesResponseType(typeof(ServiceResult<AuthenticationToken>), 200)]
+        [ProducesResponseType(typeof(ServiceResult<AuthenticationTicketInfo>), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public IActionResult RefreshToken([FromBody]AuthenticationToken authenticationToken)
+        public IActionResult RefreshToken([FromBody]AuthenticationTicketInfo authenticationToken)
         {
-            ServiceResult<AuthenticationToken> serviceResult = new ServiceResult<AuthenticationToken>();
+            ServiceResult<AuthenticationTicketInfo> serviceResult = new ServiceResult<AuthenticationTicketInfo>();
             try
             {
-                ServiceResult<AuthenticationToken> newAuthenticationTokenResult = _tokenGenerator.RefreshToken(new AuthenticationToken
+                ServiceResult<AuthenticationTicketInfo> newAuthenticationTokenResult = _tokenGenerator.RefreshToken(new AuthenticationTicketInfo
                 {
                     access_token = authenticationToken.access_token,
                     expires = authenticationToken.expires,
@@ -122,7 +122,7 @@ namespace AspCore.WebApi
                 if (newAuthenticationTokenResult.IsSucceededAndDataIncluded())
                 {
                     serviceResult.IsSucceeded = true;
-                    serviceResult.Result = new AuthenticationToken();
+                    serviceResult.Result = new AuthenticationTicketInfo();
                     serviceResult.Result.access_token = newAuthenticationTokenResult.Result.access_token;
                     serviceResult.Result.refresh_token = newAuthenticationTokenResult.Result.refresh_token;
                     serviceResult.Result.expires = newAuthenticationTokenResult.Result.expires;
@@ -145,7 +145,7 @@ namespace AspCore.WebApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize]
-        public IActionResult GetClientInfo([FromBody] AuthenticationToken authenticationToken)
+        public IActionResult GetClientInfo([FromBody] AuthenticationTicketInfo authenticationToken)
         {
             ServiceResult<TOutput> serviceResult = new ServiceResult<TOutput>();
 
@@ -153,7 +153,7 @@ namespace AspCore.WebApi
             {
                 try
                 {
-                    serviceResult = _tokenValidator.Validate(new AuthenticationToken
+                    serviceResult = _tokenValidator.Validate(new AuthenticationTicketInfo
                     {
                         access_token = authenticationToken.access_token,
                         expires = authenticationToken.expires,

@@ -1,15 +1,27 @@
 ﻿using AspCore.Authentication.JWT.Abstract;
 using AspCore.BackendForFrontend.Abstract;
-using AspCore.Caching.Abstract;
+using AspCore.BackendForFrontend.Concrete.Security.Claims;
 using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using AspCore.Storage.Abstract;
+using AspCore.Storage.Concrete;
+using AspCore.Utilities;
 using AspCore.Web.Authentication.Abstract;
+using AspCore.Web.Configuration.Options;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Security.Claims;
 
 namespace AspCore.Web.Concrete
 {
@@ -61,11 +73,8 @@ namespace AspCore.Web.Concrete
 
         public abstract string AuthenticationProviderName { get; }
 
-        protected ICacheService CacheService => LazyGetRequiredService(ref _cacheService);
-        private ICacheService _cacheService;
-
-        protected ICookieService CookieService => LazyGetRequiredService(ref _cookieService);
-        private ICookieService _cookieService;
+        public StorageService StorageManager => LazyGetRequiredService(ref _storageService);
+        private StorageService _storageService;
 
         protected TAuthenticatonBff AuthenticationBffLayer => LazyGetRequiredService(ref _authenticationBffLayer);
         private TAuthenticatonBff _authenticationBffLayer;
@@ -73,13 +82,23 @@ namespace AspCore.Web.Concrete
         protected IWebAuthenticationProvider<TAuthenticationInfo> AuthenticationProvider => LazyGetRequiredServiceByName(ref _authenticationProvider, AuthenticationProviderName);
         private IWebAuthenticationProvider<TAuthenticationInfo> _authenticationProvider;
 
-        private ITokenValidator<TAuthenticationResult> _tokenValidator;
+        private readonly ITokenValidator<TAuthenticationResult> _tokenValidator;
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private readonly IAuthenticationService _authenticationService;
+
+        private readonly CookieConfigurationBuilder _cookieConfigurationBuilder;
 
         public BaseAuthenticationController(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
             _tokenValidator = ServiceProvider.GetRequiredService<ITokenValidator<TAuthenticationResult>>();
+            _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+            _authenticationService = ServiceProvider.GetRequiredService<IAuthenticationService>();
+            _cookieConfigurationBuilder = ServiceProvider.GetRequiredService<CookieConfigurationBuilder>();
         }
+
         private void Authenticate(TAuthenticationInfo authenticationInfo = null)
         {
             ServiceResult<AuthenticationInfo> serviceResult = null;
@@ -95,17 +114,10 @@ namespace AspCore.Web.Concrete
 
             if (serviceResult.IsSucceeded)
             {
-                string tokenKey = Guid.NewGuid().ToString("N");
-
-                CookieService.SetObjectAsync(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY, tokenKey, DateTime.Now.AddDays(1), false);
-
-                ServiceResult<AuthenticationToken> authenticationResult = AuthenticationBffLayer.AuthenticateClient((TAuthenticationInfo)serviceResult.Result).Result;
+                ServiceResult<AuthenticationTicketInfo> authenticationResult = AuthenticationBffLayer.AuthenticateClient((TAuthenticationInfo)serviceResult.Result).Result;
 
                 if (authenticationResult.IsSucceededAndDataIncluded())
                 {
-                    AuthenticationBffLayer.SetAuthenticationToken(tokenKey, authenticationResult.Result);
-
-
                     ServiceResult<TAuthenticationResult> userResult = null;
 
                     if (_tokenValidator.ValidatePublicKey)
@@ -116,17 +128,82 @@ namespace AspCore.Web.Concrete
                     }
 
 
-                    if (userResult != null && userResult.IsSucceeded && userResult.Result != null)
-                    {
-                        string activeUserUId = FrontEndConstants.STORAGE_CONSTANT.APPLICATION_USER + "_" + tokenKey;
+                    ServiceResult<List<Claim>> apiClaimsResult = _tokenValidator.GetClaims(authenticationResult.Result);
 
-                        CacheService.SetObjectAsync(activeUserUId, userResult.Result, DateTime.Now.AddDays(1), false);
+                    if ((userResult != null && userResult.IsSucceeded && userResult.Result != null) && (apiClaimsResult.IsSucceeded && apiClaimsResult.Result != null))
+                    {
+
+                        var userIdClaim = apiClaimsResult.Result.FirstOrDefault(t => t.Type == AspCoreSecurityType.UserId);
+
+                        if (userIdClaim == null)
+                            throw new Exception("Api Claims must include 'AspCoreSecurityType.UserId' claim type");
+
+                        var userNameClaim = apiClaimsResult.Result.FirstOrDefault(t => t.Type == AspCoreSecurityType.UserName);
+
+                        if (userNameClaim == null)
+                            throw new Exception("Api Claims must include 'AspCoreSecurityType.UserName' claim type");
+
+
+                        var claims = new List<Claim>();
+
+                        claims.Add(new Claim(AspCoreSecurityType.UserId, userIdClaim.Value));
+                        claims.Add(new Claim(AspCoreSecurityType.UserName, userNameClaim.Value));
+                        claims.Add(new Claim(AspCoreSecurityType.UserInfo, JsonConvert.SerializeObject(userResult.Result).CompressString()));
+
+                        var claimsIdentity = new ClaimsIdentity(
+               claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                        var authticationProperties = new AuthenticationProperties
+                        {
+                            AllowRefresh = true,
+                            ExpiresUtc = DateTimeOffset.Now.AddMinutes(_cookieConfigurationBuilder.cookieOption.Expire),
+                            IsPersistent = true,
+                        };
+
+                        var jwtJson = authenticationResult.Result.access_token.CompressString();
+
+
+                        AuthenticationToken token = new AuthenticationToken();
+                        token.Name = ApiConstants.Api_Keys.ACCESS_TOKEN;
+                        token.Value = jwtJson;
+
+
+                        var refreshJson = authenticationResult.Result.refresh_token.CompressString();
+
+
+                        AuthenticationToken refreshToken = new AuthenticationToken();
+                        refreshToken.Name = ApiConstants.Api_Keys.REFRESH_TOKEN;
+                        refreshToken.Value = refreshJson;
+
+                        var expiresAt = authenticationResult.Result.expires.ToString("o", CultureInfo.InvariantCulture);
+
+
+                        AuthenticationToken expire = new AuthenticationToken();
+                        expire.Name = ApiConstants.Api_Keys.EXPIRES;
+                        expire.Value = expiresAt;
+
+
+                        List<AuthenticationToken> tokens = new List<AuthenticationToken>();
+
+                        tokens.Add(token);
+                        tokens.Add(refreshToken);
+                        tokens.Add(expire);
+
+
+                        authticationProperties.StoreTokens(tokens);
+
+                        var principal = new ClaimsPrincipal(claimsIdentity);
+
+                        _authenticationService.SignInAsync(HttpContext,
+                         CookieAuthenticationDefaults.AuthenticationScheme,
+                         principal,
+                         authticationProperties);
+
 
                         Response.Redirect(AuthenticationProvider.mainPageUrl);
                     }
                     else
                     {
-                        CacheService.RemoveAllAsync();
                         Response.Redirect(AuthenticationProvider.loginPageUrl);
                     }
                 }
@@ -140,13 +217,13 @@ namespace AspCore.Web.Concrete
                 Response.Redirect(AuthenticationProvider.loginPageUrl);
             }
         }
+
         public void Login(TAuthenticationInfo authenticationInfo = null)
         {
-            string tokenKey = CookieService.GetObject<string>(ApiConstants.Api_Keys.APP_USER_STORAGE_KEY);
+            var token = _httpContextAccessor.HttpContext.GetTokenAsync(ApiConstants.Api_Keys.ACCESS_TOKEN).Result;
 
-            if (string.IsNullOrEmpty(tokenKey) || (!string.IsNullOrEmpty(tokenKey) && CacheService.GetObject<AuthenticationToken>(tokenKey) == null))
+            if (string.IsNullOrEmpty(token))
             {
-                ClearStorage();
                 Authenticate(authenticationInfo);
             }
             else
@@ -154,22 +231,14 @@ namespace AspCore.Web.Concrete
                 Response.Redirect(AuthenticationProvider.mainPageUrl);
             }
         }
-        private void ClearStorage()
-        {
-            try
-            {
-                CookieService.RemoveAllAsync();
-                CacheService.RemoveAllAsync();
-                 
-            }
-            catch
-            {
-                // ignored
-            }
-        }
+
         public virtual void LogOut()
         {
-            ClearStorage();
+            _httpContextAccessor.HttpContext.SignOutAsync();
+
+            if (StorageManager.CookieService != null)
+                StorageManager.CookieService.RemoveAll();
+
             Response.Redirect("Login");
         }
     }

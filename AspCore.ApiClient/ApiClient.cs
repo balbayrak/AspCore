@@ -1,32 +1,20 @@
 ﻿using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Caching.Abstract;
+using AspCore.ApiClient.Entities;
 using AspCore.ConfigurationAccess.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.Authentication;
-using AspCore.Entities.Constants;
-using AspCore.Extension;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspCore.ApiClient
 {
-    public class ApiClient<TOption> : IApiClient, IDisposable
+    public class ApiClient<TOption> : IApiClient
         where TOption : class, IApiClientConfiguration, new()
     {
-        protected IHttpContextAccessor HttpContextAccessor { get; private set; }
         protected IConfigurationAccessor ConfigurationHelper { get; private set; }
-        protected ICacheService AccessTokenService { get; private set; }
-        protected ICancellationTokenHelper CancellationTokenHelper { get; }
         protected TOption ApiConfiguration { get; set; }
 
         private string _baseAddress;
@@ -40,7 +28,7 @@ namespace AspCore.ApiClient
             set
             {
                 if (!string.IsNullOrEmpty(value)) value = value.TrimStart('/');
-                if (!string.IsNullOrEmpty(value) && (!value.EndsWith("/"))) value = value + "/";
+                if (!string.IsNullOrEmpty(value) && (!value.EndsWith("/"))) value = $"{value}/";
                 _baseAddress = value;
             }
         }
@@ -63,26 +51,17 @@ namespace AspCore.ApiClient
 
         public string apiKey { get; private set; }
 
-        public AuthenticationInfo authenticationInfo { get; set; }
-
         private HttpClient client { get; set; }
 
-        public ApiClient(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfigurationAccessor configurationAccessor, ICacheService cacheService, ICancellationTokenHelper cancellationTokenHelper, string apiKey)
+        public ApiClient(IHttpClientFactory httpClientFactory, IConfigurationAccessor configurationAccessor, string apiKey)
         {
             this.apiKey = apiKey;
-            CancellationTokenHelper = cancellationTokenHelper;
-            HttpContextAccessor = httpContextAccessor;
             ConfigurationHelper = configurationAccessor;
-            AccessTokenService = cacheService;
-
-            _baseAddress = string.Empty;
 
             InitializeBaseAddress(apiKey);
             client = httpClientFactory.CreateClient(this.apiKey);
             client.BaseAddress = new Uri(_baseAddress);
         }
-
-        public virtual void AddAuthenticationRoute(string route) { }
 
         public virtual async Task<TResult> GetRequest<TPostObject, TResult>(Dictionary<string, string> headerValues = null)
               where TResult : class, new()
@@ -102,10 +81,7 @@ namespace AspCore.ApiClient
                 }
             }
 
-
-            CorrelationIdHeaderControl();
-
-            var response = await client.GetAsync(_apiUrl, CancellationTokenHelper.Token).ConfigureAwait(false);
+            var response = await client.GetAsync(_apiUrl).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
@@ -121,24 +97,12 @@ namespace AspCore.ApiClient
             return result;
         }
 
-        public virtual async Task<TResult> PostRequest<TPostObject, TResult>(TPostObject postObject, Dictionary<string, string> headerValues = null, AuthenticationToken authenticationInfo = null)
+        public virtual async Task<TResult> PostRequest<TPostObject, TResult>(TPostObject postObject, Dictionary<string, string> headerValues = null)
               where TResult : class, new()
               where TPostObject : class
         {
             TResult result;
 
-
-            if (authenticationInfo == null)
-                await Authenticate(client, false, false);
-            else
-            {
-                if (!authenticationInfo.access_token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
-                    authenticationInfo.access_token = ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER + " " + authenticationInfo.access_token;
-
-                client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
-                client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, authenticationInfo.access_token);
-            }
-
             if (headerValues != null && headerValues.Count > 0)
             {
                 foreach (var key in headerValues.Keys)
@@ -151,45 +115,19 @@ namespace AspCore.ApiClient
                 }
             }
 
-
-            CorrelationIdHeaderControl();
-
             JsonContent jsonContent = new JsonContent(postObject);
-            var response = await client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token);
-            if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
-            {
-                bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-
-                await Authenticate(client, true, refreshTokenCnt);
-
-                response = await client.PostAsync(_apiUrl, jsonContent);
-            }
+            var response = await client.PostAsync(_apiUrl, jsonContent);
 
             string responseString = await response.Content.ReadAsStringAsync();
             result = JsonConvert.DeserializeObject<TResult>(responseString);
 
-
             return result;
         }
 
-        public virtual async Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null, AuthenticationToken authenticationInfo = null)
+        public virtual async Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null)
             where TResult : class, new()
         {
             TResult result = null;
-
-
-            if (authenticationInfo == null)
-                await Authenticate(client, false, false);
-            else
-            {
-                string token = authenticationInfo.access_token;
-                if (!token.Contains(ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER))
-                    token = ApiConstants.Api_Keys.API_AUTHORIZATION_BEARER + " " + authenticationInfo.access_token;
-
-                client.DefaultRequestHeaders.Remove(ApiConstants.Api_Keys.API_AUTHORIZATION);
-                client.DefaultRequestHeaders.Add(ApiConstants.Api_Keys.API_AUTHORIZATION, token);
-            }
-
 
             if (headerValues != null && headerValues.Count > 0)
             {
@@ -203,31 +141,15 @@ namespace AspCore.ApiClient
                 }
             }
 
-            CorrelationIdHeaderControl();
-
             JsonContent jsonContent = new JsonContent(postObject);
-            var response = client.PostAsync(_apiUrl, jsonContent, CancellationTokenHelper.Token).Result;
-            if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
-            {
+            var response = await client.PostAsync(_apiUrl, jsonContent);
 
-                bool refreshTokenCnt = response.Headers.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER);
-                if (!refreshTokenCnt)
-                {
-                    string s = response.Headers.WwwAuthenticate.ToString();
-                    refreshTokenCnt = s.Contains(ApiConstants.Api_Keys.TOKEN_EXPIRED_HEADER_STR, StringComparison.InvariantCultureIgnoreCase);
-                }
-
-                await Authenticate(client, true, refreshTokenCnt);
-
-                response = await client.PostAsync(_apiUrl, jsonContent);
-            }
             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
 
                 result = JsonConvert.DeserializeObject<TResult>(responseString);
             }
-
 
             return result;
         }
@@ -237,9 +159,7 @@ namespace AspCore.ApiClient
         {
             TResult result = null;
 
-            CorrelationIdHeaderControl();
-
-            var response = await client.PostAsync(_apiUrl, content, CancellationTokenHelper.Token);
+            var response = await client.PostAsync(_apiUrl, content);
             if (response.IsSuccessStatusCode)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
@@ -248,11 +168,6 @@ namespace AspCore.ApiClient
             }
 
             return result;
-        }
-
-        public virtual async Task<AuthenticationToken> Authenticate(HttpClient client, bool forceAuthentication, bool refreshToken)
-        {
-            return null;
         }
 
         private void InitializeBaseAddress(string apiKey)
@@ -270,17 +185,17 @@ namespace AspCore.ApiClient
             }
         }
 
-        private void CorrelationIdHeaderControl()
-        {
-            if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
-            {
-                string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-                if (!string.IsNullOrEmpty(correlationID))
-                {
-                    client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
-                }
-            }
-        }
+        //private void CorrelationIdHeaderControl()
+        //{
+        //    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
+        //    {
+        //        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
+        //        if (!string.IsNullOrEmpty(correlationID))
+        //        {
+        //            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
+        //        }
+        //    }
+        //}
 
         public virtual void ChangeApiSettingsKey(string apiKey)
         {
@@ -291,7 +206,7 @@ namespace AspCore.ApiClient
         {
             _baseAddress = null;
             _apiUrl = null;
+            client.Dispose();
         }
-
     }
 }

@@ -1,3 +1,4 @@
+using AspCore.ApiClient.Handlers;
 using AspCore.Authentication.JWT.Abstract;
 using AspCore.Authentication.JWT.Concrete;
 using AspCore.BusinessApi.Configuration;
@@ -46,13 +47,25 @@ namespace AspCoreTest.WebApi
                 })
                 .AddApiClientSetting(option =>
                 {
-                    option.AddMemoryCache()
+                    option.AddCacheService(option=>
+                    {
+                        option.AddMemoryCache();
+                    })
                     .AddApiClients(option =>
                     {
-                        option.AddBearerAuthenticatedClient(option => { option.apiKey = "YetkiApi"; })
-                        .AddBearerAuthenticatedClient(option => { option.apiKey = "DocumentApi"; })
-                        .AddBearerAuthenticatedClient(option => { option.apiKey = "ViewerApi"; })
-                        .AddJWTAuthenticatedClient(option => { option.apiKey = "DataSearchApi"; })
+                        option.AddAuthenticatedApiClient(option => { 
+                            option.apiKey = "YetkiApi";
+                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                            })
+                        .AddAuthenticatedApiClient(option => { option.apiKey = "DocumentApi";
+                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                        })
+                        .AddAuthenticatedApiClient(option => { option.apiKey = "ViewerApi";
+                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                        })
+                        .AddAuthenticatedApiClient(option => { option.apiKey = "DataSearchApi";
+                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                        })
                         .Build();
                     });
                 })

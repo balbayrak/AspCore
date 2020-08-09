@@ -4,22 +4,23 @@ namespace AspCore.Utilities.DataProtector
 {
     public class DataProtectorHelper : IDataProtectorHelper
     {
-        private string _secretKey { get; set; }
-        private IDataProtectionProvider _dataProtectionProvider { get; set; }
+        public string secretKey { get; private set; }
+        public  IDataProtectionProvider dataProtectionProvider { get; private set; }
+
+        private readonly IDataProtector protector;
         public DataProtectorHelper(IDataProtectionProvider dataProtectionProvider, string secretKey)
         {
-            _secretKey = secretKey;
-            _dataProtectionProvider = dataProtectionProvider;
+            this.secretKey = secretKey;
+            this.dataProtectionProvider = dataProtectionProvider;
+            protector = dataProtectionProvider.CreateProtector(secretKey);
         }
         public string Protect(string input)
         {
-            var protector = _dataProtectionProvider.CreateProtector(_secretKey);
             return protector.Protect(input);
         }
 
         public string UnProtect(string input)
         {
-            var protector = _dataProtectionProvider.CreateProtector(_secretKey);
             return protector.Unprotect(input);
         }
     }

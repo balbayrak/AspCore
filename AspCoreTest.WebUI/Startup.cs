@@ -1,8 +1,8 @@
+using AspCore.ApiClient.Handlers;
 using AspCore.Authentication.JWT.Concrete;
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.DocumentType;
-using AspCore.RedisClient.Configuration;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
@@ -44,9 +44,10 @@ namespace AspCoreTest.WebUI
                         option.type = EnumConfigurationAccessorType.AppSettingJson;
                     });
                 })
-                .AddJWTAuthentication(option =>
+                .AddCookieAuthentication(option =>
                 {
-                    option.AddAuthenticationProvider(builder =>
+                    option.AddCookieSetting("AuthCookieOption")
+                    .AddAuthenticationProvider(builder =>
                     {
                         builder.Add("custom", typeof(CustomWebAuthenticationProvider))
                        .Build();
@@ -56,12 +57,15 @@ namespace AspCoreTest.WebUI
                         option.configurationKey = "TokenSettingOption";
                     });
                 })
-                .AddCacheService(option =>
+                .AddStorageService(option =>
                 {
                     option.AddRedisCache("RedisInfo");
-                    option.AddCookieCache();
+                    option.AddCookie();
                 })
-                .AddBffApiClient(option => { option.apiKey = "Base"; })
+                .AddBffApiClient(option =>
+                {
+                    option.apiKey = "Base";
+                })
                 .AddNotifierSetting(option =>
                 {
                     option.AddAlertViewComponent(option =>
@@ -94,7 +98,11 @@ namespace AspCoreTest.WebUI
                 {
                     option.AddApiClients("DataSearchApi", option =>
                     {
-                        option.AddJWTAuthenticatedClient(option => { option.apiKey = "DataSearchApi"; })
+                        option.AddAuthenticatedApiClient(option =>
+                        {
+                            option.apiKey = "DataSearchApi";
+                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                        })
                         .Build();
                     }).AddDataSearchEngine<PersonSearchEntity>("api/PersonCache")
                     .ElasticSearchAdmins(option =>
@@ -123,7 +131,7 @@ namespace AspCoreTest.WebUI
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseAuthorization();
+
 
             app.UseAspCoreWeb("Account");
         }

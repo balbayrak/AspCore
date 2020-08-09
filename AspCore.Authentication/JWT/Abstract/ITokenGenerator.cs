@@ -10,9 +10,9 @@ namespace AspCore.Authentication.JWT.Abstract
     public interface ITokenGenerator<TJWTInfo>
         where TJWTInfo : class, IJWTEntity, new()
     {
-        ServiceResult<AuthenticationToken> CreateToken(TJWTInfo jwtInfo);
+        ServiceResult<AuthenticationTicketInfo> CreateToken(TJWTInfo jwtInfo);
 
-        ServiceResult<AuthenticationToken> RefreshToken(AuthenticationToken token);
+        ServiceResult<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo token);
 
 
     }

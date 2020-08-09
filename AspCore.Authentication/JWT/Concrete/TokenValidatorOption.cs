@@ -35,7 +35,6 @@ namespace AspCore.Authentication.JWT.Concrete
             services.AddSingleton(typeof(IJwtHandler), sp =>
             {
                 return new JwtHandler(sp.GetRequiredService<IConfigurationAccessor>(), tokenConfigurationOption);
-
             });
 
             services.AddSingleton(typeof(ITokenValidator<TJWTInfo>), sp =>

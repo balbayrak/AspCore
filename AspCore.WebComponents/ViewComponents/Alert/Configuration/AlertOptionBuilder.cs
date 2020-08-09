@@ -35,7 +35,7 @@ namespace AspCore.WebComponents.ViewComponents.Alert.Configuration
 
             if (alertOption.alertStorage == EnumAlertStorage.TempData)
             {
-                HttpContextWrapper.Configure(services.BuildServiceProvider().GetRequiredService<IHttpContextAccessor>());
+             //   HttpContextWrapper.Configure(services.BuildServiceProvider().GetRequiredService<IHttpContextAccessor>());
 
                 services.AddSingleton<IAlertStorage, TempDataStorage>();
             }

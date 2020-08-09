@@ -1,9 +1,5 @@
 ﻿using AspCore.ApiClient.Abstract;
-using AspCore.ApiClient.Entities.Concrete;
-using AspCore.Dependency.Concrete;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using AspCore.ApiClient.Entities;
 
 namespace AspCore.ConnectedApi.Concrete
 {

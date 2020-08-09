@@ -3,6 +3,7 @@ using AspCore.Entities.Json;
 using AspCore.Extension;
 using AspCore.Utilities.MimeMapping;
 using AspCore.Web.Configuration.Options;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Security.Principal;
 
 namespace AspCore.Web.Configuration
 {
@@ -22,6 +24,9 @@ namespace AspCore.Web.Configuration
 
             var provider = new FileExtensionContentTypeProvider();
             services.AddSingleton<IMimeMappingService>(new MimeMappingManager(provider));
+
+
+            
 
             services.AddControllers().AddNewtonsoftJson(options =>
             {

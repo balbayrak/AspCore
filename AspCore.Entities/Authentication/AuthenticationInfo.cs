@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AspCore.Entities.Authentication
 {
-    public class AuthenticationInfo
+    public class AuthenticationInfo : IDisposable
     {
         public string ClientId { get; set; }
 
@@ -15,5 +15,10 @@ namespace AspCore.Entities.Authentication
         public List<string> Scope { get; set; }
 
         public string authenticationProvider { get; set; }
+
+        public void Dispose()
+        {
+            Scope = null;
+        }
     }
 }

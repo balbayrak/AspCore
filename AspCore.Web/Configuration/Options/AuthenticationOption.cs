@@ -1,6 +1,9 @@
 ﻿using AspCore.Entities.Configuration;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Security.Principal;
 
 namespace AspCore.Web.Configuration.Options
 {
@@ -10,11 +13,12 @@ namespace AspCore.Web.Configuration.Options
         {
         }
 
-        public CacheOptionConfiguration AddJWTAuthentication(Action<AuthenticationProviderBuilder> option)
+        public StorageOptionConfiguration AddCookieAuthentication(Action<CookieAuthenticationBuilder> option)
         {
-            AuthenticationProviderBuilder authenticationProviderBuilder = new AuthenticationProviderBuilder(services);
-            option(authenticationProviderBuilder);
-            return new CacheOptionConfiguration(services);
+            CookieAuthenticationBuilder cookieAuthenticationBuilder = new CookieAuthenticationBuilder(services);
+            option(cookieAuthenticationBuilder);
+
+            return new StorageOptionConfiguration(services);
         }
     }
 }

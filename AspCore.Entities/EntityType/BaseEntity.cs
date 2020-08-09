@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AspCore.Entities.EntityType
 {
-    public class BaseEntity : CoreEntity, IBaseEntity
+    public abstract class BaseEntity : CoreEntity, IBaseEntity
     {
         public DateTime CreatedDate { get; set; }
         public DateTime LastUpdateDate { get; set; }

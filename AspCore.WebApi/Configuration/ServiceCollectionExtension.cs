@@ -1,4 +1,4 @@
-﻿using AspCore.ApiClient.Entities.Concrete;
+﻿using AspCore.ApiClient.Entities;
 using AspCore.Authentication.JWT.Abstract;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Json;

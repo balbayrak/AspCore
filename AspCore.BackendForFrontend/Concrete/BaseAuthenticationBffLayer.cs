@@ -18,14 +18,14 @@ namespace AspCore.BackendForFrontend.Concrete
             apiControllerRoute = authenticationRoute;
         }
 
-        public async Task<ServiceResult<TAuthenticationResult>> GetClientInfo(AuthenticationToken authenticationToken)
+        public async Task<ServiceResult<TAuthenticationResult>> GetClientInfo(AuthenticationTicketInfo authenticationToken)
         {
             ServiceResult<TAuthenticationResult> result = new ServiceResult<TAuthenticationResult>();
             try
             {
                 ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_CLIENT_INFO;
 
-                result = await ApiClient.PostRequest<ServiceResult<TAuthenticationResult>>(authenticationToken, null, authenticationToken);
+                result = await ApiClient.PostRequest<ServiceResult<TAuthenticationResult>>(authenticationToken);
             }
             catch (Exception ex)
             {
@@ -34,14 +34,14 @@ namespace AspCore.BackendForFrontend.Concrete
             return result;
         }
 
-        public async Task<ServiceResult<AuthenticationToken>> AuthenticateClient(TAuthenticationInfo authenticationInfo)
+        public async Task<ServiceResult<AuthenticationTicketInfo>> AuthenticateClient(TAuthenticationInfo authenticationInfo)
         {
-            ServiceResult<AuthenticationToken> result = new ServiceResult<AuthenticationToken>();
+            ServiceResult<AuthenticationTicketInfo> result = new ServiceResult<AuthenticationTicketInfo>();
             try
             {
                 ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.AUTHENTICATE_CLIENT;
 
-                result = await ApiClient.PostRequest<ServiceResult<AuthenticationToken>>(authenticationInfo);
+                result = await ApiClient.PostRequest<ServiceResult<AuthenticationTicketInfo>>(authenticationInfo);
 
             }
             catch (Exception ex)
