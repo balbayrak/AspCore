@@ -1,12 +1,9 @@
-﻿using System;
+﻿using AspCore.Dtos.Dto;
+using AspCore.Entities.EntityFilter;
+using AspCore.Entities.General;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AspCore.BackendForFrontend.Entities;
-using AspCore.Dtos.Dto;
-using AspCore.Entities.DataTable;
-using AspCore.Entities.EntityFilter;
-using AspCore.Entities.EntityType;
-using AspCore.Entities.General;
 
 namespace AspCore.BackendForFrontend.Abstract
 {

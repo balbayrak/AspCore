@@ -93,7 +93,7 @@ namespace AspCore.Business.Concrete
                 return DataAccess.Delete(entityIds);
         }
 
-        public Task<ServiceResult<bool>> AddAsync(params TCreatedEntityDto[] entities)
+        public virtual Task<ServiceResult<bool>> AddAsync(params TCreatedEntityDto[] entities)
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TCreatedEntityDto[], TEntity[]>(entities);
 
@@ -103,10 +103,8 @@ namespace AspCore.Business.Concrete
                 return DataAccess.AddAsync(entityArray);
         }
 
-        public Task<ServiceResult<bool>> UpdateAsync(params TUpdatedEntityDto[] entities)
+        public virtual Task<ServiceResult<bool>> UpdateAsync(params TUpdatedEntityDto[] entities)
         {
-            var entityArrayList = AutoObjectMapper.Mapper.Map<List<TUpdatedEntityDto>, List<TEntity>>(entities.ToList());
-
             var entityArray = AutoObjectMapper.Mapper.Map<TUpdatedEntityDto[], TEntity[]>(entities);
 
             if (entities.Length > 1)

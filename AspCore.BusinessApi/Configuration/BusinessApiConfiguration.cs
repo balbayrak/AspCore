@@ -17,8 +17,6 @@ namespace AspCore.BusinessApi.Configuration
             return configurationBuilderOption;
         }
 
-
-
         public static ConfigurationBuilderOption AddDocumentAccessLayer(this ConfigurationBuilderOption configurationBuilderOption, Action<DocumentAccessBuilder> action)
         {
             DocumentAccessBuilder documentHelperBuilder = new DocumentAccessBuilder(configurationBuilderOption.services);

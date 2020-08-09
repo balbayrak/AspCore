@@ -25,7 +25,6 @@
     <ProjectReference Include="..\AspCore.AOP\AspCore.AOP.csproj" />
     <ProjectReference Include="..\AspCore.Authentication\AspCore.Authentication.csproj" />
     <ProjectReference Include="..\AspCore.ConnectedApi\AspCore.ConnectedApi.csproj" />
-    <ProjectReference Include="..\AspCore.RedisClient\AspCore.RedisClient.csproj" />
   </ItemGroup>
 
 </Project>

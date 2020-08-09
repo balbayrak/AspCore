@@ -30,11 +30,12 @@ namespace AspCoreTest.WebUI.Controllers
 
             //}).Result;
 
-            ServiceResult<List<PersonDto>> histories =  BffLayer.GetEntityHistoriesAsync(new EntityFilter
+            ServiceResult<List<PersonDto>> histories = BffLayer.GetEntityHistoriesAsync(new EntityFilter
             {
                 id = new Guid("fe809d66-1e58-40cc-9050-012daff25a04"),
-                page=0,
-                pageSize=5
+                page = 0,
+                pageSize = 5
+            }).Result;
             //StorageManager.CacheService.SetObject("test", "test");
             //StorageManager.CookieService.SetObject("test", "test");
 

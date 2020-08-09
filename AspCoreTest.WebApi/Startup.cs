@@ -81,6 +81,7 @@ namespace AspCoreTest.WebApi
                          option.configurationKey = "TokenSettingOption";
                      });
                 })
+                .AddAutoMapper()
                 .AddSwaggerSetting(option =>
                 {
                     option.swaggerDoc = new SwaggerDoc

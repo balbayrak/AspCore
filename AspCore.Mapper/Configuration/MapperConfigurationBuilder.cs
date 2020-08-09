@@ -23,7 +23,8 @@ namespace AspCore.Mapper.Configuration
         {
             var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
             var mappingConfig = new MapperConfigurationExpression();
-            mappingConfig.CreateProfile("TseCoreProfile", config =>
+            
+            mappingConfig.CreateProfile("AspCoreProfile", config =>
             {
                 var entities = MapFroms(allTypes);
                 foreach (var mapperEntity in entities)
@@ -41,7 +42,6 @@ namespace AspCore.Mapper.Configuration
             var mapper = mapperConfig.CreateMapper();
             _services.AddSingleton(mapper);
             _services.AddSingleton<IAutoObjectMapper, AutoObjectMapper>();
-            
 
         }
         private static IEnumerable<MapperEntity> MapFroms(IEnumerable<Type> types)
@@ -66,7 +66,6 @@ namespace AspCore.Mapper.Configuration
                              select (ICustomMap)Activator.CreateInstance(t);
             return customMaps;
         }
-
 
         public void Dispose()
         {

@@ -73,6 +73,7 @@ namespace AspCoreTest.DataSearchApi
                         contactEmail = "balbayrak87@gmail.com"
                     };
                 })
+                .AddAutoMapper()
                 .AddDataSearchProviders(option =>
                 {
                  

@@ -4,8 +4,6 @@ using AspCore.Entities.General;
 using AspCore.Entities.Search;
 using System;
 using System.Collections.Generic;
-using AspCore.Dtos.Dto;
-using AspCore.Dtos.Search;
 
 namespace AspCore.DataSearch.Abstract
 {

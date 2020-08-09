@@ -66,6 +66,7 @@ namespace AspCoreTest.WebUI
                 {
                     option.apiKey = "Base";
                 })
+                .AddAutoMapper()
                 .AddNotifierSetting(option =>
                 {
                     option.AddAlertViewComponent(option =>
