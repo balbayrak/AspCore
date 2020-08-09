@@ -15,18 +15,18 @@ namespace AspCore.ApiClient.Handlers
     public class CacheBasedAuthenticationHandler<TOption> : AspCoreAuthenticationHandler<TOption>
           where TOption : class, IApiClientConfiguration, new()
     {
-        private readonly ICacheService _cacheService;
+        protected readonly ICacheService CacheService;
         private readonly string _apikey;
 
         public CacheBasedAuthenticationHandler(IServiceProvider serviceProvider, string apikey) : base(serviceProvider, apikey)
         {
-            _cacheService = ServiceProvider.GetRequiredService<ICacheService>();
+            CacheService = ServiceProvider.GetRequiredService<ICacheService>();
             _apikey = apikey;
         }
 
         public override async Task<AuthenticationTicketInfo> GetToken()
         {
-            AuthenticationTicketInfo authenticationTicketInfo = await _cacheService.GetObjectAsync<AuthenticationTicketInfo>(_apikey);
+            AuthenticationTicketInfo authenticationTicketInfo = await CacheService.GetObjectAsync<AuthenticationTicketInfo>(_apikey);
 
             if (authenticationTicketInfo != null) return authenticationTicketInfo;
 
@@ -86,7 +86,7 @@ namespace AspCore.ApiClient.Handlers
 
         public override async Task AddorEditTokenStorage(AuthenticationTicketInfo authenticationTicketInfo)
         {
-            await _cacheService.SetObjectAsync<AuthenticationTicketInfo>(_apikey, authenticationTicketInfo);
+            await CacheService.SetObjectAsync<AuthenticationTicketInfo>(_apikey, authenticationTicketInfo);
         }
     }
 }

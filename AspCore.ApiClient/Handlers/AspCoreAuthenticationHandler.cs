@@ -31,7 +31,7 @@ namespace AspCore.ApiClient.Handlers
                 throw new Exception("Girilen apikey ile configuration bilgileri alınamadı");
 
             _tokenClient = _httpClientFactory.CreateClient($"{apikey}_tokenClient");
-            _tokenClient.BaseAddress = new Uri(_configurationOption.BaseAddress);
+            _tokenClient.BaseAddress = new Uri(_configurationOption.Authentication.BaseAddress);
         }
         public abstract Task<AuthenticationTicketInfo> GetToken();
         public abstract Task<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo authenticationTicketInfo);

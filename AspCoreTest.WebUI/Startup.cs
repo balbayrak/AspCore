@@ -134,7 +134,11 @@ namespace AspCoreTest.WebUI
             app.UseRouting();
 
 
-            app.UseAspCoreWeb("Account");
+            app.UseAspCoreWeb(option=>
+            {
+                option.ControllerName = "Account";
+                option.SameDomain = true;
+            });
         }
     }
 }

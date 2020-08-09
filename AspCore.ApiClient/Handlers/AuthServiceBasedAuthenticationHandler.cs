@@ -17,12 +17,12 @@ namespace AspCore.ApiClient.Handlers
     public class AuthServiceBasedAuthenticationHandler<TOption> : AspCoreAuthenticationHandler<TOption>
           where TOption : class, IApiClientConfiguration, new()
     {
-        private readonly IAuthenticationService _authenticationService;
+        protected readonly IAuthenticationService AuthenticationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthServiceBasedAuthenticationHandler(IServiceProvider serviceProvider, string apiKey) : base(serviceProvider, apiKey)
         {
-            _authenticationService = ServiceProvider.GetRequiredService<IAuthenticationService>();
+            AuthenticationService = ServiceProvider.GetRequiredService<IAuthenticationService>();
             _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
         }
 
@@ -67,14 +67,14 @@ namespace AspCore.ApiClient.Handlers
 
         public override async Task AddorEditTokenStorage(AuthenticationTicketInfo authenticationTicketInfo)
         {
-            AuthenticateResult authenticateResult = await _authenticationService.AuthenticateAsync(_httpContextAccessor.HttpContext, null);
+            AuthenticateResult authenticateResult = await AuthenticationService.AuthenticateAsync(_httpContextAccessor.HttpContext, null);
             AuthenticationProperties properties = authenticateResult.Properties;
 
             properties.UpdateTokenValue(ApiConstants.Api_Keys.ACCESS_TOKEN, authenticationTicketInfo.access_token.CompressString());
             properties.UpdateTokenValue(ApiConstants.Api_Keys.REFRESH_TOKEN, authenticationTicketInfo.refresh_token.CompressString());
             properties.UpdateTokenValue(ApiConstants.Api_Keys.EXPIRES, authenticationTicketInfo.expires.ToString("o", CultureInfo.InvariantCulture));
 
-            await _authenticationService.SignInAsync(_httpContextAccessor.HttpContext, null, authenticateResult.Principal, authenticateResult.Properties);
+            await AuthenticationService.SignInAsync(_httpContextAccessor.HttpContext, null, authenticateResult.Principal, authenticateResult.Properties);
         }
 
     }
