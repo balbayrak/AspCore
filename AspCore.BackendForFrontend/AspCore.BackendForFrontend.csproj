@@ -16,6 +16,8 @@
     <ProjectReference Include="..\AspCore.ApiClient\AspCore.ApiClient.csproj" />
     <ProjectReference Include="..\AspCore.DataSearch\AspCore.DataSearch.csproj" />
     <ProjectReference Include="..\AspCore.Dependency\AspCore.Dependency.csproj" />
+    <ProjectReference Include="..\AspCore.Dtos\AspCore.Dtos.csproj" />
+    <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
   </ItemGroup>
 
 </Project>

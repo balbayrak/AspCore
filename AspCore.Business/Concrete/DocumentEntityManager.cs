@@ -8,12 +8,14 @@ using AspCore.Entities.General;
 using AspCore.Extension;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AspCore.Dtos.Dto;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class DocumentEntityManager<TEntity, TDataAccess> : BaseEntityManager<TDataAccess, TEntity>, IDocumentEntityService<Document, TEntity>
+    public abstract class DocumentEntityManager<TEntity,TEntityDto, TDataAccess> : BaseEntityManager<TDataAccess, TEntity,TEntityDto>, IDocumentEntityService<Document, TEntity, TEntityDto>
         where TEntity : class, IDocumentEntity, new()
         where TDataAccess : IEntityRepository<TEntity>
+        where TEntityDto : class, IEntityDto, new()
     {
         private IDocumentUploader<Document> _documentUploader { get; set; }
 

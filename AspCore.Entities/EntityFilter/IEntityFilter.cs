@@ -10,7 +10,7 @@ namespace AspCore.Entities.EntityFilter
     {
         Guid id { get; set; }
         List<IncludeType<TEntity>> includes { get; set; }
-        List<SortingType<TEntity>> sorters { get; set; }
+        List<SortingType> sorters { get; set; }
         SearchType search { get; set; }
         int? page { get; set; }
         int? pageSize { get; set; }

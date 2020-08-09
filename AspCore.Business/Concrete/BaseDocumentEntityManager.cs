@@ -1,27 +1,30 @@
-﻿using System;
-using AspCore.Business.Abstract;
+﻿using AspCore.Business.Abstract;
 using AspCore.Business.General;
 using AspCore.DataAccess.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.DocumentManagement.Uploader;
+using AspCore.Dtos.Dto;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseDocumentEntityManager<TDocument, TEntity, TDataAccess> : BaseEntityManager<TDataAccess, TEntity>, IDocumentEntityService<TDocument, TEntity>
+    public abstract class BaseDocumentEntityManager<TDataAccess,TDocument, TEntity,TEntityDto,TCreatedDto,TUpdatedDto> : BaseEntityManager<TDataAccess, TEntity, TEntityDto, TCreatedDto,TUpdatedDto>, IDocumentEntityService<TDocument, TEntity, TEntityDto, TCreatedDto,TUpdatedDto>
         where TDocument : class, IDocument, new()
         where TEntity : class, IDocumentEntity, new()
         where TDataAccess : IEntityRepository<TEntity>
+        where TEntityDto : class, IEntityDto, new()
+        where TCreatedDto : class, IEntityDto, new()
+        where TUpdatedDto : class, IEntityDto, new()
     {
-        private IDocumentUploader<TDocument> _documentUploader { get; set; }
+        private IDocumentUploader<TDocument> DocumentUploader { get; }
 
         protected BaseDocumentEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _documentUploader = ServiceProvider.GetRequiredService<IDocumentUploader<TDocument>>();
+            DocumentUploader = ServiceProvider.GetRequiredService<IDocumentUploader<TDocument>>();
         }
 
         public ServiceResult<TDocument> CreateDocument(IDocumentEntityRequest<TDocument, TEntity> documentRequest)
@@ -29,7 +32,7 @@ namespace AspCore.Business.Concrete
             ServiceResult<TDocument> result = new ServiceResult<TDocument>();
             try
             {
-                result = _documentUploader.Create(documentRequest);
+                result = DocumentUploader.Create(documentRequest);
                 if (result.IsSucceededAndDataIncluded())
                 {
                     documentRequest.entity.DocumentUrl = result.Result.url;
@@ -43,7 +46,7 @@ namespace AspCore.Business.Concrete
                     else
                     {
                         documentRequest.document.url = result.Result.url;
-                        ServiceResult<bool> deleteResult = _documentUploader.Delete(documentRequest);
+                        ServiceResult<bool> deleteResult = DocumentUploader.Delete(documentRequest);
                         if (!deleteResult.IsSucceeded)
                         {
                             result.WarningMessage = BusinessConstants.DocumentUploaderErrorMessages.DOCUMENT_DELETE_AFTER_DATAACCESS_METHOD_ERROR;
@@ -63,7 +66,7 @@ namespace AspCore.Business.Concrete
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                result = _documentUploader.Delete(documentRequest);
+                result = DocumentUploader.Delete(documentRequest);
                 if (result.IsSucceeded)
                 {
                     if (documentRequest.deleteEntityWithDocument)
@@ -84,7 +87,7 @@ namespace AspCore.Business.Concrete
             ServiceResult<TDocument> result = new ServiceResult<TDocument>();
             try
             {
-                result = _documentUploader.Read(documentRequest);
+                result = DocumentUploader.Read(documentRequest);
             }
             catch (Exception ex)
             {
@@ -98,13 +101,26 @@ namespace AspCore.Business.Concrete
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                result = _documentUploader.Update(documentRequest);
+                result = DocumentUploader.Update(documentRequest);
             }
             catch (Exception ex)
             {
                 result.ErrorMessage(BusinessConstants.DocumentUploaderErrorMessages.DOCUMENT_UPDATE_METHOD_ERROR, ex);
             }
             return result;
+        }
+    }
+
+    public abstract class BaseDocumentEntityManager<TDataAccess, TDocument, TEntity,  TEntityDto> :
+        BaseDocumentEntityManager<TDataAccess,TDocument, TEntity, TEntityDto, TEntityDto, TEntityDto>
+        where TDocument : class, IDocument, new()
+        where TEntity : class, IDocumentEntity, new()
+        where TDataAccess : IEntityRepository<TEntity>
+        where TEntityDto : class, IEntityDto, new()
+       
+    {
+        protected BaseDocumentEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
         }
     }
 }

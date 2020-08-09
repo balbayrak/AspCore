@@ -4,7 +4,7 @@ using AspCore.Entities.Expression;
 
 namespace AspCore.Entities.EntityFilter
 {
-    public class SortingType<TEntity> where TEntity : class, IEntity, new()
+    public class SortingType
     {
         public string PropertyName { get; set; }
 

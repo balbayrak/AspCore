@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AspCore.BackendForFrontend.Entities;
+using AspCore.Dtos.Dto;
 using AspCore.Entities.DataTable;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
@@ -8,20 +10,27 @@ using AspCore.Entities.General;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
-    public interface IEntityBffLayer<TViewModel, TEntity> : IBffLayer
-         where TViewModel : BaseViewModel<TEntity> 
-         where TEntity : class, IEntity, new()
+    public interface IEntityBffLayer<TEntityDto,TCreatedDto,TUpdatedDto> : IBffLayer
+         where TEntityDto : class, IEntityDto, new()
+         where TCreatedDto : class, IEntityDto, new()
+         where TUpdatedDto : class, IEntityDto, new()
     {
         Task<ServiceResult<bool>> Liveness();
         Task<ServiceResult<bool>> Readiness(Guid id);
-        Task<ServiceResult<bool>> Add(List<TViewModel> entities);
-        Task<ServiceResult<bool>> Update(List<TViewModel> entities);
-        Task<ServiceResult<bool>> Delete(List<TViewModel> entities);
+        Task<ServiceResult<bool>> Add(List<TCreatedDto> entities);
+        Task<ServiceResult<bool>> Update(List<TUpdatedDto> entities);
+        Task<ServiceResult<bool>> Delete(List<TEntityDto> entities);
         Task<ServiceResult<bool>> DeleteWithIDs(List<Guid> entityIds);
-        Task<ServiceResult<List<TViewModel>>> GetAll(EntityFilter<TEntity> entityFilter);
-        Task<ServiceResult<List<TViewModel>>> GetAllAsync(EntityFilter<TEntity> filterSetting);
-        Task<ServiceResult<TViewModel>> GetById(EntityFilter<TEntity> filterSetting);
-        Task<ServiceResult<List<TViewModel>>> GetEntityHistoriesAsync(EntityFilter<TEntity> filterSetting);
+        Task<ServiceResult<List<TEntityDto>>> GetAll(EntityFilter entityFilter);
+        Task<ServiceResult<List<TEntityDto>>> GetAllAsync(EntityFilter filterSetting);
+        Task<ServiceResult<TEntityDto>> GetById(EntityFilter filterSetting);
+        Task<ServiceResult<List<TEntityDto>>> GetEntityHistoriesAsync(EntityFilter filterSetting);
+
+    }
+
+    public interface IEntityBffLayer<TEntityDto> : IEntityBffLayer<TEntityDto, TEntityDto, TEntityDto>
+        where TEntityDto : class, IEntityDto, new()
+    {
 
     }
 }

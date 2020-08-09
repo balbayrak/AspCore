@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace AspCore.WebComponents.TagHelpers.Buttons
 {
-    public class ButtonTagHelper : TagHelper
+    [HtmlTargetElement("core-button")]
+    public abstract class ButtonTagHelper : TagHelper
     {
         private const string idAtrributeName = "id";
         [HtmlAttributeName(idAtrributeName)]

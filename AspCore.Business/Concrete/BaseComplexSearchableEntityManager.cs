@@ -1,5 +1,4 @@
-﻿using AspCore.Business.Abstract;
-using AspCore.Business.General;
+﻿using AspCore.Business.General;
 using AspCore.DataAccess.Abstract;
 using AspCore.DataSearch.Abstract;
 using AspCore.Entities.EntityType;
@@ -10,15 +9,19 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AspCore.Dtos.Dto;
 using System.Threading.Tasks;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TEntity>, IEntityService<TEntity>
+    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity,TEntityDto,TCreatedDto,TUpdateDto, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TEntity, TEntityDto, TCreatedDto,TUpdateDto>
         where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
         where TSearchableEntity : class, ISearchableEntity, new()
         where TDataSearchEngine : IDataSearchEngine<TSearchableEntity>
+        where TEntityDto : class, IEntityDto, new()
+        where TCreatedDto : class, IEntityDto, new()
+        where TUpdateDto : class, IEntityDto, new()
     {
         protected ICustomMapper Mapper { get; private set; }
         private readonly TDataSearchEngine _dataSearchEngine;
@@ -69,17 +72,18 @@ namespace AspCore.Business.Concrete
             return serviceResult;
         }
 
-        public override ServiceResult<bool> Add(params TEntity[] entities)
+        public override ServiceResult<bool> Add(params TCreatedDto[] entities)
         {
             TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = DataAccess.Add(entities);
+                var entitiesArray = AutoObjectMapper.Mapper.Map<TCreatedDto[], TEntity[]>(entities);
+                ServiceResult<bool> resultDAL = DataAccess.Add(entitiesArray);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities).Result;
+                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entitiesArray);
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
 
@@ -120,118 +124,19 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
-        public override async Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
+        public override ServiceResult<bool> Update(params TUpdateDto[] entities)
         {
             TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = await DataAccess.AddAsync(entities);
+                var entitiesArray = AutoObjectMapper.Mapper.Map<TUpdateDto[], TEntity[]>(entities);
+
+                ServiceResult<bool> resultDAL = DataAccess.Update(entitiesArray);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<TSearchableEntity[]> entityResult = await GetComplexEntities(entities);
-                    if (entityResult.IsSucceededAndDataIncluded())
-                    {
-
-                        ServiceResult<bool> resultCache = _dataSearchEngine.Create(entityResult.Result.ToArray());
-                        if (resultCache.IsSucceeded)
-                        {
-                            TransactionBuilder.CommitTransaction();
-                            result.IsSucceeded = true;
-                            result.StatusMessage = resultDAL.StatusMessage;
-                        }
-                        else
-                        {
-                            result.ErrorMessage = resultCache.ErrorMessage;
-                            result.ExceptionMessage = resultCache.ExceptionMessage;
-                        }
-                    }
-                    else
-                    {
-                        result.ErrorMessage = entityResult.ErrorMessage;
-                        result.ExceptionMessage = entityResult.ExceptionMessage;
-                    }
-                }
-                else
-                {
-                    result.ErrorMessage = resultDAL.ErrorMessage;
-                    result.ExceptionMessage = resultDAL.ExceptionMessage;
-                }
-            }
-            catch
-            {
-                TransactionBuilder.RollbackTransaction();
-            }
-            finally
-            {
-                TransactionBuilder.DisposeTransaction();
-            }
-
-            return result;
-        }
-
-        public override ServiceResult<bool> Update(params TEntity[] entities)
-        {
-            TransactionBuilder.BeginTransaction();
-
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            try
-            {
-                ServiceResult<bool> resultDAL = DataAccess.Update(entities);
-                if (resultDAL.IsSucceeded)
-                {
-                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entities).Result;
-                    if (entityResult.IsSucceededAndDataIncluded())
-                    {
-                        ServiceResult<bool> resultCache = _dataSearchEngine.Update(entityResult.Result.ToArray());
-                        if (resultCache.IsSucceeded)
-                        {
-                            TransactionBuilder.CommitTransaction();
-                            result.IsSucceeded = true;
-                            result.StatusMessage = resultDAL.StatusMessage;
-                        }
-                        else
-                        {
-                            result.ErrorMessage = resultCache.ErrorMessage;
-                            result.ExceptionMessage = resultCache.ExceptionMessage;
-                        }
-                    }
-                    else
-                    {
-                        result.ErrorMessage = entityResult.ErrorMessage;
-                        result.ExceptionMessage = entityResult.ExceptionMessage;
-                    }
-                }
-                else
-                {
-                    result.ErrorMessage = resultDAL.ErrorMessage;
-                    result.ExceptionMessage = resultDAL.ExceptionMessage;
-                }
-            }
-            catch
-            {
-                TransactionBuilder.RollbackTransaction();
-            }
-            finally
-            {
-                TransactionBuilder.DisposeTransaction();
-            }
-
-            return result;
-        }
-
-        public override async Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
-        {
-            TransactionBuilder.BeginTransaction();
-
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            try
-            {
-                ServiceResult<bool> resultDAL = await DataAccess.UpdateAsync(entities);
-                if (resultDAL.IsSucceeded)
-                {
-                    ServiceResult<TSearchableEntity[]> entityResult = await GetComplexEntities(entities);
+                    ServiceResult<TSearchableEntity[]> entityResult = GetComplexEntities(entitiesArray);
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
                         ServiceResult<bool> resultCache = _dataSearchEngine.Update(entityResult.Result.ToArray());
@@ -393,5 +298,19 @@ namespace AspCore.Business.Concrete
 
 
 
+    }
+
+    public abstract class BaseComplexSearchableEntityManager<TDataAccess, TEntity, TEntityDto, TSearchableEntity, TDataSearchEngine> :
+            BaseComplexSearchableEntityManager<TDataAccess, TEntity, TEntityDto, TEntityDto, TEntityDto,
+                TSearchableEntity, TDataSearchEngine>
+        where TDataAccess : IEntityRepository<TEntity>
+        where TEntity : class, IEntity, new()
+        where TSearchableEntity : class, ISearchableEntity, new()
+        where TDataSearchEngine : IDataSearchEngine<TSearchableEntity>
+        where TEntityDto : class, IEntityDto, new()
+    {
+        protected BaseComplexSearchableEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
     }
 }

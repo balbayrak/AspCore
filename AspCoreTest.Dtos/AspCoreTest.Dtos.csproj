@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspCore.Dtos\AspCore.Dtos.csproj" />
+    <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
+    <ProjectReference Include="..\AspCoreTest.Entities\AspCoreTest.Entities.csproj" />
+  </ItemGroup>
+
+</Project>

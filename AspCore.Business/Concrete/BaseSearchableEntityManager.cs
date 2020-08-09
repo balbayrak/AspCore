@@ -6,13 +6,15 @@ using AspCore.Entities.General;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using AspCore.Dtos.Dto;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity, TDataSearchEngine> : BaseEntityManager<TDataAccess, TSearchableEntity>, IEntityService<TSearchableEntity>
+    public abstract class BaseSearchableEntityManager<TDataAccess, TSearchableEntity, TSearchableEntityDto, TDataSearchEngine> : BaseEntityManager<TDataAccess, TSearchableEntity, TSearchableEntityDto>, IEntityService<TSearchableEntity, TSearchableEntityDto>
       where TDataAccess : IEntityRepository<TSearchableEntity>
       where TSearchableEntity : class, ISearchableEntity, new()
       where TDataSearchEngine : IDataSearchEngine<TSearchableEntity>
+      where TSearchableEntityDto : class, ISearchableEntityDto, new()
     {
         private readonly TDataSearchEngine _dataSearchEngine;
 
@@ -21,17 +23,18 @@ namespace AspCore.Business.Concrete
             _dataSearchEngine = ServiceProvider.GetRequiredService<TDataSearchEngine>();
         }
 
-        public override ServiceResult<bool> Add(params TSearchableEntity[] entities)
+        public override ServiceResult<bool> Add(params TSearchableEntityDto[] entities)
         {
             TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = DataAccess.Add(entities);
+                var entitiesArray = AutoObjectMapper.Mapper.Map< TSearchableEntityDto[], TSearchableEntity[]>(entities);
+                ServiceResult<bool> resultDAL = DataAccess.Add(entitiesArray);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Create(entities);
+                    ServiceResult<bool> resultCache = _dataSearchEngine.Create(entitiesArray);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();
@@ -61,17 +64,19 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
-        public override ServiceResult<bool> Update(params TSearchableEntity[] entities)
+        public override ServiceResult<bool> Update(params TSearchableEntityDto[] entities)
         {
             TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<bool> resultDAL = DataAccess.Update(entities);
+                var entitiesArray = AutoObjectMapper.Mapper.Map<TSearchableEntityDto[], TSearchableEntity[]>(entities);
+
+                ServiceResult<bool> resultDAL = DataAccess.Update(entitiesArray);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Update(entities);
+                    ServiceResult<bool> resultCache = _dataSearchEngine.Update(entitiesArray);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();

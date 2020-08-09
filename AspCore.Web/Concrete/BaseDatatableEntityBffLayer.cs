@@ -1,18 +1,18 @@
 ﻿using AspCore.BackendForFrontend.Concrete;
+using AspCore.Dtos.Dto;
 using AspCore.Entities.DataTable;
-using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.WebComponents.HtmlHelpers.DataTable.Storage;
 using AspCore.WebComponents.HtmlHelpers.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AspCore.Web.Concrete
 {
-    public abstract class BaseDatatableEntityBffLayer<TViewModel, TEntity> : BaseEntityBffLayer<TViewModel, TEntity>
-        where TViewModel : BaseViewModel<TEntity>, new()
-        where TEntity : class, IEntity, new()
+    public abstract class BaseDatatableEntityBffLayer<TEntityDto,TCreatedDto,TUpdatedDto> : BaseEntityBffLayer<TEntityDto, TCreatedDto,TUpdatedDto>
+        where TEntityDto : class,IEntityDto,new()
+        where TCreatedDto : class,IEntityDto,new()
+        where TUpdatedDto : class,IEntityDto,new()
     {
         public BaseDatatableEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -23,13 +23,13 @@ namespace AspCore.Web.Concrete
 
             try
             {
-                var storageObject = jQueryDataTablesModel.columnInfos.DeSerialize<TEntity>();
+                var storageObject = jQueryDataTablesModel.columnInfos.DeSerialize<TEntityDto>();
                 if (storageObject != null)
                 {
-                    ServiceResult<List<TViewModel>> result = GetAllAsync(jQueryDataTablesModel.ToEntityFilter<TEntity>(storageObject.GetSearchableColumnString())).Result;
+                    ServiceResult<List<TEntityDto>> result = GetAllAsync(jQueryDataTablesModel.ToEntityFilter(storageObject.GetSearchableColumnString())).Result;
                     if (result.IsSucceeded && result.Result != null)
                     {
-                        using (var parser = new DatatableParser<TEntity>(result.Result.Select(t => t.dataEntity).ToList(), storageObject))
+                        using (var parser = new DatatableParser<TEntityDto>(result.Result, storageObject))
                         {
                             return parser.Parse(jQueryDataTablesModel, result.TotalResultCount, result.SearchResultCount);
                         }
@@ -40,10 +40,17 @@ namespace AspCore.Web.Concrete
             catch
             {
                 return null;
-                // ignored
             }
 
             return null;
+        }
+    }
+    public abstract class BaseDatatableEntityBffLayer<TEntityDto>: BaseDatatableEntityBffLayer<TEntityDto, TEntityDto, TEntityDto>
+        where TEntityDto : class, IEntityDto, new()
+
+    {
+        protected BaseDatatableEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
         }
     }
 }

@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspCore.Dependency\AspCore.Dependency.csproj" />
+    <ProjectReference Include="..\AspCore.Dtos\AspCore.Dtos.csproj" />
+    <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
     <ProjectReference Include="..\AspCore.Utilities\AspCore.Utilities.csproj" />
   </ItemGroup>
 

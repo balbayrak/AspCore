@@ -1,10 +1,12 @@
-﻿@{
+﻿@using AspCoreTest.Dtos.Dtos
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="row">
     <div class="col-md-12">
-        @(Html.DataTableHelper<Person>("persontable")
+        @(Html.DataTableHelper<PersonDto>("persontable")
              .LoadAction("/Home/LoadTable")
               .Columns(column =>
               {
@@ -64,7 +66,7 @@
     <script>
         $(document).ready(function () {
           //  var persontable = DataTableFunc.initDataTable('persontable');
-            var dt = Entity.Init('Home', 'formId', 'persontable', '.entitysubmit', 'Success!', 'Error');
+            var dt = Entity.Init('Home', 'formId', 'persontable', 'EncryptedId', '.entitysubmit', 'Success!', 'Error');
         });
     </script>
 }

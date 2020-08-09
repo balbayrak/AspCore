@@ -1,11 +1,11 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Entities.DocumentType;
+using AspCoreTest.Dtos.Dtos;
 using AspCoreTest.Entities.Models;
-using AspCoreTest.WebUI.Models.ViewModels;
 
 namespace AspCoreTest.Bffs.Abstract
 {
-    public interface IPersonCVBff : IDocumentEntityBffLayer<PersonCvViewModel, PersonCv, Document>
+    public interface IPersonCVBff : IDocumentEntityBffLayer<PersonCvDto, PersonCv, Document>
     {
     }
 }

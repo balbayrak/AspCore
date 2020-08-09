@@ -1,5 +1,6 @@
 ﻿using AspCore.Business.Abstract;
 using AspCore.Business.General;
+using AspCore.Dtos.Dto;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
@@ -15,9 +16,12 @@ using System.Threading.Tasks;
 
 namespace AspCore.BusinessApi
 {
-    public class BaseEntityController<TEntity, TEntityService> : BaseController
-        where TEntityService : IEntityService<TEntity>
+    public class BaseEntityController<TEntity, TEntityDto,TCreatedDto,TUpdatedDto, TEntityService> : BaseController
+        where TEntityService : IEntityService<TEntity, TEntityDto, TCreatedDto, TUpdatedDto>
         where TEntity : class, IEntity, new()
+        where TEntityDto : class, IEntityDto, new() 
+        where TCreatedDto : class, IEntityDto, new()
+        where TUpdatedDto : class, IEntityDto, new()
     {
         protected IServiceProvider ServiceProvider { get; }
         protected readonly object ServiceProviderLock = new object();
@@ -76,7 +80,7 @@ namespace AspCore.BusinessApi
             {
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(id)));
             }
-            ServiceResult<TEntity> readResponse = Service.GetById(new EntityFilter<TEntity>
+            ServiceResult<TEntityDto> readResponse = Service.GetById(new EntityFilter
             {
                 id = id,
             });
@@ -106,7 +110,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public IActionResult Add([FromBody]TEntity[] entities)
+        public IActionResult Add([FromBody]TCreatedDto[] entities)
         {
             if (entities == null)
             {
@@ -128,7 +132,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public async Task<IActionResult> AddAsync([FromBody] TEntity[] entities)
+        public async Task<IActionResult> AddAsync([FromBody] TCreatedDto[] entities)
         {
             if (entities == null)
             {
@@ -151,7 +155,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public IActionResult Update([FromBody]TEntity[] entities)
+        public IActionResult Update([FromBody]TUpdatedDto[] entities)
         {
             if (entities == null)
             {
@@ -172,7 +176,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public async Task<IActionResult> UpdateAsync([FromBody] TEntity[] entities)
+        public async Task<IActionResult> UpdateAsync([FromBody] TUpdatedDto[] entities)
         {
             if (entities == null)
             {
@@ -229,9 +233,9 @@ namespace AspCore.BusinessApi
         [HttpPost]
         [ProducesResponseType(500)]
         [Authorize()]
-        public IActionResult GetAll(EntityFilter<TEntity> entityFilter)
+        public IActionResult GetAll(EntityFilter entityFilter)
         {
-            ServiceResult<IList<TEntity>> response = Service.GetAll(entityFilter);
+            ServiceResult<IList<TEntityDto>> response = Service.GetAll(entityFilter);
             return response.ToHttpResponse();
         }
 
@@ -240,9 +244,9 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public async Task<IActionResult> GetAllAsync(EntityFilter<TEntity> filterSetting)
+        public async Task<IActionResult> GetAllAsync(EntityFilter filterSetting)
         {
-            ServiceResult<IList<TEntity>> response = await Service.GetAllAsync(filterSetting);
+            ServiceResult<IList<TEntityDto>> response = await Service.GetAllAsync(filterSetting);
             return response.ToHttpResponse();
         }
 
@@ -251,13 +255,13 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public IActionResult GetById(EntityFilter<TEntity> filterSetting)
+        public IActionResult GetById(EntityFilter filterSetting)
         {
             if (filterSetting.id == Guid.Empty)
             {
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(filterSetting.id)));
             }
-            ServiceResult<TEntity> response = Service.GetById(filterSetting);
+            ServiceResult<TEntityDto> response = Service.GetById(filterSetting);
             return response.ToHttpResponse();
         }
 
@@ -266,10 +270,20 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public async Task<IActionResult> GetEntityHistoriesAsync(EntityFilter<TEntity> filterSetting)
+        public async Task<IActionResult> GetEntityHistoriesAsync(EntityFilter filterSetting)
         {
-            ServiceResult<List<TEntity>> response = await Service.GetHistoriesByIdAsync(filterSetting);
+            ServiceResult<List<TEntityDto>> response = await Service.GetHistoriesByIdAsync(filterSetting);
             return response.ToHttpResponse();
+        }
+    }
+
+    public class BaseEntityController<TEntity, TEntityDto, TEntityService> : BaseEntityController<TEntity,TEntityDto,TEntityDto,TEntityDto,TEntityService>
+        where TEntityService : IEntityService<TEntity, TEntityDto>
+        where TEntity : class, IEntity, new()
+        where TEntityDto : class, IEntityDto, new()
+    {
+        public BaseEntityController(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
         }
     }
 }

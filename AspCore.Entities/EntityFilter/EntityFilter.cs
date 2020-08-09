@@ -1,15 +1,14 @@
-﻿using System;
+﻿using AspCore.Entities.EntityType;
+using System;
 using System.Collections.Generic;
-using AspCore.Entities.EntityType;
 
 namespace AspCore.Entities.EntityFilter
 {
-    public class EntityFilter<TEntity>
-    where TEntity : class, IEntity, new()
+    public class EntityFilter
     {
         public Guid id { get; set; }
 
-        public List<SortingType<TEntity>> sorters { get; set; }
+        public List<SortingType> sorters { get; set; }
 
         public SearchType search { get; set; }
 
@@ -25,4 +24,6 @@ namespace AspCore.Entities.EntityFilter
             search = null;
         }
     }
+
+   
 }

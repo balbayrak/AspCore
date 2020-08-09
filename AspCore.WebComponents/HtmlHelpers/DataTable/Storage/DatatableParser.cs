@@ -6,7 +6,7 @@ using System.Linq;
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
 {
     public class DatatableParser<TEntity> : IDisposable
-    where TEntity : class
+    
     {
         #region Fields
 
@@ -23,6 +23,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
             _entities = entities;
             _storageObject = storageObject;
         }
+
 
         public void Dispose()
         {

@@ -1,10 +1,10 @@
 ﻿using AspCore.Business.Abstract;
+using AspCoreTest.Dtos.Dtos;
 using AspCoreTest.Entities.Models;
-using AspCoreTest.Entities.SearchableEntities;
 
 namespace testbusiness.Abstract
 {
-    public interface IPersonService :  IEntityService<Person>, IBusinessService
+    public interface IPersonService :  IEntityService<Person,PersonDto>, IBusinessService
     {
     }
 }

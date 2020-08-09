@@ -12,15 +12,17 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using AspCore.Dtos.Dto;
 
 namespace AspCore.Web.Concrete
 {
-    public abstract class BaseWebEntityController<TEntity, TViewModel, TBffLayer> : BaseWebController<Document, DocumentRequest>
-        where TEntity : class, IEntity, new()
-        where TViewModel : BaseViewModel<TEntity>, new()
-        where TBffLayer : IDatatableEntityBffLayer<TViewModel, TEntity>
+    public abstract class BaseWebEntityController<TEntityDto, TCreatedDto,TUpdatedDto,TBffLayer> : BaseWebController<Document, DocumentRequest>
+        where TEntityDto : class,IEntityDto,new()
+        where TCreatedDto : class,IEntityDto,new()
+        where TUpdatedDto : class,IEntityDto,new()
+        where TBffLayer : IDatatableEntityBffLayer<TEntityDto,TCreatedDto,TUpdatedDto>
     {
-        protected TBffLayer BffLayer { get; private set; }
+        protected TBffLayer BffLayer { get; }
         public BaseWebEntityController(IServiceProvider serviceProvider, TBffLayer bffLayer) : base(serviceProvider)
         {
             BffLayer = bffLayer;
@@ -45,25 +47,24 @@ namespace AspCore.Web.Concrete
         [DataUnProtector("id")]
         public IActionResult AddOrEdit(string id)
         {
-            TViewModel viewModel = null;
             if (!string.IsNullOrEmpty(id))
             {
                 if (id != "-1")
                 {
-                    ServiceResult<TViewModel> entityResult = BffLayer.GetById(new EntityFilter<TEntity>
+                    ServiceResult<TEntityDto> entityResult = BffLayer.GetById(new EntityFilter
                     {
                         id = new Guid(id)
                     }).Result;
 
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
-                        viewModel = entityResult.Result;
+                        var viewModel = entityResult.Result;
                         return PartialView("AddOrEdit", viewModel);
                     }
                 }
                 else
                 {
-                    return PartialView("AddOrEdit", (TViewModel) null);
+                    return PartialView("AddOrEdit", (TEntityDto) null);
                 }
             }
 
@@ -71,21 +72,45 @@ namespace AspCore.Web.Concrete
         }
 
         [HttpPost]
-        public string AddOrEdit(TViewModel viewModel)
+        public string Add(TCreatedDto createdDto)
         {
-            if (viewModel != null)
+            if (createdDto != null)
             {
                 AjaxResult result = new AjaxResult();
 
                 ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
-                if (!string.IsNullOrEmpty(viewModel.dataEntity.EncryptedId))
+                if (string.IsNullOrEmpty(createdDto.EncryptedId))
                 {
-                    viewModel.dataEntity.Id = new Guid(DataProtectorFactory.Instance.UnProtect(viewModel.dataEntity.EncryptedId));
-                    addorUpdateResult = BffLayer.Update(new List<TViewModel> { viewModel }).Result;
+                    addorUpdateResult = BffLayer.Add(new List<TCreatedDto> { createdDto }).Result;
+                }
+                if (addorUpdateResult.IsSucceeded)
+                {
+                    result.Result = AjaxResultTypeEnum.Succeed;
+                    result.ResultText = addorUpdateResult.StatusMessage;
                 }
                 else
                 {
-                    addorUpdateResult = BffLayer.Add(new List<TViewModel> { viewModel }).Result;
+                    result.Result = AjaxResultTypeEnum.Error;
+                    result.ResultText = addorUpdateResult.ErrorMessage;
+                }
+
+                return JsonConvert.SerializeObject(result);
+            }
+            return null;
+        }
+
+        [HttpPost]
+        public string Edit(TUpdatedDto updatedDto)
+        {
+            if (updatedDto != null)
+            {
+                AjaxResult result = new AjaxResult();
+
+                ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
+                if (!string.IsNullOrEmpty(updatedDto.EncryptedId))
+                {
+                    updatedDto.Id = new Guid(DataProtectorFactory.Instance.UnProtect(updatedDto.EncryptedId));
+                    addorUpdateResult = BffLayer.Update(new List<TUpdatedDto> { updatedDto }).Result;
                 }
                 if (addorUpdateResult.IsSucceeded)
                 {
@@ -111,6 +136,17 @@ namespace AspCore.Web.Concrete
             {
                 ServiceResult<bool> serviceResult = BffLayer.DeleteWithIDs(new List<Guid> { new Guid(id) }).Result;
             }
+        }
+    }
+
+
+    public abstract class BaseWebEntityController<TEntityDto, TBffLayer> : BaseWebEntityController<TEntityDto, TEntityDto, TEntityDto, TBffLayer>
+        where TEntityDto : class, IEntityDto, new()
+        where TBffLayer : IDatatableEntityBffLayer<TEntityDto>
+
+    {
+        protected BaseWebEntityController(IServiceProvider serviceProvider, TBffLayer bffLayer) : base(serviceProvider, bffLayer)
+        {
         }
     }
 }
