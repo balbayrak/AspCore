@@ -7,7 +7,7 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.2.7</Version>
+    <Version>1.2.9</Version>
     <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <Company>AspCore.ApiClient</Company>

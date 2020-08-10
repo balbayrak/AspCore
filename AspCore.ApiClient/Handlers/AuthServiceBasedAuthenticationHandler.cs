@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace AspCore.ApiClient.Handlers
@@ -26,7 +27,7 @@ namespace AspCore.ApiClient.Handlers
             _httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
         }
 
-        public override async Task<AuthenticationTicketInfo> GetToken()
+        public override async Task<AuthenticationTicketInfo> GetToken(HttpRequestMessage request = null, bool forceNewToken = false)
         {
             var accesToken = await _httpContextAccessor.HttpContext.GetTokenAsync(ApiConstants.Api_Keys.ACCESS_TOKEN);
             var refreshToken = await _httpContextAccessor.HttpContext.GetTokenAsync(ApiConstants.Api_Keys.REFRESH_TOKEN);

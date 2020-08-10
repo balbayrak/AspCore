@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 
@@ -24,11 +25,11 @@ namespace AspCore.ApiClient.Handlers
             _apikey = apikey;
         }
 
-        public override async Task<AuthenticationTicketInfo> GetToken()
+        public override async Task<AuthenticationTicketInfo> GetToken(HttpRequestMessage request = null, bool forceNewToken = false)
         {
             AuthenticationTicketInfo authenticationTicketInfo = await CacheService.GetObjectAsync<AuthenticationTicketInfo>(_apikey);
 
-            if (authenticationTicketInfo != null) return authenticationTicketInfo;
+            if (!forceNewToken && authenticationTicketInfo != null) return authenticationTicketInfo;
 
 
             AuthenticationInfo authenticationInfo = new AuthenticationInfo();
@@ -46,9 +47,9 @@ namespace AspCore.ApiClient.Handlers
                 string responseString = await response.Content.ReadAsStringAsync();
 
                 result = JsonConvert.DeserializeObject<ServiceResult<AuthenticationTicketInfo>>(responseString);
-                
+
                 await AddorEditTokenStorage(result.Result);
-                
+
                 return result.Result;
             }
 
@@ -86,7 +87,7 @@ namespace AspCore.ApiClient.Handlers
 
         public override async Task AddorEditTokenStorage(AuthenticationTicketInfo authenticationTicketInfo)
         {
-            await CacheService.SetObjectAsync<AuthenticationTicketInfo>(_apikey, authenticationTicketInfo);
+            await CacheService.SetObjectAsync<AuthenticationTicketInfo>(_apikey, authenticationTicketInfo, authenticationTicketInfo.expires.AddMinutes(-1));
         }
     }
 }

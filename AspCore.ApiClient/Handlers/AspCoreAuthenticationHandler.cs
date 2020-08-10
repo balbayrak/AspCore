@@ -33,12 +33,12 @@ namespace AspCore.ApiClient.Handlers
             _tokenClient = _httpClientFactory.CreateClient($"{apikey}_tokenClient");
             _tokenClient.BaseAddress = new Uri(_configurationOption.Authentication.BaseAddress);
         }
-        public abstract Task<AuthenticationTicketInfo> GetToken();
+        public abstract Task<AuthenticationTicketInfo> GetToken(HttpRequestMessage request = null, bool forceNewToken = false);
         public abstract Task<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo authenticationTicketInfo);
         public abstract Task AddorEditTokenStorage(AuthenticationTicketInfo authenticationTicketInfo);
         protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = await GetToken();
+            var token = await GetToken(request);
 
             if (token != null)
             {
@@ -49,7 +49,14 @@ namespace AspCore.ApiClient.Handlers
 
             if (token != null && response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
             {
-                token = await RefreshToken(token);
+                if (string.IsNullOrEmpty(token.refresh_token))
+                {
+                    token = await GetToken(null, true);
+                }
+                else
+                {
+                    token = await RefreshToken(token);
+                }
 
                 if (token != null)
                 {
