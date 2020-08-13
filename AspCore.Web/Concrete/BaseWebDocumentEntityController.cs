@@ -7,6 +7,7 @@ using AspCore.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using AspCore.Dtos.Dto;
+using System.Threading.Tasks;
 
 namespace AspCore.Web.Concrete
 {
@@ -20,14 +21,14 @@ namespace AspCore.Web.Concrete
         }
         [HttpGet]
         [DataUnProtector("id")]
-        public IActionResult DownloadDocumentEntity(string id)
+        public  async Task<IActionResult> DownloadDocumentEntity(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
-                ServiceResult<TEntityDto> entityResult = BffLayer.GetById(new EntityFilter
+                ServiceResult<TEntityDto> entityResult = await BffLayer.GetByIdAsync(new EntityFilter
                 {
                     id = new Guid(id)
-                }).Result;
+                });
 
                 if (entityResult.IsSucceededAndDataIncluded())
                 {

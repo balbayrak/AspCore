@@ -4,18 +4,19 @@ using AspCore.Entities.General;
 using AspCore.Entities.Search;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AspCore.DataSearch.Abstract
 {
     public interface IDataSearchEngine<TSearchableEntity> : ITransientType
         where TSearchableEntity : class, ISearchableEntity, new()
     {
-        ServiceResult<bool> Create(params TSearchableEntity[] searchableEntities);
-        ServiceResult<bool> Update(params TSearchableEntity[] searchableEntities);
-        ServiceResult<bool> Delete(params TSearchableEntity[] searchableEntities);
-        ServiceResult<DataSearchResult<TSearchableEntity>> FindBy(bool isActiveOnly, int startIndex, int takeCount);
-        ServiceResult<DataSearchResult<TSearchableEntity>> FindById(Guid Id, bool isActive);
-        ServiceResult<DataSearchResult<TSearchableEntity>> FindByIdList(List<Guid> idList, bool isActive);
+        Task<ServiceResult<bool>> CreateAsync(params TSearchableEntity[] searchableEntities);
+        Task<ServiceResult<bool>> UpdateAsync(params TSearchableEntity[] searchableEntities);
+        Task<ServiceResult<bool>> DeleteAsync(params TSearchableEntity[] searchableEntities);
+        Task<ServiceResult<DataSearchResult<TSearchableEntity>>> FindByAsync(bool isActiveOnly, int startIndex, int takeCount);
+        Task<ServiceResult<DataSearchResult<TSearchableEntity>>> FindByIdAsync(Guid Id, bool isActive);
+        Task<ServiceResult<DataSearchResult<TSearchableEntity>>> FindByIdListAsync(List<Guid> idList, bool isActive);
 
     }
 }

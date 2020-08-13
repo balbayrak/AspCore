@@ -7,6 +7,7 @@ using AspCore.Extension;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AspCore.DataSearch.Concrete.ElasticSearch.Admin
 {
@@ -20,9 +21,9 @@ namespace AspCore.DataSearch.Concrete.ElasticSearch.Admin
             _elasticClient = elasticClient;
         }
 
-        public ServiceResult<bool> ResetIndex(bool initWithData)
+        public async Task<ServiceResult<bool>> ResetIndex(bool initWithData)
         {
-            return _elasticClient.ResetIndex(initWithData);
+            return await _elasticClient.ResetIndex(initWithData);
         }
     }
 }

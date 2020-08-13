@@ -250,7 +250,7 @@ namespace AspCore.BusinessApi
             return response.ToHttpResponse();
         }
 
-        [ActionName(ApiConstants.Urls.GET_BY_ID)]
+        [ActionName(ApiConstants.Urls.GET_BY_IDAsync)]
         [HttpPost]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]

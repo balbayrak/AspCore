@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using AspCore.Dtos.Dto;
+using System.Threading.Tasks;
 
 namespace AspCore.Business.Concrete
 {
@@ -23,18 +24,18 @@ namespace AspCore.Business.Concrete
             _dataSearchEngine = ServiceProvider.GetRequiredService<TDataSearchEngine>();
         }
 
-        public override ServiceResult<bool> Add(params TSearchableEntityDto[] entities)
+        public override async Task<ServiceResult<bool>> AddAsync(params TSearchableEntityDto[] entities)
         {
             TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                var entitiesArray = AutoObjectMapper.Mapper.Map< TSearchableEntityDto[], TSearchableEntity[]>(entities);
-                ServiceResult<bool> resultDAL = DataAccess.Add(entitiesArray);
+                var entitiesArray = AutoObjectMapper.Mapper.Map<TSearchableEntityDto[], TSearchableEntity[]>(entities);
+                ServiceResult<bool> resultDAL = await DataAccess.AddAsync(entitiesArray);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Create(entitiesArray);
+                    ServiceResult<bool> resultCache = await _dataSearchEngine.CreateAsync(entitiesArray);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();
@@ -64,7 +65,7 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
-        public override ServiceResult<bool> Update(params TSearchableEntityDto[] entities)
+        public override async Task<ServiceResult<bool>> UpdateAsync(params TSearchableEntityDto[] entities)
         {
             TransactionBuilder.BeginTransaction();
 
@@ -73,10 +74,10 @@ namespace AspCore.Business.Concrete
             {
                 var entitiesArray = AutoObjectMapper.Mapper.Map<TSearchableEntityDto[], TSearchableEntity[]>(entities);
 
-                ServiceResult<bool> resultDAL = DataAccess.Update(entitiesArray);
+                ServiceResult<bool> resultDAL = await DataAccess.UpdateAsync(entitiesArray);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Update(entitiesArray);
+                    ServiceResult<bool> resultCache = await _dataSearchEngine.UpdateAsync(entitiesArray);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();
@@ -106,21 +107,21 @@ namespace AspCore.Business.Concrete
             return result;
         }
 
-        public override ServiceResult<bool> Delete(params Guid[] entityIds)
+        public override async Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)
         {
             TransactionBuilder.BeginTransaction();
 
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ServiceResult<List<TSearchableEntity>> entityListResult = DataAccess.GetByIdList(entityIds);
+                ServiceResult<List<TSearchableEntity>> entityListResult = await DataAccess.GetByIdListAsync(entityIds);
 
                 if (entityListResult.IsSucceededAndDataIncluded())
                 {
-                    ServiceResult<bool> resultDAL = DataAccess.Delete(entityIds);
+                    ServiceResult<bool> resultDAL = await DataAccess.DeleteAsync(entityIds);
                     if (resultDAL.IsSucceeded)
                     {
-                        ServiceResult<bool> resultCache = _dataSearchEngine.Delete(entityListResult.Result.ToArray());
+                        ServiceResult<bool> resultCache = await _dataSearchEngine.DeleteAsync(entityListResult.Result.ToArray());
                         if (resultCache.IsSucceeded)
                         {
                             TransactionBuilder.CommitTransaction();

@@ -8,6 +8,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore.ElasticSearch.Concrete
 {
@@ -20,7 +21,7 @@ namespace AspCore.ElasticSearch.Concrete
             _elasticClient = elasticClient;
         }
 
-        public ServiceResult<bool> BulkIndex<T>(string aliasName, List<T> documents, int blockSize=1000)
+        public async Task<ServiceResult<bool>> BulkIndex<T>(string aliasName, List<T> documents, int blockSize = 1000)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -44,7 +45,7 @@ namespace AspCore.ElasticSearch.Concrete
                         breakFlag = true;
                     }
 
-                    response = _elasticClient.IndexMany(documents.Skip(startIndex).Take(take).ToList(), aliasName);
+                    response = await _elasticClient.IndexManyAsync(documents.Skip(startIndex).Take(take).ToList(), aliasName);
                     if (!response.IsValid) break;
                     remain -= blockSize;
                     startIndex = indexer * blockSize;
@@ -69,12 +70,12 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> ExistIndex(string indexName)
+        public async Task<ServiceResult<bool>> ExistIndex(string indexName)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                ExistsResponse response = _elasticClient.Indices.Exists(new IndexExistsRequest(Indices.Index(indexName)));
+                ExistsResponse response = await _elasticClient.Indices.ExistsAsync(new IndexExistsRequest(Indices.Index(indexName)));
                 if (response.OriginalException == null)
                 {
                     result.IsSucceeded = true;
@@ -96,7 +97,7 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> CreateIndex<T>(string indexName, string aliasName, int numberOfReplica, int numberOfShard)
+        public async Task<ServiceResult<bool>> CreateIndex<T>(string indexName, string aliasName, int numberOfReplica, int numberOfShard)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -110,7 +111,7 @@ namespace AspCore.ElasticSearch.Concrete
                     .Map<T>(m => m.AutoMap())
                     .Aliases(a => a.Alias(aliasName));
 
-                var response = _elasticClient.Indices.Create(createIndexDescriptor);
+                var response = await _elasticClient.Indices.CreateAsync(createIndexDescriptor);
 
                 if (response.IsValid && response.OriginalException == null)
                 {
@@ -130,13 +131,13 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> CreateIndex(CreateIndexDescriptor createIndexDescriptor)
+        public async Task<ServiceResult<bool>> CreateIndex(CreateIndexDescriptor createIndexDescriptor)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
 
-                var response = _elasticClient.Indices.Create(createIndexDescriptor);
+                var response = await _elasticClient.Indices.CreateAsync(createIndexDescriptor);
                 if (response.IsValid && response.OriginalException == null)
                 {
                     result.IsSucceeded = true;
@@ -156,12 +157,12 @@ namespace AspCore.ElasticSearch.Concrete
 
         }
 
-        public ServiceResult<bool> DeleteIndex(string indexName)
+        public async Task<ServiceResult<bool>> DeleteIndex(string indexName)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                var response = _elasticClient.Indices.Delete(Indices.Index(indexName));
+                var response = await _elasticClient.Indices.DeleteAsync(Indices.Index(indexName));
 
                 if (response.IsValid && response.OriginalException == null)
                 {
@@ -181,14 +182,14 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> Add<T>(string aliasName, T document)
+        public async Task<ServiceResult<bool>> Add<T>(string aliasName, T document)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                var response = _elasticClient.Index(document, i => i
-                 .Index(aliasName));
+                var response = await _elasticClient.IndexAsync(document, i => i
+                  .Index(aliasName));
 
                 if (response.IsValid && response.OriginalException == null)
                 {
@@ -208,13 +209,13 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> Update<T>(string aliasName, T document)
+        public async Task<ServiceResult<bool>> Update<T>(string aliasName, T document)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                var response = _elasticClient.Update(DocumentPath<T>
+                var response = await _elasticClient.UpdateAsync(DocumentPath<T>
                .Id(Id.From(document)),
                u => u
                    .Index(aliasName)
@@ -239,13 +240,13 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> Delete<T>(string aliasName, T document)
+        public async Task<ServiceResult<bool>> Delete<T>(string aliasName, T document)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                var response = _elasticClient.Delete(DocumentPath<T>.Id(Id.From(document)),
+                var response = await _elasticClient.DeleteAsync(DocumentPath<T>.Id(Id.From(document)),
                     u => u
                    .Index(aliasName));
 
@@ -267,13 +268,13 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<DataSearchResult<T>> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector)
+        public async Task<ServiceResult<DataSearchResult<T>>> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<DataSearchResult<T>> result = new ServiceResult<DataSearchResult<T>>();
             try
             {
-                ISearchResponse<T> response = _elasticClient.Search<T>(selector);
+                ISearchResponse<T> response = await _elasticClient.SearchAsync<T>(selector);
 
                 ValueAggregate totalAggregate = null;
                 if (response.Aggregations.ContainsKey(ESConstants.AGGREGATION_KEYS.VALUE_COUNT_AGG))
@@ -333,13 +334,13 @@ namespace AspCore.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<DataSearchResult<T>> Search<T>(ISearchRequest searchRequest)
+        public async Task<ServiceResult<DataSearchResult<T>>> Search<T>(ISearchRequest searchRequest)
                   where T : class, ISearchableEntity, new()
         {
             ServiceResult<DataSearchResult<T>> result = new ServiceResult<DataSearchResult<T>>();
             try
             {
-                var response = _elasticClient.Search<T>(searchRequest);
+                var response = await _elasticClient.SearchAsync<T>(searchRequest);
 
                 ValueAggregate totalAggregate = null;
                 if (response.Aggregations.ContainsKey(ESConstants.AGGREGATION_KEYS.VALUE_COUNT_AGG))

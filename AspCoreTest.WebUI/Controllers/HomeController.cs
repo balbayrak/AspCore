@@ -46,7 +46,7 @@ namespace AspCoreTest.WebUI.Controllers
         public IActionResult PersonCacheData()
         {
             var client = ServiceProvider.GetRequiredService<IPersonDataSearchEngine>();
-            var result = client.FindBy(true, 0, 10);
+            var result = client.FindByAsync(true, 0, 10);
             return View();
         }
 

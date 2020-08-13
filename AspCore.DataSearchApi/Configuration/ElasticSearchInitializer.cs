@@ -6,6 +6,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using Microsoft.AspNetCore.Builder;
 using System;
+using System.Threading.Tasks;
 
 namespace AspCore.DataSearchApi.Configuration
 {
@@ -17,14 +18,14 @@ namespace AspCore.DataSearchApi.Configuration
         {
             _app = app;
         }
-        public ElasticSearchInitializer InitElasticSearchIndex<TSearchableEntity, TSearchableEntityService, TElasticSearchProvider>(string indexKey, bool initWithData)
+        public async Task<ElasticSearchInitializer> InitElasticSearchIndex<TSearchableEntity, TSearchableEntityService, TElasticSearchProvider>(string indexKey, bool initWithData)
             where TSearchableEntity : class, ISearchableEntity, new()
             where TSearchableEntityService : ISearchableEntityService<TSearchableEntity>
             where TElasticSearchProvider : BaseElasticSearchProvider<TSearchableEntity, TSearchableEntityService>, IElasticSearchProvider<TSearchableEntity>
         {
 
             TElasticSearchProvider elasticSearchProvider = (TElasticSearchProvider)_app.ApplicationServices.GetService(typeof(IElasticSearchProvider<TSearchableEntity>));
-            ServiceResult<bool> result = elasticSearchProvider.InitIndex(new InitIndexRequest
+            ServiceResult<bool> result = await elasticSearchProvider.InitIndex(new InitIndexRequest
             {
                 initializeWithData = initWithData
             });

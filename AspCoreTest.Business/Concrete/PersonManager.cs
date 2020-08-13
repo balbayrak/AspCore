@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace testbusiness.Concrete
 {
-    public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person,PersonDto, PersonSearchEntity, IPersonDataSearchEngine>, IPersonService
+    public class PersonManager : BaseComplexSearchableEntityManager<IPersonDal, Person, PersonDto, PersonSearchEntity, IPersonDataSearchEngine>, IPersonService
     {
         public PersonManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -26,7 +26,7 @@ namespace testbusiness.Concrete
             return new ServiceResult<PersonSearchEntity>
             {
                 IsSucceeded = true,
-                Result = Mapper.MapProperties<Person, PersonSearchEntity>(entity)
+                Result = AutoObjectMapper.Mapper.Map<Person, PersonSearchEntity>(entity)
             };
         }
 
@@ -34,8 +34,8 @@ namespace testbusiness.Concrete
         {
             var entityMap = AutoObjectMapper.Mapper.Map<Person[]>(entities);
             ITask personTask = new PersonTask(ServiceProvider, entityMap[0], EnumCrudOperation.CreateOperation);
-            
-            ITask personTask1 = new PersonTask(ServiceProvider, entityMap[0],EnumCrudOperation.CreateOperation);
+
+            ITask personTask1 = new PersonTask(ServiceProvider, entityMap[0], EnumCrudOperation.CreateOperation);
             var res1 = personTask.Run().Result;
 
             var taskBuilder = ServiceProvider.GetRequiredService<ITaskFlowBuilder>();

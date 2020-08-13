@@ -2,6 +2,7 @@
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
+using System.Threading.Tasks;
 
 namespace AspCore.ElasticSearchApiClient
 {
@@ -13,31 +14,31 @@ namespace AspCore.ElasticSearchApiClient
            
         }
 
-        public ServiceResult<bool> Create(params T[] searchableEntities)
+        public async Task<ServiceResult<bool>> Create(params T[] searchableEntities)
         {
             _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.CREATE_ACTION_NAME;
-            return _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities).Result;
+            return await _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities);
         }
 
-        public ServiceResult<bool> Update(params T[] searchableEntities)
+        public async Task<ServiceResult<bool>> Update(params T[] searchableEntities)
         {
             _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.UPDATE_ACTION_NAME;
-            return _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities).Result;
+            return await _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities);
         }
 
-        public ServiceResult<bool> Delete(params T[] searchableEntities)
+        public async Task<ServiceResult<bool>> Delete(params T[] searchableEntities)
         {
             _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.DELETE_ACTION_NAME;
-            return _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities).Result;
+            return await _apiClient.PostRequest<ServiceResult<bool>>(searchableEntities);
         }
 
-        public ServiceResult<bool> ResetIndex(bool initWithData)
+        public async Task<ServiceResult<bool>> ResetIndex(bool initWithData)
         {
             _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.RESET_INDEX_ACTION_NAME;
-            return _apiClient.PostRequest<ServiceResult<bool>>(new InitIndexRequest
+            return await _apiClient.PostRequest<ServiceResult<bool>>(new InitIndexRequest
             {
                 initializeWithData = initWithData
-            }).Result;
+            });
         }
     }
 }

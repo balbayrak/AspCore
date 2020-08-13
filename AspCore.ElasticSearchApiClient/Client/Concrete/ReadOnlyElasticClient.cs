@@ -6,6 +6,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Entities.Search;
 using System;
+using System.Threading.Tasks;
 
 namespace AspCore.ElasticSearchApiClient
 {
@@ -26,14 +27,14 @@ namespace AspCore.ElasticSearchApiClient
             _elasticApiRoute = elasticApiRoute;
         }
 
-        public ServiceResult<DataSearchResult<T>> Read(Func<DataSearchBuilder<T>, DataSearchBuilder<T>> builder)
+        public async Task<ServiceResult<DataSearchResult<T>>> Read(Func<DataSearchBuilder<T>, DataSearchBuilder<T>> builder)
         {
             DataSearchBuilder<T> searchBuilder = new DataSearchBuilder<T>();
             searchBuilder = builder(searchBuilder);
             SearchRequestItem requestItem = searchBuilder.GetRequestItem();
 
             _apiClient.apiUrl = _elasticApiRoute + "/" + ApiConstants.DataSearchApi_Urls.READ_ACTION_NAME;
-            return _apiClient.PostRequest<ServiceResult<DataSearchResult<T>>>(requestItem).Result;
+            return await _apiClient.PostRequest<ServiceResult<DataSearchResult<T>>>(requestItem);
         }
 
     }

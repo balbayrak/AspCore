@@ -21,6 +21,7 @@ namespace AspCore.Entities.Constants
             public const string GET_ALL_ASYNC = "GetAllAsync";
             public const string GET_ENTITY_HISTORIES_ASYNC = "GetEntityHistoriesAsync";
             public const string GET_BY_ID = "GetById";
+            public const string GET_BY_IDAsync = "GetByIdAsync";
             public const string AUTHENTICATE_CLIENT = "AuthenticateClient";
             public const string REFRESH_TOKEN = "RefreshToken";
             public const string GET_CLIENT_INFO = "GetClientInfo";

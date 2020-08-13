@@ -1,8 +1,8 @@
-﻿using AspCore.Entities.Constants;
+﻿using AspCore.Dtos.Dto;
+using AspCore.Entities.Constants;
 using AspCore.Entities.DataTable;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.EntityFilter;
-using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Utilities.DataProtector;
 using AspCore.Web.Abstract;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using AspCore.Dtos.Dto;
+using System.Threading.Tasks;
 
 namespace AspCore.Web.Concrete
 {
@@ -45,16 +45,16 @@ namespace AspCore.Web.Concrete
 
         [HttpGet]
         [DataUnProtector("id")]
-        public IActionResult AddOrEdit(string id)
+        public async Task<IActionResult> AddOrEdit(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 if (id != "-1")
                 {
-                    ServiceResult<TEntityDto> entityResult = BffLayer.GetById(new EntityFilter
+                    ServiceResult<TEntityDto> entityResult = await BffLayer.GetByIdAsync(new EntityFilter
                     {
                         id = new Guid(id)
-                    }).Result;
+                    });
 
                     if (entityResult.IsSucceededAndDataIncluded())
                     {
@@ -72,7 +72,7 @@ namespace AspCore.Web.Concrete
         }
 
         [HttpPost]
-        public string Add(TCreatedDto createdDto)
+        public async Task<string> Add(TCreatedDto createdDto)
         {
             if (createdDto != null)
             {
@@ -81,7 +81,7 @@ namespace AspCore.Web.Concrete
                 ServiceResult<bool> addorUpdateResult = new ServiceResult<bool>();
                 if (string.IsNullOrEmpty(createdDto.EncryptedId))
                 {
-                    addorUpdateResult = BffLayer.Add(new List<TCreatedDto> { createdDto }).Result;
+                    addorUpdateResult = await BffLayer.AddAsync(new List<TCreatedDto> { createdDto });
                 }
                 if (addorUpdateResult.IsSucceeded)
                 {
@@ -100,7 +100,7 @@ namespace AspCore.Web.Concrete
         }
 
         [HttpPost]
-        public string Edit(TUpdatedDto updatedDto)
+        public async Task<string> Edit(TUpdatedDto updatedDto)
         {
             if (updatedDto != null)
             {
@@ -110,7 +110,7 @@ namespace AspCore.Web.Concrete
                 if (!string.IsNullOrEmpty(updatedDto.EncryptedId))
                 {
                     updatedDto.Id = new Guid(DataProtectorFactory.Instance.UnProtect(updatedDto.EncryptedId));
-                    addorUpdateResult = BffLayer.Update(new List<TUpdatedDto> { updatedDto }).Result;
+                    addorUpdateResult =await BffLayer.UpdateAsync(new List<TUpdatedDto> { updatedDto });
                 }
                 if (addorUpdateResult.IsSucceeded)
                 {
@@ -134,7 +134,7 @@ namespace AspCore.Web.Concrete
         {
             if (!string.IsNullOrEmpty(id))
             {
-                ServiceResult<bool> serviceResult = BffLayer.DeleteWithIDs(new List<Guid> { new Guid(id) }).Result;
+                BffLayer.DeleteWithIDsAsync(new List<Guid> { new Guid(id) });
             }
         }
     }

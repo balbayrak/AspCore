@@ -7,6 +7,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AspCore.DataSearchApi.ElasticSearch.Abstract
 {
@@ -15,11 +16,11 @@ namespace AspCore.DataSearchApi.ElasticSearch.Abstract
     {
         IESContext context { get; }
 
-        ServiceResult<bool> ResetIndex(InitIndexRequest initRequest);
-        ServiceResult<bool> InitIndex(InitIndexRequest initRequest);
-        ServiceResult<bool> CreateIndexItem(TSearchableEntity[] searchableEntities);
-        ServiceResult<DataSearchResult<TSearchableEntity>> ReadIndexItem(SearchRequestItem searchRequestItem);
-        ServiceResult<bool> UpdateIndexItem( TSearchableEntity[] searchableEntities);
-        ServiceResult<bool> DeleteIndexItem(TSearchableEntity[] searchableEntities);
+        Task<ServiceResult<bool>> ResetIndex(InitIndexRequest initRequest);
+        Task<ServiceResult<bool>> InitIndex(InitIndexRequest initRequest);
+        Task<ServiceResult<bool>> CreateIndexItem(TSearchableEntity[] searchableEntities);
+        Task<ServiceResult<DataSearchResult<TSearchableEntity>>> ReadIndexItem(SearchRequestItem searchRequestItem);
+        Task<ServiceResult<bool>> UpdateIndexItem( TSearchableEntity[] searchableEntities);
+        Task<ServiceResult<bool>> DeleteIndexItem(TSearchableEntity[] searchableEntities);
     }
 }

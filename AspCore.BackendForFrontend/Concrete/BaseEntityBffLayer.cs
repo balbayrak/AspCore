@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AspCore.BackendForFrontend.Abstract;
+﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.Dtos.Dto;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityFilter;
-using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
@@ -35,25 +33,25 @@ namespace AspCore.BackendForFrontend.Concrete
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(id);
             return result;
         }
-        public async Task<ServiceResult<bool>> Add(List<TCreatedDto> entities)
+        public async Task<ServiceResult<bool>> AddAsync(List<TCreatedDto> entities)
         {
             ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.ADDAsync;
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entities);
             return result;
         }
-        public async Task<ServiceResult<bool>> Update(List<TUpdatedDto> entities)
+        public async Task<ServiceResult<bool>> UpdateAsync(List<TUpdatedDto> entities)
         {
             ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.UPDATEAsync;
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entities);
             return result;
         }
-        public async Task<ServiceResult<bool>> Delete(List<TEntityDto> entities)
+        public async Task<ServiceResult<bool>> DeleteAsync(List<TEntityDto> entities)
         {
             ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETE;
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entities);
             return result;
         }
-        public async Task<ServiceResult<bool>> DeleteWithIDs(List<Guid> entityIds)
+        public async Task<ServiceResult<bool>> DeleteWithIDsAsync(List<Guid> entityIds)
         {
             ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETEAsync;
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entityIds.ToArray());
@@ -71,13 +69,12 @@ namespace AspCore.BackendForFrontend.Concrete
             var result = await ApiClient.PostRequest<ServiceResult<List<TEntityDto>>>(filterSetting);
             return result.ProtectEntity();
         }
-        public async Task<ServiceResult<TEntityDto>> GetById(EntityFilter filterSetting)
+        public async Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter filterSetting)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_BY_ID;
+            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_BY_IDAsync;
             var result = await ApiClient.PostRequest<ServiceResult<TEntityDto>>(filterSetting);
             return result.ProtectEntity();
         }
-
         public async Task<ServiceResult<List<TEntityDto>>> GetEntityHistoriesAsync(EntityFilter filterSetting)
         {
             ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_ENTITY_HISTORIES_ASYNC;

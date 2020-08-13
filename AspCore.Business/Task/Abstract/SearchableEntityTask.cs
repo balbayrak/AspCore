@@ -29,7 +29,7 @@ namespace AspCore.Business.Task.Abstract
                 ServiceResult<bool> resultDAL = await DataLayer.AddAsync(Entity);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Create(Entity);
+                    ServiceResult<bool> resultCache = await _dataSearchEngine.CreateAsync(Entity);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();
@@ -59,7 +59,7 @@ namespace AspCore.Business.Task.Abstract
                 ServiceResult<bool> resultDAL = await DataLayer.UpdateAsync(Entity);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Update(Entity);
+                    ServiceResult<bool> resultCache = await _dataSearchEngine.UpdateAsync(Entity);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();
@@ -89,7 +89,7 @@ namespace AspCore.Business.Task.Abstract
                 ServiceResult<bool> resultDAL = await DataLayer.DeleteAsync(Entity);
                 if (resultDAL.IsSucceeded)
                 {
-                    ServiceResult<bool> resultCache = _dataSearchEngine.Delete(Entity);
+                    ServiceResult<bool> resultCache = await _dataSearchEngine.DeleteAsync(Entity);
                     if (resultCache.IsSucceeded)
                     {
                         TransactionBuilder.CommitTransaction();

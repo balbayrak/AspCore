@@ -134,6 +134,19 @@ namespace AspCore.Business.Concrete
             return data.ChangeResult(default(TEntityDto));
         }
 
+        public async Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter setting)
+        {
+
+            var data = await DataAccess.GetByIdAsync(setting.id);
+            if (data.IsSucceeded)
+            {
+                var entityArray = AutoObjectMapper.Mapper.Map<TEntity, TEntityDto>(data.Result);
+                return data.ChangeResult(entityArray);
+            }
+
+            return data.ChangeResult(default(TEntityDto));
+        }
+
         public ServiceResult<IList<TEntityDto>> GetAll(EntityFilter setting)
         {
             if (setting == null)

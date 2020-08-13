@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using AspCore.Dtos.Dto;
+using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Abstract
 {
@@ -13,11 +14,11 @@ namespace AspCore.BackendForFrontend.Abstract
          where TUpdatedDto : class, IEntityDto, new()
 
     {
-        ServiceResult<List<TSearchableEntity>> FindBy(bool isActiveOnly, int startIndex, int takeCount);
+        Task<ServiceResult<List<TSearchableEntity>>> FindBy(bool isActiveOnly, int startIndex, int takeCount);
 
-        ServiceResult<TSearchableEntity> FindById(Guid Id, bool isActive);
+        Task<ServiceResult<TSearchableEntity>> FindById(Guid Id, bool isActive);
 
-        ServiceResult<List<TSearchableEntity>> FindByIdList(List<Guid> idList, bool isActive);
+        Task<ServiceResult<List<TSearchableEntity>>> FindByIdList(List<Guid> idList, bool isActive);
     }
 
     public interface ISearchableEntityBffLayer<TSearchableEntity> : ISearchableEntityBffLayer<TSearchableEntity, TSearchableEntity,

@@ -13,10 +13,11 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 {
-    public abstract class BaseElasticSearchProvider<TSearchableEntity,TSearchableEntityService> : IElasticSearchProvider<TSearchableEntity>
+    public abstract class BaseElasticSearchProvider<TSearchableEntity, TSearchableEntityService> : IElasticSearchProvider<TSearchableEntity>
           where TSearchableEntity : class, ISearchableEntity, new()
           where TSearchableEntityService : ISearchableEntityService<TSearchableEntity>
     {
@@ -37,18 +38,18 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
             this.context = ServiceProvider.GetRequiredService<IESContext>();
         }
 
-        public ServiceResult<bool> ResetIndex(InitIndexRequest initRequest)
+        public async Task<ServiceResult<bool>> ResetIndex(InitIndexRequest initRequest)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
             try
             {
-                ServiceResult<bool> existResult = context.ExistIndex(aliasKey);
+                ServiceResult<bool> existResult = await context.ExistIndex(aliasKey);
                 if (existResult.IsSucceeded)
                 {
                     if (existResult.Result)
                     {
-                        ServiceResult<bool> deleteResult = context.DeleteIndex(indexKey);
+                        ServiceResult<bool> deleteResult = await context.DeleteIndex(indexKey);
                         if (!(deleteResult.IsSucceeded && deleteResult.Result))
                         {
                             result.ErrorMessage = deleteResult.ErrorMessage;
@@ -58,7 +59,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                     if (string.IsNullOrEmpty(result.ErrorMessage))
                     {
-                        result = context.CreateIndex(createIndexDescriptor);
+                        result = await context.CreateIndex(createIndexDescriptor);
 
                         if (string.IsNullOrEmpty(result.ErrorMessage) && initRequest.initializeWithData)
                         {
@@ -68,7 +69,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
                                 ServiceResult<TSearchableEntity[]> entityResult = searchableEntityService.GetSearchableEntities();
                                 if (entityResult.IsSucceededAndDataIncluded())
                                 {
-                                    result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
+                                    result = await context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
                                 }
                                 else
                                 {
@@ -93,19 +94,19 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> InitIndex(InitIndexRequest initRequest)
+        public async Task<ServiceResult<bool>> InitIndex(InitIndexRequest initRequest)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
             try
             {
-                ServiceResult<bool> existResult = context.ExistIndex(aliasKey);
+                ServiceResult<bool> existResult = await context.ExistIndex(aliasKey);
                 if (existResult.IsSucceeded)
                 {
                     if (!existResult.Result)
                     {
 
-                        result = context.CreateIndex(createIndexDescriptor);
+                        result = await context.CreateIndex(createIndexDescriptor);
 
                         if (result.IsSucceeded && initRequest.initializeWithData)
                         {
@@ -117,12 +118,12 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
                                 ServiceResult<TSearchableEntity[]> entityResult = searchableEntityService.GetSearchableEntities();
                                 if (entityResult.IsSucceededAndDataIncluded())
                                 {
-                                    result = context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
+                                    result = await context.BulkIndex(aliasKey, entityResult.Result.ToList(), 1000);
                                     result.IsSucceeded = true;
                                 }
                                 else
                                 {
-                                    context.DeleteIndex(indexKey);
+                                    await context.DeleteIndex(indexKey);
                                     result.ErrorMessage = entityResult.ErrorMessage;
                                     result.ExceptionMessage = entityResult.ExceptionMessage;
                                 }
@@ -144,7 +145,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
             return result;
         }
 
-        public ServiceResult<bool> CreateIndexItem( TSearchableEntity[] searchableEntities)
+        public async Task<ServiceResult<bool>> CreateIndexItem(TSearchableEntity[] searchableEntities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -159,11 +160,11 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                 if (searchableEntities.Length == 1)
                 {
-                    result = context.Add(aliasKey, searchableEntities[0]);
+                    result = await context.Add(aliasKey, searchableEntities[0]);
                 }
                 else
                 {
-                    result = context.BulkIndex(aliasKey, searchableEntities.ToList(), 1000);
+                    result = await context.BulkIndex(aliasKey, searchableEntities.ToList(), 1000);
                 }
             }
             catch (Exception ex)
@@ -173,7 +174,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
             return result;
         }
-        public ServiceResult<DataSearchResult<TSearchableEntity>> ReadIndexItem(SearchRequestItem searchRequestItem)
+        public async Task<ServiceResult<DataSearchResult<TSearchableEntity>>> ReadIndexItem(SearchRequestItem searchRequestItem)
         {
             ServiceResult<DataSearchResult<TSearchableEntity>> result = new ServiceResult<DataSearchResult<TSearchableEntity>>();
             try
@@ -224,7 +225,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
                 if (aggs != null)
                     searchRequest.Aggregations = aggs;
 
-                result = context.Search<TSearchableEntity>(searchRequest);
+                result = await context.Search<TSearchableEntity>(searchRequest);
 
             }
             catch (Exception ex)
@@ -234,7 +235,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
             return result;
         }
-        public ServiceResult<bool> UpdateIndexItem( TSearchableEntity[] searchableEntities)
+        public async Task<ServiceResult<bool>> UpdateIndexItem(TSearchableEntity[] searchableEntities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -248,11 +249,11 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                 if (searchableEntities.Length == 1)
                 {
-                    result = context.Update(aliasKey, searchableEntities[0]);
+                    result = await context.Update(aliasKey, searchableEntities[0]);
                 }
                 else
                 {
-                    result = context.BulkIndex(aliasKey, searchableEntities.ToList());
+                    result = await context.BulkIndex(aliasKey, searchableEntities.ToList());
                 }
             }
             catch (Exception ex)
@@ -262,7 +263,7 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
             return result;
         }
-        public ServiceResult<bool> DeleteIndexItem(TSearchableEntity[] searchableEntities)
+        public async Task<ServiceResult<bool>> DeleteIndexItem(TSearchableEntity[] searchableEntities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -276,11 +277,11 @@ namespace AspCore.DataSearchApi.ElasticSearch.Concrete
 
                 if (searchableEntities.Length == 1)
                 {
-                    result = context.Update(aliasKey, searchableEntities[0]);
+                    result = await context.Update(aliasKey, searchableEntities[0]);
                 }
                 else
                 {
-                    result = context.BulkIndex(aliasKey, searchableEntities.ToList());
+                    result = await context.BulkIndex(aliasKey, searchableEntities.ToList());
                 }
             }
             catch (Exception ex)

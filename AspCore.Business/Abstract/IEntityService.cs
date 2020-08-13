@@ -30,6 +30,8 @@ namespace AspCore.Business.Abstract
 
         ServiceResult<TEntityDto> GetById(EntityFilter setting);
 
+        Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter setting);
+
         ServiceResult<IList<TEntityDto>> GetAll(EntityFilter setting);
 
         Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(EntityFilter setting);

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace AspCore.DataSearchApi
 {
@@ -27,37 +28,37 @@ namespace AspCore.DataSearchApi
         }
 
         [NonAction]
-        protected virtual IActionResult ResetIndexWithData(InitIndexRequest initRequest)
+        protected virtual async Task<IActionResult> ResetIndexWithData(InitIndexRequest initRequest)
         {
-            ServiceResult<bool> result = _elasticSearchProvider.ResetIndex(initRequest);
+            ServiceResult<bool> result = await _elasticSearchProvider.ResetIndex(initRequest);
             return result.ToHttpResponse();
         }
 
         [NonAction]
-        protected virtual IActionResult CreateIndexItem(TSearchableEntity[] searchableEntities)
+        protected virtual async Task<IActionResult> CreateIndexItem(TSearchableEntity[] searchableEntities)
         {
-            ServiceResult<bool> result = _elasticSearchProvider.CreateIndexItem(searchableEntities);
+            ServiceResult<bool> result = await _elasticSearchProvider.CreateIndexItem(searchableEntities);
             return result.ToHttpResponse();
         }
 
         [NonAction]
-        protected virtual IActionResult ReadIndexItem(SearchRequestItem searchRequestItem)
+        protected virtual async Task<IActionResult> ReadIndexItem(SearchRequestItem searchRequestItem)
         {
-            ServiceResult<DataSearchResult<TSearchableEntity>> result = _elasticSearchProvider.ReadIndexItem(searchRequestItem);
+            ServiceResult<DataSearchResult<TSearchableEntity>> result = await _elasticSearchProvider.ReadIndexItem(searchRequestItem);
             return result.ToHttpResponse();
         }
 
         [NonAction]
-        protected virtual IActionResult UpdateIndexItem(TSearchableEntity[] searchableEntities)
+        protected virtual async Task<IActionResult> UpdateIndexItem(TSearchableEntity[] searchableEntities)
         {
-            ServiceResult<bool> result = _elasticSearchProvider.UpdateIndexItem(searchableEntities);
+            ServiceResult<bool> result = await _elasticSearchProvider.UpdateIndexItem(searchableEntities);
             return result.ToHttpResponse();
         }
 
         [NonAction]
-        protected virtual IActionResult DeleteIndexItem(TSearchableEntity[] searchableEntities)
+        protected virtual async Task<IActionResult> DeleteIndexItem(TSearchableEntity[] searchableEntities)
         {
-            ServiceResult<bool> result = _elasticSearchProvider.DeleteIndexItem(searchableEntities);
+            ServiceResult<bool> result = await _elasticSearchProvider.DeleteIndexItem(searchableEntities);
             return result.ToHttpResponse();
         }
 
@@ -65,44 +66,44 @@ namespace AspCore.DataSearchApi
         [ActionName(ApiConstants.DataSearchApi_Urls.RESET_INDEX_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult ResetIndex(InitIndexRequest initIndexRequest)
+        public async Task<IActionResult> ResetIndex(InitIndexRequest initIndexRequest)
         {
-            return ResetIndexWithData(initIndexRequest);
+            return await ResetIndexWithData(initIndexRequest);
         }
 
         [Authorize]
         [ActionName(ApiConstants.DataSearchApi_Urls.CREATE_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult Create(TSearchableEntity[] searchableEntities)
+        public async Task<IActionResult> Create(TSearchableEntity[] searchableEntities)
         {
-            return CreateIndexItem(searchableEntities);
+            return await CreateIndexItem(searchableEntities);
         }
 
         [Authorize]
         [ActionName(ApiConstants.DataSearchApi_Urls.READ_ACTION_NAME)]
         [HttpPost]
-        public IActionResult Read(SearchRequestItem searchRequestItem)
+        public async Task<IActionResult> Read(SearchRequestItem searchRequestItem)
         {
-            return ReadIndexItem(searchRequestItem);
+            return await ReadIndexItem(searchRequestItem);
         }
 
         [Authorize]
         [ActionName(ApiConstants.DataSearchApi_Urls.UPDATE_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult Update(TSearchableEntity[] searchableEntities)
+        public async Task<IActionResult> Update(TSearchableEntity[] searchableEntities)
         {
-            return UpdateIndexItem(searchableEntities);
+            return await UpdateIndexItem(searchableEntities);
         }
 
         [Authorize]
         [ActionName(ApiConstants.DataSearchApi_Urls.DELETE_ACTION_NAME)]
         [HttpPost]
 
-        public IActionResult Delete(TSearchableEntity[] searchableEntities)
+        public async Task<IActionResult> Delete(TSearchableEntity[] searchableEntities)
         {
-            return DeleteIndexItem(searchableEntities);
+            return await DeleteIndexItem(searchableEntities);
         }
 
     }

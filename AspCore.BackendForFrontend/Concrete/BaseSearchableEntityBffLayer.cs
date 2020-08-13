@@ -1,15 +1,15 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
 using AspCore.DataSearch.Abstract;
-using AspCore.Dependency.Concrete;
+using AspCore.Dtos.Dto;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Entities.Search;
 using AspCore.Extension;
+using AspCore.Mapper.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using AspCore.Dtos.Dto;
-using AspCore.Mapper.Abstract;
+using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
@@ -29,11 +29,11 @@ namespace AspCore.BackendForFrontend.Concrete
             _autoObjectMapper = ServiceProvider.GetRequiredService<IAutoObjectMapper>();
         }
 
-        public ServiceResult<List<TEntityDto>> FindBy(bool isActiveOnly, int startIndex, int takeCount)
+        public async Task<ServiceResult<List<TEntityDto>>> FindBy(bool isActiveOnly, int startIndex, int takeCount)
         {
             var viewResult = new ServiceResult<List<TEntityDto>>();
 
-            ServiceResult<DataSearchResult<TSearchableEntity>> result = DataSearchEngine.FindBy(isActiveOnly, startIndex, takeCount);
+            ServiceResult<DataSearchResult<TSearchableEntity>> result = await DataSearchEngine.FindByAsync(isActiveOnly, startIndex, takeCount);
             
             if (result.IsSucceededAndDataIncluded())
             {
@@ -42,12 +42,12 @@ namespace AspCore.BackendForFrontend.Concrete
             return viewResult;
         }
 
-        public ServiceResult<TEntityDto> FindById(Guid Id, bool isActive)
+        public async Task<ServiceResult<TEntityDto>> FindById(Guid Id, bool isActive)
         {
             var viewResult = new ServiceResult<TEntityDto>();
             ServiceResult<DataSearchResult<TSearchableEntity>> result = null;
 
-            result = DataSearchEngine.FindById(Id, isActive);
+            result = await DataSearchEngine.FindByIdAsync(Id, isActive);
 
             if (result.IsSucceededAndDataIncluded())
             {
@@ -57,10 +57,10 @@ namespace AspCore.BackendForFrontend.Concrete
             return viewResult;
         }
 
-        public ServiceResult<List<TEntityDto>> FindByIdList(List<Guid> idList, bool isActive)
+        public async Task<ServiceResult<List<TEntityDto>>> FindByIdList(List<Guid> idList, bool isActive)
         {
             var viewResult = new ServiceResult<List<TEntityDto>>();
-            ServiceResult<DataSearchResult<TSearchableEntity>> result = DataSearchEngine.FindByIdList(idList, isActive);
+            ServiceResult<DataSearchResult<TSearchableEntity>> result = await DataSearchEngine.FindByIdListAsync(idList, isActive);
            
             if (result.IsSucceededAndDataIncluded())
             {

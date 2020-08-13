@@ -14,13 +14,13 @@ namespace AspCore.BackendForFrontend.Abstract
     {
         Task<ServiceResult<bool>> Liveness();
         Task<ServiceResult<bool>> Readiness(Guid id);
-        Task<ServiceResult<bool>> Add(List<TCreatedDto> entities);
-        Task<ServiceResult<bool>> Update(List<TUpdatedDto> entities);
-        Task<ServiceResult<bool>> Delete(List<TEntityDto> entities);
-        Task<ServiceResult<bool>> DeleteWithIDs(List<Guid> entityIds);
+        Task<ServiceResult<bool>> AddAsync(List<TCreatedDto> entities);
+        Task<ServiceResult<bool>> UpdateAsync(List<TUpdatedDto> entities);
+        Task<ServiceResult<bool>> DeleteAsync(List<TEntityDto> entities);
+        Task<ServiceResult<bool>> DeleteWithIDsAsync(List<Guid> entityIds);
         Task<ServiceResult<List<TEntityDto>>> GetAll(EntityFilter entityFilter);
         Task<ServiceResult<List<TEntityDto>>> GetAllAsync(EntityFilter filterSetting);
-        Task<ServiceResult<TEntityDto>> GetById(EntityFilter filterSetting);
+        Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter filterSetting);
         Task<ServiceResult<List<TEntityDto>>> GetEntityHistoriesAsync(EntityFilter filterSetting);
 
     }
