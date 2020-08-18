@@ -11,11 +11,10 @@ namespace AspCoreTest.Business.Concrete.Tasks
     {
         public PersonTask(IServiceProvider serviceProvider, Person person, EnumCrudOperation enumCrudOperation) : base(serviceProvider, person, enumCrudOperation)
         {
-
+            this.AddValidator(new PersonTaskValidator(person));
+            this.AddValidator(new PersonTaskValidator2(person));
         }
         public override bool RunWithTransaction => false;
-
-        public override List<ITaskValidator> Validators => new List<ITaskValidator> { new PersonTaskValidator(this.Entity), new PersonTaskValidator2(this.Entity) };
 
     }
 }

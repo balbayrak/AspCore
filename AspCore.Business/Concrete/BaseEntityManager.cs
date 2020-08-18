@@ -1,5 +1,6 @@
 ﻿using AspCore.Business.Abstract;
 using AspCore.Business.Specifications.Abstract;
+using AspCore.Business.Task.Abstract;
 using AspCore.DataAccess.Abstract;
 using AspCore.Dtos.Dto;
 using AspCore.Entities.EntityFilter;
@@ -39,7 +40,7 @@ namespace AspCore.Business.Concrete
                 {
                     if (reference == null)
                     {
-                        reference = (TRef) ServiceProvider.GetRequiredService(serviceType);
+                        reference = (TRef)ServiceProvider.GetRequiredService(serviceType);
                     }
                 }
             }
@@ -53,6 +54,9 @@ namespace AspCore.Business.Concrete
 
         private IAutoObjectMapper _autoObjectMapper;
         protected IAutoObjectMapper AutoObjectMapper => LazyGetRequiredService(ref _autoObjectMapper);
+
+        private ITaskBuilder _taskBuilder;
+        protected ITaskBuilder TaskBuilder => LazyGetRequiredService(ref _taskBuilder);
 
         protected BaseEntityManager(IServiceProvider serviceProvider)
         {
@@ -205,11 +209,11 @@ namespace AspCore.Business.Concrete
                     sorters = setting.sorters.ToSortingExpressionList<TEntity>();
                 }
 
-                dataList= await DataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
+                dataList = await DataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
             }
             else
             {
-                dataList=await DataAccess.GetListAsync(expression, setting.page, setting.pageSize);
+                dataList = await DataAccess.GetListAsync(expression, setting.page, setting.pageSize);
             }
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(dataList.Result);
             return dataList.ChangeResult(result);
@@ -217,7 +221,7 @@ namespace AspCore.Business.Concrete
 
         public async Task<ServiceResult<List<TEntityDto>>> GetHistoriesByIdAsync(EntityFilter setting)
         {
-            var data=await DataAccess.GetHistoriesById(setting.id, setting.page, setting.pageSize);
+            var data = await DataAccess.GetHistoriesById(setting.id, setting.page, setting.pageSize);
             var result = AutoObjectMapper.Mapper.Map<List<TEntityDto>>(data.Result);
             return data.ChangeResult(result);
 
@@ -225,18 +229,18 @@ namespace AspCore.Business.Concrete
 
         public async Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(ISpecification<TEntity> specification)
         {
-            var data=await DataAccess.GetListAsync(specification.ToExpression());
+            var data = await DataAccess.GetListAsync(specification.ToExpression());
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(data.Result);
             return data.ChangeResult(result);
         }
 
-       
+
     }
 
-    public abstract class  BaseEntityManager<TDataAccess, TEntity, TEntityDto> : BaseEntityManager<TDataAccess, TEntity, TEntityDto,
-            TEntityDto, TEntityDto> 
-        where TEntityDto : class, IEntityDto, new() 
-        where TDataAccess : IEntityRepository<TEntity> 
+    public abstract class BaseEntityManager<TDataAccess, TEntity, TEntityDto> : BaseEntityManager<TDataAccess, TEntity, TEntityDto,
+            TEntityDto, TEntityDto>
+        where TEntityDto : class, IEntityDto, new()
+        where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
     {
         protected BaseEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
@@ -244,5 +248,5 @@ namespace AspCore.Business.Concrete
         }
     }
 
-    
+
 }

@@ -33,17 +33,35 @@ namespace testbusiness.Concrete
         public override ServiceResult<bool> Add(params PersonDto[] entities)
         {
             var entityMap = AutoObjectMapper.Mapper.Map<Person[]>(entities);
-            ITask personTask = new PersonTask(ServiceProvider, entityMap[0], EnumCrudOperation.CreateOperation);
 
-            ITask personTask1 = new PersonTask(ServiceProvider, entityMap[0], EnumCrudOperation.CreateOperation);
-            var res1 = personTask.Run().Result;
+           // var res = TaskBuilder.GenerateEntityTask<PersonTask, Person>(entityMap[0], null).Run().Result;
+
+            //ITask personTask = new PersonTask(ServiceProvider, entityMap[0], EnumCrudOperation.CreateOperation).AddValidator(new PersonTaskValidator(entityMap[0]));
+
+            //ITask personTask1 = new PersonTask(ServiceProvider, entityMap[0], EnumCrudOperation.CreateOperation);
+            //var res1 = personTask.Run().Result;
 
             var taskBuilder = ServiceProvider.GetRequiredService<ITaskFlowBuilder>();
-            taskBuilder.AddTask(personTask);
-            taskBuilder.AddTask(personTask1);
+            taskBuilder.AddTask(TaskBuilder.GenerateEntityTask<PersonTask, Person>(entityMap[0]));
+            taskBuilder.AddTask(TaskBuilder.GenerateEntityTask<PersonTask, Person>(entityMap[0]));
 
             var res = taskBuilder.RunTasks().Result;
-            return (ServiceResult<bool>)res1;
+            return (ServiceResult<bool>)res;
+        }
+
+        public override async Task<ServiceResult<bool>> AddAsync(params PersonDto[] entities)
+        {
+            var entityMap = AutoObjectMapper.Mapper.Map<Person[]>(entities);
+
+            //var res = await TaskBuilder.GenerateEntityTask<PersonTask, Person>(entityMap[0], null).Run();
+
+           
+            var taskBuilder = ServiceProvider.GetRequiredService<ITaskFlowBuilder>();
+            taskBuilder.AddTask(TaskBuilder.GenerateEntityTask<PersonTask, Person>(entityMap[0]));
+            taskBuilder.AddTask(TaskBuilder.GenerateEntityTask<PersonTask, Person>(entityMap[0]));
+
+            var res = taskBuilder.RunTasks().Result;
+            return (ServiceResult<bool>)res;
         }
     }
 }

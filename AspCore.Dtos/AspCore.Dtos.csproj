@@ -3,10 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
-    <Company>AspCore.Dtos</Company>
+    <Company>Bilal Albayrak, Yusuf Aykaç</Company>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <Company>AspCore.Dependency</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.1.9</Version>
+    <Version>1.2.1</Version>
     <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
 
   </PropertyGroup>

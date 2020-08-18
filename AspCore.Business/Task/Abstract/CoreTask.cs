@@ -1,29 +1,25 @@
 ﻿using AspCore.Business.Task.Concrete;
 using AspCore.Entities.General;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AspCore.Business.Task.Abstract
 {
-    public abstract class CoreTask<TInput, TOutput>
+    public abstract class CoreTask<TInput, TOutput> : ITask
     {
         protected TInput Input { get; private set; }
         public CoreTask(TInput input)
         {
             Input = input;
         }
-        public virtual bool SkipValidate
-        {
-            get
-            {
-                return false;
-            }
-        }
 
         public abstract Task<ServiceResult<TOutput>> RunTask();
 
-        public abstract List<ITaskValidator> Validators { get; }
+        private List<ITaskValidator> _Validators { get; set; }
+
+        public List<ITaskValidator> Validators => this._Validators;
 
         public async Task<ServiceResult<bool>> Validate()
         {
@@ -50,11 +46,7 @@ namespace AspCore.Business.Task.Abstract
             ServiceResult<TOutput> tResult;
             try
             {
-                ServiceResult<bool> validationResult = new ServiceResult<bool> { IsSucceeded = true };
-                if (!SkipValidate)
-                {
-                    validationResult = await Validate();
-                }
+                ServiceResult<bool> validationResult = await Validate();
 
                 if (validationResult.IsSucceeded && validationResult.Result)
                 {
@@ -101,6 +93,14 @@ namespace AspCore.Business.Task.Abstract
         public virtual Task<ServiceResult<bool>> RollBack()
         {
             return System.Threading.Tasks.Task.FromResult(new ServiceResult<bool> { IsSucceeded = true });
+        }
+
+        public ITask AddValidator<T>(T validator) where T : class, ITaskValidator
+        {
+            this._Validators = this._Validators ?? new List<ITaskValidator>();
+            this._Validators.Add(validator);
+
+            return this;
         }
 
         public void Dispose()

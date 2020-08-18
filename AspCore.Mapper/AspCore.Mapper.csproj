@@ -3,8 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
-    <Company>AspCore.Mapper</Company>
+    <Company>Bilal Albayrak, Yusuf Aykaç</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

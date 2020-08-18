@@ -16,29 +16,34 @@ namespace AspCore.Business.Task.Abstract
         protected readonly TDAL DataLayer;
         protected readonly ITransactionBuilder TransactionBuilder;
         protected TEntity Entity { get; set; }
-        protected EnumCrudOperation CrudOperation { get; set; }
+        protected EnumCrudOperation? CrudOperation { get; set; }
 
         protected IServiceProvider ServiceProvider { get; private set; }
-        protected EntityTask(IServiceProvider serviceProvider, TEntity entity, EnumCrudOperation enumCrudOperation) : base(entity)
+
+        protected EntityTask(IServiceProvider serviceProvider, TEntity entity, EnumCrudOperation? enumCrudOperation = null) : base(entity)
         {
             ServiceProvider = serviceProvider;
             Entity = entity;
             CrudOperation = enumCrudOperation;
-           
+
             DataLayer = ServiceProvider.GetRequiredService<TDAL>();
             TransactionBuilder = ServiceProvider.GetRequiredService<ITransactionBuilder>();
         }
+
 
         public override async Task<ServiceResult<TResult>> RunTask()
         {
             ServiceResult<TResult> serviceResult = new ServiceResult<TResult>();
 
-            if (CrudOperation == EnumCrudOperation.CreateOperation)
-                serviceResult = await CreateAsync();
-            else if (CrudOperation == EnumCrudOperation.UpdateOperation)
-                serviceResult = await UpdateAsync();
-            else if (CrudOperation == EnumCrudOperation.DeleteOperation)
-                serviceResult = await DeleteAsync();
+            if (CrudOperation.HasValue)
+            {
+                if (CrudOperation.Value == EnumCrudOperation.CreateOperation)
+                    serviceResult = await CreateAsync();
+                else if (CrudOperation.Value == EnumCrudOperation.UpdateOperation)
+                    serviceResult = await UpdateAsync();
+                else if (CrudOperation.Value == EnumCrudOperation.DeleteOperation)
+                    serviceResult = await DeleteAsync();
+            }
 
             return serviceResult;
         }

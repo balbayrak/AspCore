@@ -9,17 +9,22 @@ using System.Threading.Tasks;
 
 namespace AspCore.Business.Task.Abstract
 {
-    public abstract class SearchableEntityTask<TSearchableEntity, TResult, TDAL> : EntityTask<TSearchableEntity,TResult, TDAL>
+    public abstract class SearchableEntityTask<TSearchableEntity, TResult, TDAL> : EntityTask<TSearchableEntity, TResult, TDAL>
         where TSearchableEntity : class, ISearchableEntity, new()
         where TDAL : IEntityRepository<TSearchableEntity>
     {
         private readonly IDataSearchEngine<TSearchableEntity> _dataSearchEngine;
-        public SearchableEntityTask(IServiceProvider serviceProvider, TSearchableEntity entity, EnumCrudOperation enumCrudOperation) : base(serviceProvider,entity,enumCrudOperation)
+        public SearchableEntityTask(IServiceProvider serviceProvider, TSearchableEntity entity, EnumCrudOperation enumCrudOperation) : base(serviceProvider, entity, enumCrudOperation)
         {
             _dataSearchEngine = ServiceProvider.GetRequiredService<IDataSearchEngine<TSearchableEntity>>();
         }
 
-        public override  async Task<ServiceResult<TResult>> CreateAsync()
+        public SearchableEntityTask(IServiceProvider serviceProvider, TSearchableEntity entity) : base(serviceProvider, entity)
+        {
+            _dataSearchEngine = ServiceProvider.GetRequiredService<IDataSearchEngine<TSearchableEntity>>();
+        }
+
+        public override async Task<ServiceResult<TResult>> CreateAsync()
         {
             TransactionBuilder.BeginTransaction();
 

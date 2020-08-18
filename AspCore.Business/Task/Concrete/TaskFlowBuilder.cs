@@ -41,7 +41,7 @@ namespace AspCore.Business.Task.Concrete
                         }
                         _transactionBuilder.RollbackTransaction();
                         break;
-                       
+
                     }
 
                     if (result.IsSucceeded)
