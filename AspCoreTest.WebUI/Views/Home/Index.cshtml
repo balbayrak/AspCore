@@ -4,6 +4,7 @@
     ViewData["Title"] = "Home Page";
 }
 
+
 <div class="row">
     <div class="col-md-12">
         @(Html.DataTableHelper<PersonDto>("persontable")
@@ -16,30 +17,28 @@
                   column.BoundColumn(p => p.Surname).Title("Surname").Searchable(Operation.StartsWith);
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
-                      action.ModalButton()
-                            .Visible(true)
-                            .Text("Edit")
-                            .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
-                            .IClass("fa fa-edit")
-                            .ActionInfo(new ActionInfo { actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET })
-                            .BlockUI()
-                            .Modal(EnumModalSize.Large)
-                            .BackDropStatic();
+                      action.ActionButton()
+                          .Visible(true)
+                          .Text("Edit")
+                          .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze btnEdit")
+                          .IClass("fa fa-edit")
+                          .ActionInfo(new ActionInfo {actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET, IsAction = false});
+
                       action.ConfirmButton()
                             .Visible(true)
                             .Text("Delete")
                             .CssClass("btn btn-sm red btn-outline filter-submit margin-bottom red-haze")
                             .IClass("fa fa-trash-o")
-                            .ActionInfo(new ActionInfo { actionUrl = "/Home/Delete", methodType = EnumHttpMethod.POST })
+                            .ActionInfo(new ActionInfo { actionUrl = "/Home/Delete", methodType = EnumHttpMethod.POST,})
                             .BlockUI()
                             .ConfirmOption(new ConfirmOption("test", "Sil", ""));
 
                   });
               })
               .RowCssConditions(condition =>
-{
-    condition.AddRowCss(p => p.Name, "Bilal", "red");
-})
+              {
+                  condition.AddRowCss(p => p.Name, "Bilal", "red");
+              })
              .ToolBarActions(action =>
              {
                  action.ModalActionButton()
@@ -65,8 +64,18 @@
 {
     <script>
         $(document).ready(function () {
-          //  var persontable = DataTableFunc.initDataTable('persontable');
+            //  var persontable = DataTableFunc.initDataTable('persontable');
             var dt = Entity.Init('Home', 'formId', 'persontable', 'EncryptedId', '.entitysubmit', 'Success!', 'Error');
+
+            $(".btnEdit").on("click", function() {
+                var id = $(this).data("id");
+                alert(id);
+            });
+
+            $('#persontable tbody').on('click', '.btnEdit', function (e) {
+                var id = $(this).data('id');
+                alert(id);
+            });
         });
     </script>
 }

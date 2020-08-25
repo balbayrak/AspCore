@@ -60,6 +60,7 @@ namespace AspCore.Web.Concrete
         [HttpGet]
         public IActionResult DownloadDocument(string documentUrl)
         {
+            
             if (!string.IsNullOrEmpty(documentUrl))
             {
                 ServiceResult<TDocument> documentResult = DocumentHelper.GetDocument(new TDocumentRequest

@@ -29,7 +29,7 @@ namespace AspCore.WebComponents.HtmlHelpers.General
             public static readonly string DATA_BLOCKUI = "data-blockui";
 
             public static readonly string DATA_TARGET_URL = "data-target-url";
-
+            public static readonly string DATA_ID = "data-id";
             public static readonly string DATA_TARGET_BODY = "data-target-body";
 
             public static readonly string DATA_TOGGLE = "data-toggle";
