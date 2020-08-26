@@ -100,7 +100,7 @@ namespace AspCore.Business.Concrete
         public virtual Task<ServiceResult<bool>> AddAsync(params TCreatedEntityDto[] entities)
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TCreatedEntityDto[], TEntity[]>(entities);
-
+            
             if (entities.Length > 1)
                 return DataAccess.AddWithTransactionAsync(entityArray);
             else

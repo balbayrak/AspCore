@@ -15,7 +15,10 @@ namespace AspCore.DataAccess.Abstract
         ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter);
         ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize);
         Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize);
+        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, params Expression<Func<TEntity, object>>[] propertySelectors);
+
         Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter);
+        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] propertySelectors);
         ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter();
         Task<ServiceResult<TEntity[]>> GetListWithIgnoreGlobalFilterAsync();
 
