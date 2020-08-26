@@ -7,9 +7,9 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.2.2</Version>
+    <Version>1.2.5</Version>
     <Company>AspCore.WebComponents</Company>
-    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
+    <PackageReleaseNotes>IsAction prop added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
