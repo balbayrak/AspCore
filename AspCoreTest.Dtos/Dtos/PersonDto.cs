@@ -8,9 +8,11 @@ namespace AspCoreTest.Dtos.Dtos
     {
         public string Name { get; set; }
         public string Surname { get; set; }
-
-        public AdminDto Admin { get; set; }
+        public virtual AdminDto Admin { get; set; }
     }
 
-  
+    public class AdminDto : EntityDto, IMapFrom<Admin>
+    {
+        public string Description { get; set; }
+    }
 }

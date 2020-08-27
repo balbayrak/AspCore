@@ -10,6 +10,7 @@ namespace AspCore.Dtos.Dto
         { 
             Id = Guid.NewGuid();
         }
+       
         public Guid Id { get; set; }
         public string EncryptedId { get; set; }
     }

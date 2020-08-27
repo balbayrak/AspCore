@@ -17,10 +17,11 @@ namespace AspCoreTest.WebUI.Controllers
 {
     public class HomeController : BaseWebEntityController<PersonDto, IPersonBff>
     {
-        private IAdminBff _adminBff;
-        public HomeController(IServiceProvider serviceProvider, IPersonBff personBff) :base(serviceProvider, personBff)
+        private readonly IPersonCVBff _personCvBff;
+
+        public HomeController(IServiceProvider serviceProvider, IPersonBff personBff,IPersonCVBff personCvBff) :base(serviceProvider, personBff)
         {
-            _adminBff = ServiceProvider.GetRequiredService<IAdminBff>();
+            _personCvBff = personCvBff;
         }
 
         public IActionResult Index()
@@ -70,7 +71,22 @@ namespace AspCoreTest.WebUI.Controllers
 
             AlertService.Info("default!", "Default!", AlertType.Default);
 
+            var models = new List<PersonCvDto>()
+            {
+                new PersonCvDto() {Id = Guid.NewGuid(), Name = "Yusuf", DocumentUrl = "sadsadsada",Person = new PersonDto(){Name = "yusuf",Surname = "aykaç"}},
+                new PersonCvDto() {Id = Guid.NewGuid(), Name = "Bilal", DocumentUrl = "sadsadsada",Person = new PersonDto(){Name = "Bilal",Surname = "Aykaç"}}
+            };
+            _personCvBff.AddAsync(models);
 
+            //var personCvList = _personCvBff.GetWithInclude().Result.Result;
+
+            //foreach (var personCvDto in personCvList)
+            //{
+            //    personCvDto.Name = "Yusuf3";
+            //    personCvDto.Person.Surname = "Aykaç3";
+
+            //}
+          //  _personCvBff.UpdateAsync(personCvList);
             ViewBag.Models = new List<Person>()
             {
                 new Person() {Id = Guid.NewGuid(), Name = "Yusuf"},

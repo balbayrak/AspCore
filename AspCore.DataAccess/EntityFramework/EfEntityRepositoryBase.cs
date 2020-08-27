@@ -145,6 +145,55 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        public IQueryable<TEntity> WithIncludes(params Expression<Func<TEntity, object>>[] propertySelectors)
+        {
+            var query = TableNoTracking;
+
+            if (propertySelectors != null && propertySelectors.Length > 0)
+            {
+                foreach (var propertySelector in propertySelectors)
+                {
+                    query = query.Include(propertySelector);
+                }
+            }
+
+            return query;
+        }
+        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, params Expression<Func<TEntity, object>>[] propertySelectors)
+        {
+            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
+            try
+            {
+                var query = WithIncludes(propertySelectors);
+                var countTask = await query.CountAsync();
+
+                if (filter != null)
+                    query = query.Where(filter);
+
+                TEntity[] resultsTask;
+                if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
+                {
+                    var skip = page.Value * pageSize.Value;
+                    resultsTask = await query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
+                }
+                else
+                {
+                    resultsTask = await query.ToArrayAsync();
+                }
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.Result = resultsTask;
+                result.SearchResultCount = result.Result.Count();
+
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
         public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
@@ -167,7 +216,28 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
+        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] propertySelectors)
+        {
+            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
+            try
+            {
+                var query = WithIncludes(propertySelectors);
+                var countTask = await query.CountAsync();
+                if (filter != null)
+                    query = query.Where(filter);
+                var resultsTask = await query.ToArrayAsync();
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.Result = resultsTask;
+                result.SearchResultCount = result.Result.Count();
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
 
+            return result;
+        }
         public ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter()
         {
             ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
@@ -1023,7 +1093,7 @@ namespace AspCore.DataAccess.EntityFramework
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                
+
                 foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                 {
                     IEntity entity = entry.Entity;

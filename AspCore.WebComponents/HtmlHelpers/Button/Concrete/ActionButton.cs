@@ -109,10 +109,15 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
                 link.Attributes.Add(HelperConstant.General.DATA_BLOCKUI, false.ToString());
             }
 
-            if (!string.IsNullOrEmpty(this.action.actionUrl))
+            if (!string.IsNullOrEmpty(this.action.actionUrl)&&action.IsAction)
             {
                 link.Attributes.Add(HelperConstant.General.DATA_TARGET_URL, this.action.actionUrl);
                 link.Attributes.Add(HelperConstant.General.DATA_EVENT_HTTPMETHOD, this.action.methodType.ToString());
+            }
+
+            if (!action.IsAction)
+            {
+                link.Attributes.Add(HelperConstant.General.DATA_ID, "{0}");
             }
 
             var iClassTag = new TagBuilder("i");
