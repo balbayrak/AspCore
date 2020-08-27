@@ -6,7 +6,6 @@ using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
 using AspCore.Utilities;
-using AspCore.Utilities.Mapper.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -1064,6 +1063,7 @@ namespace AspCore.DataAccess.EntityFramework
                     if (!entity.entityState.HasValue)
                         entity.entityState = CoreEntityState.Unchanged;
                     entry.State = GetEntityState(entity.entityState.Value);
+                    Context.Entry(entity);
                 }
 
                 int value = Context.SaveChanges();
