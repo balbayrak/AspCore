@@ -34,8 +34,8 @@ namespace AspCoreTest.WebUI
                 option.AddDependencyResolver(option =>
                 {
                     option.AutoBind();
-                    option.AutoBindModules();
-                    option.AddDependencyModule<WebDependencyModule2>();
+                   // option.AutoBindModules();
+                   // option.AddDependencyModule<WebDependencyModule2>();
                 })
                 .AddConfigurationManager(option =>
                 {

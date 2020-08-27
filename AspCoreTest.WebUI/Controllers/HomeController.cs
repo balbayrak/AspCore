@@ -6,6 +6,7 @@ using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
 using AspCoreTest.DataSearch.Abstract;
 using AspCoreTest.Dtos.Dtos;
+using AspCoreTest.Entities.ModelFilters;
 using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,10 @@ namespace AspCoreTest.WebUI.Controllers
 {
     public class HomeController : BaseWebEntityController<PersonDto, IPersonBff>
     {
+        private IAdminBff _adminBff;
         public HomeController(IServiceProvider serviceProvider, IPersonBff personBff) :base(serviceProvider, personBff)
         {
+            _adminBff = ServiceProvider.GetRequiredService<IAdminBff>();
         }
 
         public IActionResult Index()
@@ -45,8 +48,13 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult PersonCacheData()
         {
-            var client = ServiceProvider.GetRequiredService<IPersonDataSearchEngine>();
-            var result = client.FindByAsync(true, 0, 10);
+            //var client = ServiceProvider.GetRequiredService<IPersonDataSearchEngine>();
+            //var filter = new PersonFilter();
+            //filter.name = "bilal";
+
+            _adminBff.AddAsync(null);
+
+
             return View();
         }
 

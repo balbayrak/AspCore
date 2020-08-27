@@ -15,7 +15,7 @@ namespace AspCore.Storage.Concrete
         private readonly IHttpContextAccessor _contextAccessor;
         private string _uniqueKey;
         private bool _secureCookie;
-        public CookieManager(IHttpContextAccessor contextAccessor, bool secureCookie = false, Guid? uniqueKey=null)
+        public CookieManager(IHttpContextAccessor contextAccessor, bool secureCookie = false, Guid? uniqueKey = null)
         {
             _contextAccessor = contextAccessor;
             _uniqueKey = uniqueKey.HasValue ? uniqueKey.Value.ToString("N") : Guid.NewGuid().ToString("N");
@@ -27,7 +27,6 @@ namespace AspCore.Storage.Concrete
             if (!string.IsNullOrEmpty(key))
             {
                 key = $"{_uniqueKey}_{key}";
-                var list = _contextAccessor.HttpContext.Response.Cookies;
 
                 if (_contextAccessor.HttpContext.Request.Cookies.ContainsKey(key))
                 {
@@ -56,7 +55,7 @@ namespace AspCore.Storage.Concrete
             }
         }
 
-        public bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null)
+        public bool SetObject<T>(string key, T obj, bool? sameSiteStrict = null, DateTime? expires = null)
         {
             try
             {

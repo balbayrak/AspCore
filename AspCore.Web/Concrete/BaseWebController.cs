@@ -39,7 +39,7 @@ namespace AspCore.Web.Concrete
             return reference;
         }
 
-        public StorageService StorageManager => LazyGetRequiredService(ref _storageService);
+        protected StorageService StorageManager => LazyGetRequiredService(ref _storageService);
         private StorageService _storageService;
 
         protected IAlertService AlertService => LazyGetRequiredService(ref _alertService);

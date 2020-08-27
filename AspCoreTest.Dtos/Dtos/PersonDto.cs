@@ -8,6 +8,8 @@ namespace AspCoreTest.Dtos.Dtos
     {
         public string Name { get; set; }
         public string Surname { get; set; }
+
+        public AdminDto Admin { get; set; }
     }
 
   

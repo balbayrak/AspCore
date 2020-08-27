@@ -35,6 +35,7 @@ namespace AspCoreTest.DataSearchApi.ESProviders
                                                                      .Fields(f => f.Keyword(t => t.Name("keyword").IgnoreAbove(256)))
                                                                                       .Fielddata(true)
                                                                      )
+
                                                                )
                                                                )
 

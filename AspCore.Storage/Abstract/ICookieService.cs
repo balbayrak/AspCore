@@ -12,6 +12,6 @@ namespace AspCore.Storage.Abstract
 
         void RemoveAll();
 
-        bool SetObject<T>(string key, T obj, DateTime? expires = null, bool? sameSiteStrict = null);
+        bool SetObject<T>(string key, T obj, bool? sameSiteStrict = null, DateTime? expires = null);
     }
 }

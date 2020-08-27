@@ -16,7 +16,7 @@ namespace AspCore.Entities.EntityType
 
         public CoreEntity()
         {
-            this.Id = Guid.NewGuid();
+           // this.Id = Guid.NewGuid();
             this.entityState = CoreEntityState.Added;
         }
     }

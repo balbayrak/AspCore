@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 
 namespace AspCore.ApiClient
@@ -140,9 +141,9 @@ namespace AspCore.ApiClient
                     }
                 }
             }
-
-            JsonContent jsonContent = new JsonContent(postObject);
-            var response = await client.PostAsync(_apiUrl, jsonContent);
+            var formatter = new JsonMediaTypeFormatter() { SerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto } };
+            formatter.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+            var response = client.PostAsync(_apiUrl, postObject, formatter).Result;
 
             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -184,18 +185,6 @@ namespace AspCore.ApiClient
                 }
             }
         }
-
-        //private void CorrelationIdHeaderControl()
-        //{
-        //    if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null)
-        //    {
-        //        string correlationID = HttpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.CORRELATION_ID);
-        //        if (!string.IsNullOrEmpty(correlationID))
-        //        {
-        //            client.DefaultRequestHeaders.Add(HttpContextConstant.HEADER_KEY.CORRELATION_ID, correlationID);
-        //        }
-        //    }
-        //}
 
         public virtual void ChangeApiSettingsKey(string apiKey)
         {

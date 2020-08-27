@@ -61,6 +61,11 @@ namespace AspCore.Business.Task.Abstract
                 {
                     result.IsSucceeded = true;
                 }
+                else
+                {
+                    result.ErrorMessage = resultDAL.ErrorMessage;
+                    result.ExceptionMessage = resultDAL.ExceptionMessage;
+                }
 
             }
             catch
@@ -90,6 +95,11 @@ namespace AspCore.Business.Task.Abstract
                 {
                     result.IsSucceeded = true;
                 }
+                else
+                {
+                    result.ErrorMessage = resultDAL.ErrorMessage;
+                    result.ExceptionMessage = resultDAL.ExceptionMessage;
+                }
 
             }
             catch
@@ -118,6 +128,11 @@ namespace AspCore.Business.Task.Abstract
                 if (resultDAL.IsSucceeded)
                 {
                     result.IsSucceeded = true;
+                }
+                else
+                {
+                    result.ErrorMessage = resultDAL.ErrorMessage;
+                    result.ExceptionMessage = resultDAL.ExceptionMessage;
                 }
 
             }

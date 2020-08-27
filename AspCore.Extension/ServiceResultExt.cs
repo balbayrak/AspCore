@@ -14,7 +14,7 @@ namespace AspCore.Extension
 {
     public static class ServiceResultExt
     {
-        public static void StatusMessage<TResult, TEntity>(this ServiceResult<TResult> result,string message, CoreEntityState entityState)
+        public static void StatusMessage<TResult, TEntity>(this ServiceResult<TResult> result, string message, CoreEntityState entityState)
         {
             if (entityState == CoreEntityState.Added)
             {
@@ -33,7 +33,8 @@ namespace AspCore.Extension
         {
             result.IsSucceeded = false;
             result.ErrorMessage = errorMessage;
-            result.ExceptionMessage = ex.Message + "---> stacktrace:" + ex.StackTrace;
+            if (ex != null)
+                result.ExceptionMessage = ex.Message + "---> stacktrace:" + ex.StackTrace;
         }
         public static void ErrorMessage<TResult>(this ServiceResult<TResult> result, string errorMessage, string exceptionMessage, string customExceptionMessage = null)
         {
@@ -63,9 +64,9 @@ namespace AspCore.Extension
         }
 
 
-        public static ServiceResult<TDestionation> ChangeResult<TSource,TDestionation>(this ServiceResult<TSource> result, TDestionation entity)
+        public static ServiceResult<TDestionation> ChangeResult<TSource, TDestionation>(this ServiceResult<TSource> result, TDestionation entity)
         {
-            ServiceResult <TDestionation> resultDestionation= new ServiceResult<TDestionation>()
+            ServiceResult<TDestionation> resultDestionation = new ServiceResult<TDestionation>()
             {
                 Result = entity,
                 ErrorMessage = result.ErrorMessage,
@@ -178,7 +179,7 @@ where TEntity : class, ISearchableEntity, new()
             serviceResult.Result = entityView;
         }
 
-        public static void ToViewModelResultFromSearchableEntityList<TEntity,TSearchableEntity>(this ServiceResult<List<TEntity>> serviceResult, IAutoObjectMapper autoObjectMapper, ServiceResult<DataSearchResult<TSearchableEntity>> result) 
+        public static void ToViewModelResultFromSearchableEntityList<TEntity, TSearchableEntity>(this ServiceResult<List<TEntity>> serviceResult, IAutoObjectMapper autoObjectMapper, ServiceResult<DataSearchResult<TSearchableEntity>> result)
             where TSearchableEntity : class, ISearchableEntity, new()
             where TEntity : class, IEntityDto, new()
 
@@ -195,7 +196,7 @@ where TEntity : class, ISearchableEntity, new()
         }
 
         public static void ToViewModelResultFromCacheEntity<TEntityDto, TSearchableEntity>(this ServiceResult<TEntityDto> serviceResult, IAutoObjectMapper autoObjectMapper, ServiceResult<DataSearchResult<TSearchableEntity>> result)
-            where TEntityDto :IEntityDto, new()
+            where TEntityDto : IEntityDto, new()
             where TSearchableEntity : class, ISearchableEntity, new()
         {
 

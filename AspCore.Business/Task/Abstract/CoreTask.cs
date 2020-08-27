@@ -25,6 +25,7 @@ namespace AspCore.Business.Task.Abstract
         {
             ServiceResult<bool> validationResult = new ServiceResult<bool>();
             validationResult.IsSucceeded = true;
+            validationResult.Result = true;
             validationResult.WarningMessage = null;
             validationResult.ErrorMessage = null;
             validationResult.ExceptionMessage = null;
