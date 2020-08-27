@@ -51,7 +51,7 @@ namespace AspCore.BackendForFrontend.Concrete
 
             if (result.IsSucceededAndDataIncluded())
             {
-                viewResult.ToViewModelResultFromCacheEntity(_autoObjectMapper,result);
+                viewResult.ToViewModelResultFromSearchableEntity(_autoObjectMapper,result);
             }
 
             return viewResult;

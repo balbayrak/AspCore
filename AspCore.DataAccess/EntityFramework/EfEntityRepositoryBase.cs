@@ -28,7 +28,6 @@ namespace AspCore.DataAccess.EntityFramework
         protected IServiceProvider ServiceProvider { get; private set; }
         protected TDbContext Context { get; }
         private DbSet<TEntity> _entities;
-        private readonly ICustomMapper _mapper;
 
         protected virtual DbSet<TEntity> Entities => _entities ?? (_entities = Context.Set<TEntity>());
         protected virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
@@ -37,7 +36,6 @@ namespace AspCore.DataAccess.EntityFramework
         {
             ServiceProvider = serviceProvider;
             Context = ServiceProvider.GetService<TDbContext>();
-            _mapper = ServiceProvider.GetRequiredService<ICustomMapper>();
             _entities = Context.Set<TEntity>();
         }
 

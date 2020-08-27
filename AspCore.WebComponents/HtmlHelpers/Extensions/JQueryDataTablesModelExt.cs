@@ -20,16 +20,11 @@ namespace AspCore.WebComponents.HtmlHelpers.Extensions
                     sortings.Add(new SortingType(item.propertyName, item.sortDirection));
                 }
             }
-            SearchType searchType = null;
-
-            if (!string.IsNullOrEmpty(searchableColumns?.Trim()))
+            SearchType searchType = new SearchType
             {
-                searchType = new SearchType
-                {
-                    searchableColumns = searchableColumns,
-                    searchValue = model.sSearch
-                };
-            }
+                searchableColumns = searchableColumns?.Trim(),
+                searchValue = model.sSearch
+            };
 
             return new EntityFilter
             {

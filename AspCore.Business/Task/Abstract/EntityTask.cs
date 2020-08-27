@@ -12,7 +12,13 @@ namespace AspCore.Business.Task.Abstract
         where TEntity : class, IEntity, new()
         where TDAL : IEntityRepository<TEntity>
     {
-        public abstract bool RunWithTransaction { get; }
+        public virtual bool RunWithTransaction
+        {
+            get
+            {
+                return false;
+            }
+        }
         protected readonly TDAL DataLayer;
         protected readonly ITransactionBuilder TransactionBuilder;
         protected TEntity Entity { get; set; }

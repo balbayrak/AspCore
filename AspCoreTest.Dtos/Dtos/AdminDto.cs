@@ -7,7 +7,5 @@ namespace AspCoreTest.Dtos.Dtos
     public class AdminDto : EntityDto, IMapFrom<Admin>
     {
         public string Description { get; set; }
-
-        public PersonDto Person { get; set; }
     }
 }

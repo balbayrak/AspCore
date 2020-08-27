@@ -15,14 +15,5 @@ namespace AspCoreTest.Bffs.Concrete
         public PersonBff(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
-
-        public override Task<ServiceResult<bool>> AddAsync(List<PersonDto> entities)
-        {
-            entities[0].Id = Guid.NewGuid();
-            entities[0].Admin = new AdminDto();
-            entities[0].Admin.Description = "test";
-         
-            return base.AddAsync(entities);
-        }
     }
 }

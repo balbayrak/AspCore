@@ -24,6 +24,4 @@ namespace AspCore.Entities.EntityFilter
             search = null;
         }
     }
-
-   
 }

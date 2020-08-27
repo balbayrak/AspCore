@@ -53,9 +53,7 @@ namespace AspCoreTest.WebUI.Controllers
             //var filter = new PersonFilter();
             //filter.name = "bilal";
 
-            _adminBff.AddAsync(null);
-
-
+           
             return View();
         }
 

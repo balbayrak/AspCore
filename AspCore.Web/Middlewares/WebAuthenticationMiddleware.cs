@@ -1,4 +1,5 @@
 ﻿using AspCore.Entities.Constants;
+using AspCore.Web.Configuration.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -11,12 +12,14 @@ namespace AspCore.Web.Middlewares
         private readonly IHttpContextAccessor _httpContextAccessor;
         private string _authenticationControllerName;
         private bool _sameDomain;
-        public WebAuthenticationMiddleware(RequestDelegate next, IHttpContextAccessor httpContextAccessor, string authenticationControllerName,bool sameDomain)
+        private CookieConfigurationBuilder _cookieConfigurationBuilder;
+        public WebAuthenticationMiddleware(RequestDelegate next, IHttpContextAccessor httpContextAccessor, CookieConfigurationBuilder cookieConfigurationBuilder, string authenticationControllerName, bool sameDomain)
         {
             _authenticationControllerName = authenticationControllerName;
             _httpContextAccessor = httpContextAccessor;
             _next = next;
             _sameDomain = sameDomain;
+            _cookieConfigurationBuilder = cookieConfigurationBuilder;
 
         }
         public async Task InvokeAsync(HttpContext httpContext)
@@ -29,7 +32,17 @@ namespace AspCore.Web.Middlewares
             }
             else
             {
-                await _next(httpContext);
+                if(_httpContextAccessor.HttpContext.Request.Path.Value.Contains($"/{_authenticationControllerName}"))
+                {
+                    await _next(httpContext);
+                }
+                else
+                {
+                    if (_httpContextAccessor.HttpContext.Request.Cookies[_cookieConfigurationBuilder.cookieOption.CookieName] != null)
+                        await _next(httpContext);
+                    else
+                        httpContext.Response.Redirect($"/{_authenticationControllerName}/Login");
+                }
             }
         }
     }
