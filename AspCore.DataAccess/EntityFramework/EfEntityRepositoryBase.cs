@@ -41,10 +41,8 @@ namespace AspCore.DataAccess.EntityFramework
             _entities = Context.Set<TEntity>();
         }
 
-        
         public ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter)
         {
-           
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
             try
             {
@@ -77,7 +75,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter, int? page = null, int? pageSize = null)
+        public ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter = null, int? page = null, int? pageSize = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
@@ -111,7 +109,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page = null, int? pageSize = null)
+        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter = null, int? page = null, int? pageSize = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
@@ -146,11 +144,12 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
-        public  IQueryable<TEntity> WithIncludes(params Expression<Func<TEntity, object>>[] propertySelectors)
+
+        public IQueryable<TEntity> WithIncludes(params Expression<Func<TEntity, object>>[] propertySelectors)
         {
             var query = TableNoTracking;
 
-            if (propertySelectors!=null&&propertySelectors.Length>0)
+            if (propertySelectors != null && propertySelectors.Length > 0)
             {
                 foreach (var propertySelector in propertySelectors)
                 {
@@ -195,8 +194,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
-
-        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter)
+        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
@@ -218,7 +216,6 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
-
         public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] propertySelectors)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
@@ -241,7 +238,6 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
-
         public ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter()
         {
             ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
@@ -290,6 +286,11 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        /// <summary>
+        /// work without transaction
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public ServiceResult<bool> Add(params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -298,13 +299,14 @@ namespace AspCore.DataAccess.EntityFramework
                 foreach (TEntity item in entities)
                 {
                     Context.Entry(item).State = EntityState.Added;
+                    Context.Set<TEntity>().Add(item);
                 }
-                int value = Context.SaveChanges();
-                if (value > 0)
+
+                result = ProcessEntityWithStateNotTransaction(entities);
+
+                if (result.IsSucceeded && result.Result)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
-                    result.Result = true;
-                    result.IsSucceeded = true;
                 }
                 else
                 {
@@ -321,6 +323,11 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        /// <summary>
+        /// work without transaction
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public async Task<ServiceResult<bool>> AddAsync(params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -328,14 +335,15 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 foreach (TEntity item in entities)
                 {
-                    Context.Entry(item).State = EntityState.Added;
+                    item.entityState = CoreEntityState.Added;
+                    Context.Set<TEntity>().Add(item);
                 }
-                int value = await Context.SaveChangesAsync();
-                if (value > 0)
+
+                result = await ProcessEntityWithStateNotTransactionAsync(entities);
+
+                if (result.IsSucceeded && result.Result)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
-                    result.Result = true;
-                    result.IsSucceeded = true;
                 }
                 else
                 {
@@ -352,11 +360,17 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        /// <summary>
+        /// work with transaction
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public ServiceResult<bool> AddWithTransaction(params TEntity[] entities)
         {
             foreach (var item in entities)
             {
                 item.entityState = CoreEntityState.Added;
+                Context.Set<TEntity>().Add(item);
             }
 
             ServiceResult<bool> result = ProcessEntityWithState(entities);
@@ -368,11 +382,17 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
+        /// <summary>
+        /// work with transaction
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public async Task<ServiceResult<bool>> AddWithTransactionAsync(params TEntity[] entities)
         {
             foreach (var item in entities)
             {
                 item.entityState = CoreEntityState.Added;
+                Context.Set<TEntity>().Add(item);
             }
 
             ServiceResult<bool> result = await ProcessEntityWithStateAsync(entities);
@@ -386,23 +406,20 @@ namespace AspCore.DataAccess.EntityFramework
 
         public ServiceResult<bool> Update(params TEntity[] entities)
         {
-            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
-            var updatedEntityList = entitylist.Result;
-            updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                foreach (var updatedInput in updatedEntityList)
+                foreach (var updatedInput in entities)
                 {
-                    Context.Attach(updatedInput);
+                    updatedInput.entityState = CoreEntityState.Modified;
                     Context.Update(updatedInput);
                 }
-                int value = Context.SaveChanges();
-                if (value > 0)
+
+                result = ProcessEntityWithStateNotTransaction(entities);
+
+                if (result.IsSucceeded && result.Result)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
-                    result.Result = true;
-                    result.IsSucceeded = true;
                 }
                 else
                 {
@@ -420,23 +437,20 @@ namespace AspCore.DataAccess.EntityFramework
 
         public async Task<ServiceResult<bool>> UpdateAsync(params TEntity[] entities)
         {
-            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
-            var updatedEntityList = entitylist.Result;
-            updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                foreach (var updatedInput in updatedEntityList)
+                foreach (var updatedInput in entities)
                 {
-                    Context.Attach(updatedInput);
+                    updatedInput.entityState = CoreEntityState.Modified;
                     Context.Update(updatedInput);
                 }
-                int value = await Context.SaveChangesAsync();
-                if (value > 0)
+
+                result = await ProcessEntityWithStateNotTransactionAsync(entities);
+
+                if (result.IsSucceeded && result.Result)
                 {
                     result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
-                    result.Result = true;
-                    result.IsSucceeded = true;
                 }
                 else
                 {
@@ -454,22 +468,29 @@ namespace AspCore.DataAccess.EntityFramework
 
         public ServiceResult<bool> UpdateWithTransaction(params TEntity[] entities)
         {
-            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
-            List<TEntity> updatedEntityList = null;
-            if (entitylist.IsSucceededAndDataIncluded())
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
             {
-                updatedEntityList = entitylist.Result;
-                updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
-                foreach (var item in updatedEntityList)
+                foreach (var updatedInput in entities)
                 {
-                    Context.Attach(item);
-                    Context.Update(item);
+                    updatedInput.entityState = CoreEntityState.Modified;
+                    Context.Update(updatedInput);
+                }
+
+                result = ProcessEntityWithState(entities);
+
+                if (result.IsSucceeded && result.Result)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                }
+                else
+                {
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
                 }
             }
-            ServiceResult<bool> result = ProcessEntityWithState(updatedEntityList?.ToArray());
-            if (result.IsSucceeded)
+            catch (Exception ex)
             {
-                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
             }
 
             return result;
@@ -477,22 +498,29 @@ namespace AspCore.DataAccess.EntityFramework
 
         public async Task<ServiceResult<bool>> UpdateWithTransactionAsync(params TEntity[] entities)
         {
-            ServiceResult<List<TEntity>> entitylist = GetByIdListTracking(entities.Select(t => t.Id).ToList());
-            List<TEntity> updatedEntityList = null;
-            if (entitylist.IsSucceededAndDataIncluded())
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
             {
-                updatedEntityList = entitylist.Result;
-                updatedEntityList = _mapper.MapToList(entities.ToList(), updatedEntityList);
-                foreach (var item in updatedEntityList)
+                foreach (var updatedInput in entities)
                 {
-                    Context.Attach(item);
-                    Context.Update(item);
+                    updatedInput.entityState = CoreEntityState.Modified;
+                    Context.Update(updatedInput);
+                }
+
+                result = await ProcessEntityWithStateAsync(entities);
+
+                if (result.IsSucceeded && result.Result)
+                {
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                }
+                else
+                {
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
                 }
             }
-            ServiceResult<bool> result = await ProcessEntityWithStateAsync(updatedEntityList?.ToArray());
-            if (result.IsSucceeded)
+            catch (Exception ex)
             {
-                result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_UPDATE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
             }
 
             return result;
@@ -937,7 +965,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public virtual ServiceResult<bool> ProcessEntityWithState(params TEntity[] entities)
+        private ServiceResult<bool> ProcessEntityWithState(params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -948,16 +976,13 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     using (dbContextTransaction = Context.Database.BeginTransaction())
                     {
-                        foreach (var item in entities)
+                        foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                         {
-                            Context.Set<TEntity>().Add(item);
-                            foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
-                            {
-                                IEntity entity = entry.Entity;
-                                if (!entity.entityState.HasValue)
-                                    entity.entityState = CoreEntityState.Unchanged;
-                                entry.State = GetEntityState(entity.entityState.Value);
-                            }
+                            IEntity entity = entry.Entity;
+                            if (!entity.entityState.HasValue)
+                                entity.entityState = CoreEntityState.Unchanged;
+                            entry.State = GetEntityState(entity.entityState.Value);
+                            Context.Entry(entity);
                         }
 
                         int value = Context.SaveChanges();
@@ -985,7 +1010,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public virtual async Task<ServiceResult<bool>> ProcessEntityWithStateAsync(params TEntity[] entities)
+        private async Task<ServiceResult<bool>> ProcessEntityWithStateAsync(params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -996,16 +1021,13 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     using (dbContextTransaction = Context.Database.BeginTransaction())
                     {
-                        foreach (var item in entities)
+                        foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                         {
-                            Context.Set<TEntity>().Add(item);
-                            foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
-                            {
-                                IEntity entity = entry.Entity;
-                                if (!entity.entityState.HasValue)
-                                    entity.entityState = CoreEntityState.Unchanged;
-                                entry.State = GetEntityState(entity.entityState.Value);
-                            }
+                            IEntity entity = entry.Entity;
+                            if (!entity.entityState.HasValue)
+                                entity.entityState = CoreEntityState.Unchanged;
+                            entry.State = GetEntityState(entity.entityState.Value);
+                            Context.Entry(entity);
                         }
 
                         int value = await Context.SaveChangesAsync();
@@ -1033,12 +1055,11 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<bool> ProcessEntityWithStateNotTransaction(TEntity item)
+        private ServiceResult<bool> ProcessEntityWithStateNotTransaction(TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
             {
-                _entities.Add(item);
                 foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                 {
                     IEntity entity = entry.Entity;
@@ -1067,7 +1088,42 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<bool> ProcessEntitiesWithState(List<TEntity> items)
+        private async Task<ServiceResult<bool>> ProcessEntityWithStateNotTransactionAsync(TEntity[] entities)
+        {
+            ServiceResult<bool> result = new ServiceResult<bool>();
+            try
+            {
+
+                foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
+                {
+                    IEntity entity = entry.Entity;
+                    if (!entity.entityState.HasValue)
+                        entity.entityState = CoreEntityState.Unchanged;
+                    entry.State = GetEntityState(entity.entityState.Value);
+                    Context.Entry(entity);
+                }
+
+                int value = await Context.SaveChangesAsync();
+                if (value > 0)
+                {
+                    result.IsSucceeded = true;
+                    result.Result = true;
+                }
+                else
+                {
+                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
+
+        private ServiceResult<bool> ProcessEntitiesWithState(List<TEntity> items)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             IDbContextTransaction dbContextTransaction = null;
@@ -1075,16 +1131,13 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 using (dbContextTransaction = Context.Database.BeginTransaction())
                 {
-                    foreach (var item in items)
+                    foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                     {
-                        _entities.Add(item);
-                        foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
-                        {
-                            IEntity entity = entry.Entity;
-                            if (!entity.entityState.HasValue)
-                                entity.entityState = CoreEntityState.Unchanged;
-                            entry.State = GetEntityState(entity.entityState.Value);
-                        }
+                        IEntity entity = entry.Entity;
+                        if (!entity.entityState.HasValue)
+                            entity.entityState = CoreEntityState.Unchanged;
+                        entry.State = GetEntityState(entity.entityState.Value);
+                        Context.Entry(entity);
                     }
 
                     int value = Context.SaveChanges();
@@ -1130,24 +1183,5 @@ namespace AspCore.DataAccess.EntityFramework
             }
         }
 
-        private void IsDeletedFilter(ref IQueryable<TEntity> query, Expression<Func<TEntity, bool>> filter = null)
-        {
-            //if (filter != null)
-            //{
-            //    if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
-            //    {
-            //        filter = ExpressionBuilder.CombineWithAndAlso(filter, ExpressionBuilder.GetEqualsExpression<TEntity>(nameof(IBaseEntity.IsDeleted), false));
-            //        //filter = Expression.Lambda<Func<TEntity, bool>>(expression, filter.Parameters);
-            //    }
-            //    query = query.Where(filter);
-            //}
-            //else
-            //{
-            //    if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
-            //    {
-            //        query = query.Where(ExpressionBuilder.GetEqualsExpression<TEntity>(nameof(IBaseEntity.IsDeleted), false));
-            //    }
-            //}
-        }
     }
 }

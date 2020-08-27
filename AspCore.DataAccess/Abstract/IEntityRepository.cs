@@ -66,11 +66,6 @@ namespace AspCore.DataAccess.Abstract
 
         Task<ServiceResult<IList<TEntity>>> FindListAsync(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null);
 
-        ServiceResult<bool> ProcessEntityWithState(params TEntity[] entities);
-
-        ServiceResult<bool> ProcessEntityWithStateNotTransaction(TEntity item);
-
-        ServiceResult<bool> ProcessEntitiesWithState(List<TEntity> items);
 
         Task<ServiceResult<List<TEntity>>> GetHistoriesById(Guid id, int? page = null, int? pageSize = null);
     }
