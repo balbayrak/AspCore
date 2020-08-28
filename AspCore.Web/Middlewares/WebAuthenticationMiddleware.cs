@@ -32,16 +32,25 @@ namespace AspCore.Web.Middlewares
             }
             else
             {
-                if(_httpContextAccessor.HttpContext.Request.Path.Value.Contains($"/{_authenticationControllerName}"))
+                if (_sameDomain)
                 {
-                    await _next(httpContext);
+                    if (_httpContextAccessor.HttpContext.Request.Path.Value.Contains($"/{_authenticationControllerName}"))
+                    {
+                        await _next(httpContext);
+                    }
+                    else
+                    {
+                        if (_httpContextAccessor.HttpContext.Request.Cookies[_cookieConfigurationBuilder.cookieOption.CookieName] != null)
+                            await _next(httpContext);
+                        else
+                        {
+                            httpContext.Response.Redirect($"/{_authenticationControllerName}/Login");
+                        }
+                    }
                 }
                 else
                 {
-                    if (_httpContextAccessor.HttpContext.Request.Cookies[_cookieConfigurationBuilder.cookieOption.CookieName] != null)
-                        await _next(httpContext);
-                    else
-                        httpContext.Response.Redirect($"/{_authenticationControllerName}/Login");
+                    await _next(httpContext);
                 }
             }
         }
