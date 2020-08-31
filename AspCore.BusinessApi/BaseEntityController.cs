@@ -239,6 +239,16 @@ namespace AspCore.BusinessApi
             return response.ToHttpResponse();
         }
 
+        [ActionName(ApiConstants.Urls.GET_ALL)]
+        [HttpGet]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public IActionResult GetAll()
+        {
+            ServiceResult<IList<TEntityDto>> response = Service.GetAll();
+            return response.ToHttpResponse();
+        }
+
         [ActionName(ApiConstants.Urls.GET_ALL_ASYNC)]
         [HttpPost]
         [ProducesResponseType(400)]
@@ -247,6 +257,17 @@ namespace AspCore.BusinessApi
         public async Task<IActionResult> GetAllAsync(EntityFilter filterSetting)
         {
             ServiceResult<IList<TEntityDto>> response = await Service.GetAllAsync(filterSetting);
+            return response.ToHttpResponse();
+        }
+
+        [ActionName(ApiConstants.Urls.GET_ALL_ASYNC)]
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            ServiceResult<IList<TEntityDto>> response = await Service.GetAllAsync();
             return response.ToHttpResponse();
         }
 
@@ -262,6 +283,21 @@ namespace AspCore.BusinessApi
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(filterSetting.id)));
             }
             ServiceResult<TEntityDto> response = Service.GetById(filterSetting);
+            return response.ToHttpResponse();
+        }
+
+        [ActionName(ApiConstants.Urls.GET_BY_IDAsync)]
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public IActionResult GetById(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(id)));
+            }
+            ServiceResult<TEntityDto> response = Service.GetById(id);
             return response.ToHttpResponse();
         }
 

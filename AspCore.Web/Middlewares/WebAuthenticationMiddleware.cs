@@ -50,7 +50,9 @@ namespace AspCore.Web.Middlewares
                 }
                 else
                 {
+
                     await _next(httpContext);
+
                 }
             }
         }

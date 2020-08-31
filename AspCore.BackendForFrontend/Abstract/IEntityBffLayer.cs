@@ -18,11 +18,11 @@ namespace AspCore.BackendForFrontend.Abstract
         Task<ServiceResult<bool>> UpdateAsync(List<TUpdatedDto> entities);
         Task<ServiceResult<bool>> DeleteAsync(List<TEntityDto> entities);
         Task<ServiceResult<bool>> DeleteWithIDsAsync(List<Guid> entityIds);
-        Task<ServiceResult<List<TEntityDto>>> GetAll(EntityFilter entityFilter);
         Task<ServiceResult<List<TEntityDto>>> GetAllAsync(EntityFilter filterSetting);
+        Task<ServiceResult<List<TEntityDto>>> GetAllAsync();
         Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter filterSetting);
+        Task<ServiceResult<TEntityDto>> GetByIdAsync(Guid id);
         Task<ServiceResult<List<TEntityDto>>> GetEntityHistoriesAsync(EntityFilter filterSetting);
-
     }
 
     public interface IEntityBffLayer<TEntityDto> : IEntityBffLayer<TEntityDto, TEntityDto, TEntityDto>

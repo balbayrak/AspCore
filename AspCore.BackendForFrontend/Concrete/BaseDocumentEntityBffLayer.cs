@@ -23,28 +23,29 @@ namespace AspCore.BackendForFrontend.Concrete
 
         public async Task<ServiceResult<TDocument>> AddDocument(IDocumentEntityRequest<TDocument, TEntity> documentEntityRequest)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.ADDDOCUMENT;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.ADDDOCUMENT}";
             var result = await ApiClient.PostRequest<ServiceResult<TDocument>>(documentEntityRequest);
             return result;
         }
 
         public async Task<ServiceResult<bool>> DeleteDocument(IDocumentEntityRequest<TDocument, TEntity> documentEntityRequest)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETEDOCUMENT;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.DELETEDOCUMENT}";
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(documentEntityRequest);
             return result;
         }
 
         public async Task<ServiceResult<TDocument>> ReadDocument(IDocumentRequest<TDocument> documentEntityRequest)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.READDOCUMENT;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.READDOCUMENT}";
             var result = await ApiClient.PostRequest<ServiceResult<TDocument>>(documentEntityRequest);
             return result;
         }
 
         public async Task<ServiceResult<bool>> UpdateDocument(IDocumentEntityRequest<TDocument, TEntity> documentEntityRequest)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.UPDATEDOCUMENT;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.UPDATEDOCUMENT}";
+            
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(documentEntityRequest);
             return result;
         }

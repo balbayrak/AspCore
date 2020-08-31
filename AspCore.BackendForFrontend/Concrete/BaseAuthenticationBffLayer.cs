@@ -23,7 +23,8 @@ namespace AspCore.BackendForFrontend.Concrete
             ServiceResult<TAuthenticationResult> result = new ServiceResult<TAuthenticationResult>();
             try
             {
-                ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_CLIENT_INFO;
+                ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.GET_CLIENT_INFO}";
+                
 
                 result = await ApiClient.PostRequest<ServiceResult<TAuthenticationResult>>(authenticationToken);
             }
@@ -39,8 +40,7 @@ namespace AspCore.BackendForFrontend.Concrete
             ServiceResult<AuthenticationTicketInfo> result = new ServiceResult<AuthenticationTicketInfo>();
             try
             {
-                ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.AUTHENTICATE_CLIENT;
-
+                ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.AUTHENTICATE_CLIENT}";
                 result = await ApiClient.PostRequest<ServiceResult<AuthenticationTicketInfo>>(authenticationInfo);
 
             }

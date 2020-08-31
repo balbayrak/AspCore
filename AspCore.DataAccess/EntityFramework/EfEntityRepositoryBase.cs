@@ -213,6 +213,28 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
+        public ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter = null)
+        {
+            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
+            try
+            {
+                var query = TableNoTracking.AsQueryable();
+                var countTask = query.Count();
+                if (filter != null)
+                    query = query.Where(filter);
+                var resultsTask = query.ToArray();
+                result.IsSucceeded = true;
+                result.TotalResultCount = countTask;
+                result.Result = resultsTask;
+                result.SearchResultCount = result.Result.Count();
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
+            }
+
+            return result;
+        }
         public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] propertySelectors)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();

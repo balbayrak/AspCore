@@ -10,74 +10,80 @@ using System.Threading.Tasks;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public abstract class BaseEntityBffLayer<TEntityDto,TCreatedDto,TUpdatedDto> : BaseBffLayer, IEntityBffLayer<TEntityDto,TCreatedDto,TUpdatedDto>
+    public abstract class BaseEntityBffLayer<TEntityDto, TCreatedDto, TUpdatedDto> : BaseBffLayer, IEntityBffLayer<TEntityDto, TCreatedDto, TUpdatedDto>
         where TEntityDto : class, IEntityDto, new()
         where TCreatedDto : class, IEntityDto, new()
         where TUpdatedDto : class, IEntityDto, new()
     {
         protected BaseEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            apiControllerRoute = "api/" + typeof(TEntityDto).Name.Replace("Dto","");
+            apiControllerRoute = "api/" + typeof(TEntityDto).Name.Replace("Dto", "");
         }
 
         public async Task<ServiceResult<bool>> Liveness()
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.LIVENESS;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.LIVENESS}";
 
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(string.Empty);
             return result;
         }
         public async Task<ServiceResult<bool>> Readiness(Guid id)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.READINESS;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.READINESS}";
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(id);
             return result;
         }
         public async Task<ServiceResult<bool>> AddAsync(List<TCreatedDto> entities)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.ADDAsync;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.ADDAsync}";
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entities);
             return result;
         }
         public async Task<ServiceResult<bool>> UpdateAsync(List<TUpdatedDto> entities)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.UPDATEAsync;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.UPDATEAsync}";
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entities);
             return result;
         }
         public async Task<ServiceResult<bool>> DeleteAsync(List<TEntityDto> entities)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETE;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.DELETEAsync}";
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entities);
             return result;
         }
         public async Task<ServiceResult<bool>> DeleteWithIDsAsync(List<Guid> entityIds)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.DELETEAsync;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.DELETE_WITH_IDs}";
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(entityIds.ToArray());
             return result;
         }
-        public async Task<ServiceResult<List<TEntityDto>>> GetAll(EntityFilter entityFilter)
-        {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_ALL;
-            var result = await ApiClient.PostRequest<ServiceResult<List<TEntityDto>>>(entityFilter);
-            return result.ProtectEntity();
-        }
         public async Task<ServiceResult<List<TEntityDto>>> GetAllAsync(EntityFilter filterSetting)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_ALL_ASYNC;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.GET_ALL_ASYNC}";
             var result = await ApiClient.PostRequest<ServiceResult<List<TEntityDto>>>(filterSetting);
+            return result.ProtectEntity();
+        }
+        public async Task<ServiceResult<List<TEntityDto>>> GetAllAsync()
+        {
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.GET_ALL_ASYNC}";
+            var result = await ApiClient.GetRequest<ServiceResult<List<TEntityDto>>>();
             return result.ProtectEntity();
         }
         public async Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter filterSetting)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_BY_IDAsync;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.GET_BY_IDAsync}";
             var result = await ApiClient.PostRequest<ServiceResult<TEntityDto>>(filterSetting);
+            return result.ProtectEntity();
+        }
+        public async Task<ServiceResult<TEntityDto>> GetByIdAsync(Guid id)
+        {
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.GET_BY_IDAsync}/{id}";
+            var result = await ApiClient.GetRequest<ServiceResult<TEntityDto>>();
             return result.ProtectEntity();
         }
         public async Task<ServiceResult<List<TEntityDto>>> GetEntityHistoriesAsync(EntityFilter filterSetting)
         {
-            ApiClient.apiUrl = apiControllerRoute + "/" + ApiConstants.Urls.GET_ENTITY_HISTORIES_ASYNC;
+            ApiClient.apiUrl = $"{apiControllerRoute}/{ApiConstants.Urls.GET_ENTITY_HISTORIES_ASYNC}";
             var result = await ApiClient.PostRequest<ServiceResult<List<TEntityDto>>>(filterSetting);
             return result.ProtectEntity();
         }

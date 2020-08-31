@@ -16,9 +16,8 @@ namespace AspCore.ApiClient.Abstract
 
         void ChangeApiSettingsKey(string apiKey);
 
-        Task<TResult> GetRequest<TPostObject, TResult>(Dictionary<string, string> headerValues = null)
-            where TResult : class, new()
-              where TPostObject : class;
+        Task<TResult> GetRequest<TResult>(Dictionary<string, string> headerValues = null)
+            where TResult : class, new();
 
         Task<TResult> PostRequest<TResult>(HttpContent content) where TResult : class, new();
 

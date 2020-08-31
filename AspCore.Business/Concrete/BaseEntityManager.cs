@@ -100,7 +100,7 @@ namespace AspCore.Business.Concrete
         public virtual Task<ServiceResult<bool>> AddAsync(params TCreatedEntityDto[] entities)
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TCreatedEntityDto[], TEntity[]>(entities);
-            
+
             if (entities.Length > 1)
                 return DataAccess.AddWithTransactionAsync(entityArray);
             else
@@ -138,6 +138,19 @@ namespace AspCore.Business.Concrete
             return data.ChangeResult(default(TEntityDto));
         }
 
+        public ServiceResult<TEntityDto> GetById(Guid id)
+        {
+
+            var data = DataAccess.GetById(id);
+            if (data.IsSucceeded)
+            {
+                var entityArray = AutoObjectMapper.Mapper.Map<TEntity, TEntityDto>(data.Result);
+                return data.ChangeResult(entityArray);
+            }
+
+            return data.ChangeResult(default(TEntityDto));
+        }
+
         public async Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter setting)
         {
 
@@ -151,70 +164,92 @@ namespace AspCore.Business.Concrete
             return data.ChangeResult(default(TEntityDto));
         }
 
-        public ServiceResult<IList<TEntityDto>> GetAll(EntityFilter setting)
+        public async Task<ServiceResult<TEntityDto>> GetByIdAsync(Guid id)
         {
-            if (setting == null)
+
+            var data = await DataAccess.GetByIdAsync(id);
+            if (data.IsSucceeded)
             {
-                throw new ArgumentNullException(nameof(setting));
+                var entityArray = AutoObjectMapper.Mapper.Map<TEntity, TEntityDto>(data.Result);
+                return data.ChangeResult(entityArray);
             }
+
+            return data.ChangeResult(default(TEntityDto));
+        }
+
+        public ServiceResult<IList<TEntityDto>> GetAll(EntityFilter setting = null)
+        {
 
             ServiceResult<IList<TEntity>> dataList;
-            Expression<Func<TEntity, bool>> expression = null;
-            List<SearchInfo> searchInfos = setting.GetSearchInfo();
 
-            if (searchInfos != null && !string.IsNullOrEmpty(setting.search.searchValue))
+            if (setting != null)
             {
-                expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
-            }
+                Expression<Func<TEntity, bool>> expression = null;
+                List<SearchInfo> searchInfos = setting.GetSearchInfo();
 
-            if (setting.sorters != null)
-            {
-                List<SortingExpression<TEntity>> sorters = null;
-                if (setting.sorters != null)
+                if (searchInfos != null && !string.IsNullOrEmpty(setting.search.searchValue))
                 {
-                    sorters = setting.sorters.ToSortingExpressionList<TEntity>();
+                    expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
                 }
 
-                dataList = DataAccess.FindList(expression, sorters, setting.page, setting.pageSize);
+                if (setting.sorters != null)
+                {
+                    List<SortingExpression<TEntity>> sorters = null;
+                    if (setting.sorters != null)
+                    {
+                        sorters = setting.sorters.ToSortingExpressionList<TEntity>();
+                    }
+
+                    dataList = DataAccess.FindList(expression, sorters, setting.page, setting.pageSize);
+                }
+                else
+                {
+                    dataList = DataAccess.GetList(expression, setting.page, setting.pageSize);
+                }
             }
             else
             {
-                dataList = DataAccess.GetList(expression, setting.page, setting.pageSize);
+                dataList = DataAccess.GetList();
             }
 
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(dataList.Result);
             return dataList.ChangeResult(result);
         }
 
-        public async Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(EntityFilter setting)
+        public async Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(EntityFilter setting=null)
         {
-            if (setting == null)
-            {
-                throw new ArgumentNullException(nameof(setting));
-            }
+            
             ServiceResult<IList<TEntity>> dataList;
-            Expression<Func<TEntity, bool>> expression = null;
-            List<SearchInfo> searchInfos = setting.GetSearchInfo();
-
-            if (searchInfos != null && !string.IsNullOrEmpty(setting.search.searchValue))
+            if(setting!=null)
             {
-                expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
-            }
+                Expression<Func<TEntity, bool>> expression = null;
+                List<SearchInfo> searchInfos = setting.GetSearchInfo();
 
-            if (setting.sorters != null)
-            {
-                List<SortingExpression<TEntity>> sorters = null;
-                if (setting.sorters != null)
+                if (searchInfos != null && !string.IsNullOrEmpty(setting.search.searchValue))
                 {
-                    sorters = setting.sorters.ToSortingExpressionList<TEntity>();
+                    expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
                 }
 
-                dataList = await DataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
+                if (setting.sorters != null)
+                {
+                    List<SortingExpression<TEntity>> sorters = null;
+                    if (setting.sorters != null)
+                    {
+                        sorters = setting.sorters.ToSortingExpressionList<TEntity>();
+                    }
+
+                    dataList = await DataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
+                }
+                else
+                {
+                    dataList = await DataAccess.GetListAsync(expression, setting.page, setting.pageSize);
+                }
             }
             else
             {
-                dataList = await DataAccess.GetListAsync(expression, setting.page, setting.pageSize);
+                dataList = await DataAccess.GetListAsync();
             }
+          
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(dataList.Result);
             return dataList.ChangeResult(result);
         }
@@ -233,8 +268,6 @@ namespace AspCore.Business.Concrete
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(data.Result);
             return data.ChangeResult(result);
         }
-
-
     }
 
     public abstract class BaseEntityManager<TDataAccess, TEntity, TEntityDto> : BaseEntityManager<TDataAccess, TEntity, TEntityDto,
@@ -247,6 +280,4 @@ namespace AspCore.Business.Concrete
         {
         }
     }
-
-
 }

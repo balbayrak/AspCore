@@ -64,9 +64,8 @@ namespace AspCore.ApiClient
             client.BaseAddress = new Uri(_baseAddress);
         }
 
-        public virtual async Task<TResult> GetRequest<TPostObject, TResult>(Dictionary<string, string> headerValues = null)
+        public virtual async Task<TResult> GetRequest<TResult>(Dictionary<string, string> headerValues = null)
               where TResult : class, new()
-              where TPostObject : class
         {
             TResult result = null;
 

@@ -22,7 +22,7 @@
                           .Text("Edit")
                           .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze btnEdit")
                           .IClass("fa fa-edit")
-                          .ActionInfo(new ActionInfo {actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET, IsAction = false});
+                          .ActionInfo(new ActionInfo {actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET, PreventDefault = true});
 
                       action.ConfirmButton()
                             .Visible(true)

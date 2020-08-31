@@ -39,7 +39,7 @@ namespace AspCore.BackendForFrontend.Concrete
         }
         public ServiceResult<TDocument> GetDocument(IDocumentRequest<TDocument> documentRequest)
         {
-            ApiClient.apiUrl = _uploaderRoute + "/" + ApiConstants.Urls.READDOCUMENT;
+            ApiClient.apiUrl = $"{_uploaderRoute}/{ApiConstants.Urls.READDOCUMENT}";
             return ApiClient.PostRequest<ServiceResult<TDocument>>(documentRequest).Result;
         }
         public ServiceResult<string> ViewDocuments(IDocumentViewRequest<TDocument,ViewerToolbarSetting> viewRequest)
@@ -56,7 +56,8 @@ namespace AspCore.BackendForFrontend.Concrete
             documentApiViewRequest.validateFiles = viewRequest.validateFiles;
             documentApiViewRequest.viewerToolbarSetting = viewRequest.viewerToolbarSetting;
 
-            ApiClient.apiUrl = _viewerRoute + "/" + ApiConstants.Urls.VIEWDOCUMENTS;
+            ApiClient.apiUrl = $"{_viewerRoute}/{ApiConstants.Urls.VIEWDOCUMENTS}";
+         
             return ApiClient.PostRequest<ServiceResult<string>>(documentApiViewRequest).Result;
         }
     }

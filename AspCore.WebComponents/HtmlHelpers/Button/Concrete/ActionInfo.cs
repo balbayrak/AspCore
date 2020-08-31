@@ -6,11 +6,11 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
     {
         public ActionInfo()
         {
-            IsAction = true;
+            PreventDefault = false;
         }
         public string actionUrl { get; set; }
 
-        public bool IsAction { get; set; }
+        public bool PreventDefault { get; set; }
 
         public EnumHttpMethod methodType { get; set; }
     }
