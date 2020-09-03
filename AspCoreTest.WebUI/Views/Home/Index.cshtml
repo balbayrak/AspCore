@@ -17,12 +17,15 @@
                   column.BoundColumn(p => p.Surname).Title("Surname").Searchable(Operation.StartsWith);
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
-                      action.ActionButton()
-                          .Visible(true)
-                          .Text("Edit")
-                          .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze btnEdit")
-                          .IClass("fa fa-edit")
-                          .ActionInfo(new ActionInfo {actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET, PreventDefault = true});
+                      action.ModalButton()
+                               .Visible(true)
+                               .Text("Edit")
+                               .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
+                               .IClass("fa fa-edit")
+                               .ActionInfo(new ActionInfo { actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET })
+                               .BlockUI()
+                               .Modal(EnumModalSize.Large)
+                               .BackDropStatic();
 
                       action.ConfirmButton()
                             .Visible(true)

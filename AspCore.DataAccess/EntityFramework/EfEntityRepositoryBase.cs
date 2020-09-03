@@ -852,12 +852,12 @@ namespace AspCore.DataAccess.EntityFramework
                         foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                         {
                             IEntity entity = entry.Entity;
-                            if (!entity.entityState.HasValue)
-                                entity.entityState = CoreEntityState.Unchanged;
+
                             if (entity.entityState.HasValue)
                                 entry.State = GetEntityState(entity.entityState.Value);
                             else
                                 entry.State = defaultState;
+                           
                             Context.Entry(entity);
                         }
 
@@ -900,8 +900,6 @@ namespace AspCore.DataAccess.EntityFramework
                         foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                         {
                             IEntity entity = entry.Entity;
-                            if (!entity.entityState.HasValue)
-                                entity.entityState = CoreEntityState.Unchanged;
                             if (entity.entityState.HasValue)
                                 entry.State = GetEntityState(entity.entityState.Value);
                             else
@@ -942,8 +940,6 @@ namespace AspCore.DataAccess.EntityFramework
                 foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                 {
                     IEntity entity = entry.Entity;
-                    if (!entity.entityState.HasValue)
-                        entity.entityState = CoreEntityState.Unchanged;
                     if (entity.entityState.HasValue)
                         entry.State = GetEntityState(entity.entityState.Value);
                     else
@@ -980,8 +976,6 @@ namespace AspCore.DataAccess.EntityFramework
                 foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                 {
                     IEntity entity = entry.Entity;
-                    if (!entity.entityState.HasValue)
-                        entity.entityState = CoreEntityState.Unchanged;
                     if (entity.entityState.HasValue)
                         entry.State = GetEntityState(entity.entityState.Value);
                     else
@@ -1020,8 +1014,6 @@ namespace AspCore.DataAccess.EntityFramework
                     foreach (EntityEntry<IEntity> entry in Context.ChangeTracker.Entries<IEntity>())
                     {
                         IEntity entity = entry.Entity;
-                        if (!entity.entityState.HasValue)
-                            entity.entityState = CoreEntityState.Unchanged;
                         if (entity.entityState.HasValue)
                             entry.State = GetEntityState(entity.entityState.Value);
                         else

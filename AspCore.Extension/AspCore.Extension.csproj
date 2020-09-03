@@ -7,7 +7,7 @@
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
-    <Version>1.2.5</Version>
+    <Version>1.2.6</Version>
     <Company>AspCore.Extension</Company>
     <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>

@@ -147,8 +147,8 @@ where TEntity : class, ISearchableEntity, new()
             ServiceResult<List<TEntity>> serviceResult = new ServiceResult<List<TEntity>>();
 
             serviceResult.IsSucceeded = result.IsSucceeded;
-            serviceResult.SearchResultCount = result.SearchResultCount;
-            serviceResult.TotalResultCount = result.TotalResultCount;
+            serviceResult.TotalResultCount = (result.Result.searchCount > 0 && result.Result.totalCount != result.Result.searchCount) ? result.Result.searchCount : result.Result.totalCount;
+            serviceResult.SearchResultCount = result.Result.searchCount == 0 ? result.Result.totalCount : result.Result.searchCount;
             if (result.IsSucceededAndDataIncluded())
             {
                 result.Result.items.ForEach(x => x.ProtectEntity());

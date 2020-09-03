@@ -17,7 +17,7 @@ namespace AspCore.DataAccess.General
             dataAccessFilter.page = filter.page;
             dataAccessFilter.pageSize = filter.pageSize;
 
-            if (!string.IsNullOrEmpty(filter.search.searchValue))
+            if (filter.search != null && !string.IsNullOrEmpty(filter.search.searchValue))
             {
                 dataAccessFilter.searchQuery = filter.GetSearchExpression<TEntity>();
             }
