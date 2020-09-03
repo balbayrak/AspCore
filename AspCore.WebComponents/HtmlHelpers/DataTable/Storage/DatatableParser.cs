@@ -43,7 +43,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
 
             var provider = new DatatableEntityProvider<TEntity>(_entities);
 
-            var reply = new JQueryDataTablesResponse(provider.Provide(_storageObject).ToArray(), totalRecords, totalRecords, Convert.ToInt32(param.sEcho));
+            var reply = new JQueryDataTablesResponse(provider.Provide(_storageObject).ToArray(), totalRecords, displayRecords, Convert.ToInt32(param.sEcho));
 
             return reply;
         }

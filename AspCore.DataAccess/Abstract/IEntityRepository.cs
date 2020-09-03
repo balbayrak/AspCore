@@ -2,24 +2,22 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AspCore.DataAccess.General;
 using AspCore.Dependency.Abstract;
+using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Utilities;
 
 namespace AspCore.DataAccess.Abstract
 {
-    public interface IEntityRepository<TEntity> : IScopedType where TEntity : class, IEntity, new()
+    public interface IEntityRepository<TEntity> : IScopedType where TEntity : class, IEntity
     {
         Task<ServiceResult<TEntity>> GetAsync(Expression<Func<TEntity, bool>> filter);
         ServiceResult<TEntity> Get(Expression<Func<TEntity, bool>> filter);
-        ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter = null);
-        ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize);
-        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize);
-        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, params Expression<Func<TEntity, object>>[] propertySelectors);
+        ServiceResult<IList<TEntity>> GetList(DataAccessFilter<TEntity> dataAccessFilter = null);
+        Task<ServiceResult<IList<TEntity>>> GetListAsync(DataAccessFilter<TEntity> dataAccessFilter = null);
 
-        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter=null);
-        Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] propertySelectors);
         ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter();
         Task<ServiceResult<TEntity[]>> GetListWithIgnoreGlobalFilterAsync();
 
@@ -62,11 +60,6 @@ namespace AspCore.DataAccess.Abstract
         ServiceResult<List<TEntity>> GetByIdList(params Guid[] entityIds);
 
         Task<ServiceResult<List<TEntity>>> GetByIdListAsync(params Guid[] entityIds);
-
-        ServiceResult<IList<TEntity>> FindList(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null);
-
-        Task<ServiceResult<IList<TEntity>>> FindListAsync(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null);
-
 
         Task<ServiceResult<List<TEntity>>> GetHistoriesById(Guid id, int? page = null, int? pageSize = null);
     }

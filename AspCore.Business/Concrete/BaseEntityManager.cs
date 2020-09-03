@@ -2,6 +2,7 @@
 using AspCore.Business.Specifications.Abstract;
 using AspCore.Business.Task.Abstract;
 using AspCore.DataAccess.Abstract;
+using AspCore.DataAccess.General;
 using AspCore.Dtos.Dto;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
@@ -184,28 +185,9 @@ namespace AspCore.Business.Concrete
 
             if (setting != null)
             {
-                Expression<Func<TEntity, bool>> expression = null;
-                List<SearchInfo> searchInfos = setting.GetSearchInfo();
+                var datafilter = setting.ToDataFilter<TEntity>();
 
-                if (searchInfos != null && !string.IsNullOrEmpty(setting.search.searchValue))
-                {
-                    expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
-                }
-
-                if (setting.sorters != null)
-                {
-                    List<SortingExpression<TEntity>> sorters = null;
-                    if (setting.sorters != null)
-                    {
-                        sorters = setting.sorters.ToSortingExpressionList<TEntity>();
-                    }
-
-                    dataList = DataAccess.FindList(expression, sorters, setting.page, setting.pageSize);
-                }
-                else
-                {
-                    dataList = DataAccess.GetList(expression, setting.page, setting.pageSize);
-                }
+                dataList = DataAccess.GetList(datafilter);
             }
             else
             {
@@ -222,28 +204,9 @@ namespace AspCore.Business.Concrete
             ServiceResult<IList<TEntity>> dataList;
             if(setting!=null)
             {
-                Expression<Func<TEntity, bool>> expression = null;
-                List<SearchInfo> searchInfos = setting.GetSearchInfo();
+                var datafilter = setting.ToDataFilter<TEntity>();
 
-                if (searchInfos != null && !string.IsNullOrEmpty(setting.search.searchValue))
-                {
-                    expression = ExpressionBuilder.GetSearchExpression<TEntity>(searchInfos, setting.search.searchValue);
-                }
-
-                if (setting.sorters != null)
-                {
-                    List<SortingExpression<TEntity>> sorters = null;
-                    if (setting.sorters != null)
-                    {
-                        sorters = setting.sorters.ToSortingExpressionList<TEntity>();
-                    }
-
-                    dataList = await DataAccess.FindListAsync(expression, sorters, setting.page, setting.pageSize);
-                }
-                else
-                {
-                    dataList = await DataAccess.GetListAsync(expression, setting.page, setting.pageSize);
-                }
+                dataList = await DataAccess.GetListAsync(datafilter);
             }
             else
             {
@@ -264,7 +227,9 @@ namespace AspCore.Business.Concrete
 
         public async Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(ISpecification<TEntity> specification)
         {
-            var data = await DataAccess.GetListAsync(specification.ToExpression());
+            var datafilter = new DataAccessFilter<TEntity>();
+            datafilter.query = specification.ToExpression();
+            var data = await DataAccess.GetListAsync(datafilter);
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(data.Result);
             return data.ChangeResult(result);
         }

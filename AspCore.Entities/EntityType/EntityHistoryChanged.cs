@@ -6,7 +6,7 @@ using System.Text;
 namespace AspCore.Entities.EntityType
 {
     public class EntityHistoryChanged<TEntity>
-        where TEntity : class, IEntity, new()
+        where TEntity : class, IEntity
     {
         public EntityHistoryChanged()
         {

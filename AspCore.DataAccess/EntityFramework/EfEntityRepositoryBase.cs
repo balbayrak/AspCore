@@ -2,6 +2,7 @@
 using AspCore.DataAccess.EntityFramework.History;
 using AspCore.DataAccess.General;
 using AspCore.Dependency.Concrete;
+using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
@@ -14,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -21,7 +23,7 @@ using System.Threading.Tasks;
 namespace AspCore.DataAccess.EntityFramework
 {
     public abstract class EfEntityRepositoryBase<TDbContext, TEntity> : IEntityRepository<TEntity>
-     where TEntity : class, IEntity, new()
+     where TEntity : class, IEntity
         where TDbContext : CoreDbContext
     {
         protected IServiceProvider ServiceProvider { get; private set; }
@@ -72,30 +74,59 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter = null, int? page = null, int? pageSize = null)
+        public ServiceResult<IList<TEntity>> GetList(DataAccessFilter<TEntity> dataAccessFilter = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = Entities.AsQueryable();
+                IQueryable<TEntity> query;
+                int countTask;
+                int searchTask;
 
-                var countTask = query.Count();
-                if (filter != null)
-                    query = query.Where(filter);
-
-                if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
+                if (dataAccessFilter != null)
                 {
-                    var skip = page.Value * pageSize.Value;
+                    if (dataAccessFilter.includes != null)
+                    {
+                        query = WithIncludes(dataAccessFilter.includes);
+                    }
+                    else
+                        query = TableNoTracking.AsQueryable();
 
-                    result.Result = query.Skip(skip).Take(pageSize.Value).ToArray();
+                    if (dataAccessFilter.query != null)
+                        query = query.Where(dataAccessFilter.query);
+
+                    countTask = query.Count();
+
+                    if (dataAccessFilter.searchQuery != null)
+                    {
+                        if (dataAccessFilter.query != null)
+                            query = query.Where(dataAccessFilter.query.CombineWithAndAlso(dataAccessFilter.searchQuery));
+                        else
+                            query = query.Where(dataAccessFilter.searchQuery);
+                    }
+
+                    if (dataAccessFilter.page.HasValue && dataAccessFilter.page.Value >= 0 && dataAccessFilter.pageSize.HasValue)
+                    {
+                        searchTask = query.Count();
+
+                        var skip = dataAccessFilter.page.Value * dataAccessFilter.pageSize.Value;
+
+                        query = query.Skip(skip).Take(dataAccessFilter.pageSize.Value);
+                    }
+                    else
+                        searchTask = query.Count();
                 }
                 else
                 {
-                    result.Result = query.ToArray();
+                    query = TableNoTracking.AsQueryable();
+                    countTask = query.Count();
+                    searchTask = query.Count();
                 }
+
+                result.Result = query.ToArray();
+                result.TotalResultCount = countTask == searchTask ? countTask : searchTask;
                 result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.SearchResultCount = result.Result.Count();
+                result.SearchResultCount = searchTask;
 
             }
             catch (Exception ex)
@@ -106,33 +137,59 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter = null, int? page = null, int? pageSize = null)
+        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(DataAccessFilter<TEntity> dataAccessFilter = null)
         {
             ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
             try
             {
-                var query = TableNoTracking.AsQueryable();
-                var countTask = await query.CountAsync();
-
-                if (filter != null)
-                    query = query.Where(filter);
-
-                TEntity[] resultsTask;
-                if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
+                IQueryable<TEntity> query;
+                int countTask;
+                int searchTask;
+                if (dataAccessFilter != null)
                 {
-                    var skip = page.Value * pageSize.Value;
-                    resultsTask = await query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
+                    if (dataAccessFilter.includes != null)
+                    {
+                        query = WithIncludes(dataAccessFilter.includes);
+                    }
+                    else
+                        query = TableNoTracking.AsQueryable();
+
+                    if (dataAccessFilter.query != null)
+                        query = query.Where(dataAccessFilter.query);
+
+                    countTask = await query.CountAsync();
+
+                    if (dataAccessFilter.searchQuery != null)
+                    {
+                        if (dataAccessFilter.query != null)
+                            query = query.Where(dataAccessFilter.query.CombineWithAndAlso(dataAccessFilter.searchQuery));
+                        else
+                            query = query.Where(dataAccessFilter.searchQuery);
+                    }
+
+                    if (dataAccessFilter.page.HasValue && dataAccessFilter.page.Value >= 0 && dataAccessFilter.pageSize.HasValue)
+                    {
+                        searchTask = await query.CountAsync();
+
+                        var skip = dataAccessFilter.page.Value * dataAccessFilter.pageSize.Value;
+
+                        query = query.Skip(skip).Take(dataAccessFilter.pageSize.Value);
+                    }
+                    else
+                        searchTask = await query.CountAsync();
+
                 }
                 else
                 {
-                    resultsTask = await query.ToArrayAsync();
+                    query = TableNoTracking.AsQueryable();
+                    countTask = await query.CountAsync();
+                    searchTask = await query.CountAsync();
                 }
+
+                result.Result = await query.ToArrayAsync();
+                result.TotalResultCount = countTask == searchTask ? countTask : searchTask;
                 result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.Result = resultsTask;
-                result.SearchResultCount = result.Result.Count();
-
-
+                result.SearchResultCount = searchTask;
             }
             catch (Exception ex)
             {
@@ -142,11 +199,11 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public IQueryable<TEntity> WithIncludes(params Expression<Func<TEntity, object>>[] propertySelectors)
+        private IQueryable<TEntity> WithIncludes(List<Expression<Func<TEntity, object>>> propertySelectors)
         {
             var query = TableNoTracking;
 
-            if (propertySelectors != null && propertySelectors.Length > 0)
+            if (propertySelectors != null && propertySelectors.Count > 0)
             {
                 foreach (var propertySelector in propertySelectors)
                 {
@@ -156,107 +213,7 @@ namespace AspCore.DataAccess.EntityFramework
 
             return query;
         }
-        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, params Expression<Func<TEntity, object>>[] propertySelectors)
-        {
-            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
-            try
-            {
-                var query = WithIncludes(propertySelectors);
-                var countTask = await query.CountAsync();
 
-                if (filter != null)
-                    query = query.Where(filter);
-
-                TEntity[] resultsTask;
-                if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
-                {
-                    var skip = page.Value * pageSize.Value;
-                    resultsTask = await query.Skip(skip).Take(pageSize.Value).ToArrayAsync();
-                }
-                else
-                {
-                    resultsTask = await query.ToArrayAsync();
-                }
-                result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.Result = resultsTask;
-                result.SearchResultCount = result.Result.Count();
-
-
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter = null)
-        {
-            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
-            try
-            {
-                var query = TableNoTracking.AsQueryable();
-                var countTask = await query.CountAsync();
-                if (filter != null)
-                    query = query.Where(filter);
-                var resultsTask = await query.ToArrayAsync();
-                result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.Result = resultsTask;
-                result.SearchResultCount = result.Result.Count();
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-        public ServiceResult<IList<TEntity>> GetList(Expression<Func<TEntity, bool>> filter = null)
-        {
-            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
-            try
-            {
-                var query = TableNoTracking.AsQueryable();
-                var countTask = query.Count();
-                if (filter != null)
-                    query = query.Where(filter);
-                var resultsTask = query.ToArray();
-                result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.Result = resultsTask;
-                result.SearchResultCount = result.Result.Count();
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-        public async Task<ServiceResult<IList<TEntity>>> GetListAsync(Expression<Func<TEntity, bool>> filter, params Expression<Func<TEntity, object>>[] propertySelectors)
-        {
-            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
-            try
-            {
-                var query = WithIncludes(propertySelectors);
-                var countTask = await query.CountAsync();
-                if (filter != null)
-                    query = query.Where(filter);
-                var resultsTask = await query.ToArrayAsync();
-                result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.Result = resultsTask;
-                result.SearchResultCount = result.Result.Count();
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
         public ServiceResult<TEntity[]> GetListWithIgnoreGlobalFilter()
         {
             ServiceResult<TEntity[]> result = new ServiceResult<TEntity[]>();
@@ -321,7 +278,7 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Set<TEntity>().Add(item);
                 }
 
-                result = ProcessEntityWithStateNotTransaction(entities);
+                result = ProcessEntityWithStateNotTransaction(EntityState.Added, entities);
 
                 if (result.IsSucceeded && result.Result)
                 {
@@ -358,7 +315,7 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Set<TEntity>().Add(item);
                 }
 
-                result = await ProcessEntityWithStateNotTransactionAsync(entities);
+                result = await ProcessEntityWithStateNotTransactionAsync(EntityState.Added, entities);
 
                 if (result.IsSucceeded && result.Result)
                 {
@@ -392,7 +349,7 @@ namespace AspCore.DataAccess.EntityFramework
                 Context.Set<TEntity>().Add(item);
             }
 
-            ServiceResult<bool> result = ProcessEntityWithState(entities);
+            ServiceResult<bool> result = ProcessEntityWithState(EntityState.Added, entities);
             if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
@@ -414,7 +371,7 @@ namespace AspCore.DataAccess.EntityFramework
                 Context.Set<TEntity>().Add(item);
             }
 
-            ServiceResult<bool> result = await ProcessEntityWithStateAsync(entities);
+            ServiceResult<bool> result = await ProcessEntityWithStateAsync(EntityState.Added, entities);
             if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_ADD_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Added);
@@ -434,7 +391,7 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Update(updatedInput);
                 }
 
-                result = ProcessEntityWithStateNotTransaction(entities);
+                result = ProcessEntityWithStateNotTransaction(EntityState.Modified, entities);
 
                 if (result.IsSucceeded && result.Result)
                 {
@@ -465,7 +422,7 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Update(updatedInput);
                 }
 
-                result = await ProcessEntityWithStateNotTransactionAsync(entities);
+                result = await ProcessEntityWithStateNotTransactionAsync(EntityState.Modified, entities);
 
                 if (result.IsSucceeded && result.Result)
                 {
@@ -496,7 +453,7 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Update(updatedInput);
                 }
 
-                result = ProcessEntityWithState(entities);
+                result = ProcessEntityWithState(EntityState.Modified, entities);
 
                 if (result.IsSucceeded && result.Result)
                 {
@@ -526,7 +483,7 @@ namespace AspCore.DataAccess.EntityFramework
                     Context.Update(updatedInput);
                 }
 
-                result = await ProcessEntityWithStateAsync(entities);
+                result = await ProcessEntityWithStateAsync(EntityState.Modified, entities);
 
                 if (result.IsSucceeded && result.Result)
                 {
@@ -555,12 +512,12 @@ namespace AspCore.DataAccess.EntityFramework
                     var updatedEntity = Context.Entry(item);
                     updatedEntity.State = EntityState.Deleted;
                 }
-                int value = Context.SaveChanges();
-                if (value > 0)
+
+                result = ProcessEntityWithStateNotTransaction(EntityState.Deleted, entities);
+
+                if (result.IsSucceeded && result.Result)
                 {
-                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
-                    result.Result = true;
-                    result.IsSucceeded = true;
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
                 }
                 else
                 {
@@ -585,17 +542,18 @@ namespace AspCore.DataAccess.EntityFramework
                     var updatedEntity = Context.Entry(item);
                     updatedEntity.State = EntityState.Deleted;
                 }
-                int value = await Context.SaveChangesAsync();
-                if (value > 0)
+
+                result = await ProcessEntityWithStateNotTransactionAsync(EntityState.Deleted, entities);
+
+                if (result.IsSucceeded && result.Result)
                 {
-                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
-                    result.Result = true;
-                    result.IsSucceeded = true;
+                    result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Modified);
                 }
                 else
                 {
                     result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
                 }
+
             }
             catch (Exception ex)
             {
@@ -651,7 +609,7 @@ namespace AspCore.DataAccess.EntityFramework
                 entitylist.Result.ForEach(t => t.entityState = CoreEntityState.Deleted);
             }
 
-            ServiceResult<bool> result = ProcessEntityWithState(entitylist.Result.ToArray());
+            ServiceResult<bool> result = ProcessEntityWithState(EntityState.Deleted, entitylist.Result.ToArray());
             if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
@@ -667,7 +625,7 @@ namespace AspCore.DataAccess.EntityFramework
                 entitylist.Result.ForEach(t => t.entityState = CoreEntityState.Deleted);
             }
 
-            ServiceResult<bool> result = await ProcessEntityWithStateAsync(entitylist.Result.ToArray());
+            ServiceResult<bool> result = await ProcessEntityWithStateAsync(EntityState.Deleted, entitylist.Result.ToArray());
             if (result.IsSucceeded)
             {
                 result.StatusMessage<bool, TEntity>(DALConstants.DALErrorMessages.DAL_DELETE_SUCCESS_MESSAGE_WITH_PARAMETER, CoreEntityState.Deleted);
@@ -880,111 +838,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        public ServiceResult<IList<TEntity>> FindList(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null)
-        {
-            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
-
-            try
-            {
-                IQueryable<TEntity> dbQuery = Entities;
-
-                var query = dbQuery.AsQueryable();
-                var countTask = query.Count();
-
-                if (filter != null)
-                    query = query.Where(filter);
-
-
-                if (sorters != null && sorters.Count > 0)
-                {
-                    query = query.CustomSort(sorters);
-                }
-
-                if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
-                {
-                    var skip = page.Value * pageSize.Value;
-
-                    result.Result = query.Skip(skip).Take(pageSize.Value).AsNoTracking().ToList();
-                }
-                else
-                {
-                    result.Result = query.AsNoTracking().ToList();
-                }
-
-                result.IsSucceeded = true;
-                result.TotalResultCount = countTask;
-                result.SearchResultCount = result.Result.Count();
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-
-        public async Task<ServiceResult<IList<TEntity>>> FindListAsync(Expression<Func<TEntity, bool>> filter, List<SortingExpression<TEntity>> sorters = null, int? page = null, int? pageSize = null)
-        {
-            ServiceResult<IList<TEntity>> result = new ServiceResult<IList<TEntity>>();
-
-            try
-            {
-                IQueryable<TEntity> dbQuery = Entities;
-
-                var query = dbQuery.AsQueryable();
-                var countTask = query.CountAsync();
-
-                if (filter != null)
-                    query = query.Where(filter);
-
-
-                if (sorters != null && sorters.Count > 0)
-                {
-                    query = query.CustomSort(sorters);
-                }
-
-                Task<TEntity[]> resultsTask;
-
-                if (page.HasValue && page.Value >= 0 && pageSize.HasValue)
-                {
-                    var skip = page.Value * pageSize.Value;
-
-                    resultsTask = query.Skip(skip).Take(pageSize.Value).AsNoTracking().ToArrayAsync();
-                }
-                else
-                {
-                    resultsTask = query.AsNoTracking().ToArrayAsync();
-                }
-
-                await Task.WhenAll(resultsTask, countTask);
-
-                if (countTask.IsCompletedSuccessfully && resultsTask.IsCompletedSuccessfully && result.Result != null)
-                {
-                    List<TEntity> resultList = resultsTask.Result.ToList();
-                    if (sorters != null && sorters.Count > 0)
-                    {
-                        result.Result = resultList.CustomSort(sorters);
-                    }
-                    result.IsSucceeded = true;
-                    result.Result = resultList;
-                    result.TotalResultCount = countTask.Result;
-                    result.SearchResultCount = result.Result.Count();
-                }
-                else
-                {
-                    result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, null);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                result.ErrorMessage(DALConstants.DALErrorMessages.DAL_ERROR_OCCURRED, ex);
-            }
-
-            return result;
-        }
-
-        private ServiceResult<bool> ProcessEntityWithState(params TEntity[] entities)
+        private ServiceResult<bool> ProcessEntityWithState(EntityState defaultState, params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -1000,7 +854,10 @@ namespace AspCore.DataAccess.EntityFramework
                             IEntity entity = entry.Entity;
                             if (!entity.entityState.HasValue)
                                 entity.entityState = CoreEntityState.Unchanged;
-                            entry.State = GetEntityState(entity.entityState.Value);
+                            if (entity.entityState.HasValue)
+                                entry.State = GetEntityState(entity.entityState.Value);
+                            else
+                                entry.State = defaultState;
                             Context.Entry(entity);
                         }
 
@@ -1029,7 +886,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        private async Task<ServiceResult<bool>> ProcessEntityWithStateAsync(params TEntity[] entities)
+        private async Task<ServiceResult<bool>> ProcessEntityWithStateAsync(EntityState defaultState, params TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
 
@@ -1045,7 +902,10 @@ namespace AspCore.DataAccess.EntityFramework
                             IEntity entity = entry.Entity;
                             if (!entity.entityState.HasValue)
                                 entity.entityState = CoreEntityState.Unchanged;
-                            entry.State = GetEntityState(entity.entityState.Value);
+                            if (entity.entityState.HasValue)
+                                entry.State = GetEntityState(entity.entityState.Value);
+                            else
+                                entry.State = defaultState;
                             Context.Entry(entity);
                         }
 
@@ -1074,7 +934,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        private ServiceResult<bool> ProcessEntityWithStateNotTransaction(TEntity[] entities)
+        private ServiceResult<bool> ProcessEntityWithStateNotTransaction(EntityState defaultState, TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
@@ -1084,7 +944,10 @@ namespace AspCore.DataAccess.EntityFramework
                     IEntity entity = entry.Entity;
                     if (!entity.entityState.HasValue)
                         entity.entityState = CoreEntityState.Unchanged;
-                    entry.State = GetEntityState(entity.entityState.Value);
+                    if (entity.entityState.HasValue)
+                        entry.State = GetEntityState(entity.entityState.Value);
+                    else
+                        entry.State = defaultState;
                     Context.Entry(entity);
                 }
 
@@ -1108,7 +971,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        private async Task<ServiceResult<bool>> ProcessEntityWithStateNotTransactionAsync(TEntity[] entities)
+        private async Task<ServiceResult<bool>> ProcessEntityWithStateNotTransactionAsync(EntityState defaultState, TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             try
@@ -1119,7 +982,10 @@ namespace AspCore.DataAccess.EntityFramework
                     IEntity entity = entry.Entity;
                     if (!entity.entityState.HasValue)
                         entity.entityState = CoreEntityState.Unchanged;
-                    entry.State = GetEntityState(entity.entityState.Value);
+                    if (entity.entityState.HasValue)
+                        entry.State = GetEntityState(entity.entityState.Value);
+                    else
+                        entry.State = defaultState;
                     Context.Entry(entity);
                 }
 
@@ -1143,7 +1009,7 @@ namespace AspCore.DataAccess.EntityFramework
             return result;
         }
 
-        private ServiceResult<bool> ProcessEntitiesWithState(List<TEntity> items)
+        private ServiceResult<bool> ProcessEntitiesWithState(EntityState defaultState, List<TEntity> items)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
             IDbContextTransaction dbContextTransaction = null;
@@ -1156,7 +1022,10 @@ namespace AspCore.DataAccess.EntityFramework
                         IEntity entity = entry.Entity;
                         if (!entity.entityState.HasValue)
                             entity.entityState = CoreEntityState.Unchanged;
-                        entry.State = GetEntityState(entity.entityState.Value);
+                        if (entity.entityState.HasValue)
+                            entry.State = GetEntityState(entity.entityState.Value);
+                        else
+                            entry.State = defaultState;
                         Context.Entry(entity);
                     }
 

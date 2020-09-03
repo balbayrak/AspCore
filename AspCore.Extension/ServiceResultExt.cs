@@ -149,7 +149,7 @@ where TEntity : class, ISearchableEntity, new()
             serviceResult.IsSucceeded = result.IsSucceeded;
             serviceResult.SearchResultCount = result.SearchResultCount;
             serviceResult.TotalResultCount = result.TotalResultCount;
-            if (serviceResult.IsSucceededAndDataIncluded())
+            if (result.IsSucceededAndDataIncluded())
             {
                 result.Result.items.ForEach(x => x.ProtectEntity());
                 serviceResult.Result = result.Result.items;

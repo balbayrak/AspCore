@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AspCore.Entities.General
 {
-    public class BaseServiceResult : MarshalByRefObject, IDisposable
+    public class BaseServiceResult : IDisposable
     {
         private bool _DisposedValue = false;
         private int _statusCode;
