@@ -43,5 +43,6 @@ namespace testbusiness.Concrete
             entities[0].Admin.Description = "eewrew";
             return base.AddAsync(entities);
         }
+        
     }
 }

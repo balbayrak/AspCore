@@ -32,17 +32,13 @@ namespace AspCore.Business.Abstract
 
         Task<ServiceResult<TEntityDto>> GetByIdAsync(EntityFilter setting);
 
-        Task<ServiceResult<TEntityDto>> GetByIdAsync(Guid id);
+        ServiceResult<IList<TEntityDto>> GetAll(EntityFilter setting);
 
-        ServiceResult<TEntityDto> GetById(Guid id);
-
-        ServiceResult<IList<TEntityDto>> GetAll(EntityFilter setting = null);
-
-        Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(EntityFilter setting = null);
+        Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(EntityFilter setting);
 
         Task<ServiceResult<List<TEntityDto>>> GetHistoriesByIdAsync(EntityFilter setting);
         Task<ServiceResult<IList<TEntityDto>>> GetAllAsync(ISpecification<TEntity> specification);
-
+        Task<ServiceResult<IList<TEntityDto>>> GetAllAsync();
     }
 
     public interface IEntityService<TEntity, TEntityDto> : IEntityService<TEntity, TEntityDto, TEntityDto, TEntityDto>

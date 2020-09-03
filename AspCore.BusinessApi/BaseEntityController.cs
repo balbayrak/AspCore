@@ -243,9 +243,9 @@ namespace AspCore.BusinessApi
         [HttpGet]
         [ProducesResponseType(500)]
         [Authorize()]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            ServiceResult<IList<TEntityDto>> response = Service.GetAll();
+            ServiceResult<IList<TEntityDto>> response =await Service.GetAllAsync();
             return response.ToHttpResponse();
         }
 
@@ -297,7 +297,11 @@ namespace AspCore.BusinessApi
             {
                 return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_GUID_EMPTY, nameof(id)));
             }
-            ServiceResult<TEntityDto> response = Service.GetById(id);
+
+            ServiceResult<TEntityDto> response = Service.GetById(new EntityFilter()
+            {
+                id = id
+            });
             return response.ToHttpResponse();
         }
 

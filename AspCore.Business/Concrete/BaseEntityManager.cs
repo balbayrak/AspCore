@@ -233,6 +233,13 @@ namespace AspCore.Business.Concrete
             var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(data.Result);
             return data.ChangeResult(result);
         }
+
+        public async Task<ServiceResult<IList<TEntityDto>>> GetAllAsync()
+        {
+            var data = await DataAccess.GetListAsync();
+            var result = AutoObjectMapper.Mapper.Map<IList<TEntityDto>>(data.Result);
+            return data.ChangeResult(result);
+        }
     }
 
     public abstract class BaseEntityManager<TDataAccess, TEntity, TEntityDto> : BaseEntityManager<TDataAccess, TEntity, TEntityDto,
