@@ -171,9 +171,23 @@ namespace AspCore.ApiClient.Configuration
             AddClientConfiguration(services, apiClientOption);
 
             if (injectImplementationType)
-                services.AddTransient<TConcrete, TConcrete>();
+            {
+                services.AddTransient(typeof(TConcrete), sp =>
+                {
+                    var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
+                    var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                    return (TConcrete)Activator.CreateInstance(typeof(TConcrete), httpClientfactory, configurationAccessor, apiClientOption.apiKey);
+                });
+            }
             else
-                services.AddTransient<IApiClient, TConcrete>();
+            {
+                services.AddTransient(typeof(IApiClient), sp =>
+                {
+                    var httpClientfactory = sp.GetRequiredService<IHttpClientFactory>();
+                    var configurationAccessor = sp.GetRequiredService<IConfigurationAccessor>();
+                    return (TConcrete)Activator.CreateInstance(typeof(TConcrete), httpClientfactory, configurationAccessor, apiClientOption.apiKey);
+                });
+            }
 
             return apiClientOption.apiKey;
         }

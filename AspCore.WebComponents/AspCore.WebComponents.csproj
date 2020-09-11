@@ -7,7 +7,7 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.2.8</Version>
+    <Version>1.3.1</Version>
     <Company>AspCore.WebComponents</Company>
     <PackageReleaseNotes>IsAction prop added.</PackageReleaseNotes>
   </PropertyGroup>
