@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AspCore.Entities.EntityType;
 
 namespace AspCore.Dtos.Dto
 {
@@ -10,7 +11,6 @@ namespace AspCore.Dtos.Dto
         { 
             Id = Guid.NewGuid();
         }
-       
         public Guid Id { get; set; }
         public string EncryptedId { get; set; }
     }

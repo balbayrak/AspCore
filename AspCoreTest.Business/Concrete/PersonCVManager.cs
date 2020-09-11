@@ -24,7 +24,7 @@ namespace testbusiness.Concrete
         public async Task<ServiceResult<List<PersonCvDto>>> GetWithInclude()
         {
             var dataFilter = new DataAccessFilter<PersonCv>();
-            dataFilter.Load(t => t.Person);
+            dataFilter.Load(t => t.Person).Load(t=>t.Person.Admin);
             dataFilter.query = t => t.Id == new Guid("e2845ff9-4f00-4c17-8e4b-0e5d8617197b") ||
                        t.Id == new Guid("7553c60d-3495-4132-a160-0ede96e50618");
             var result =

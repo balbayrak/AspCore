@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace AspCore.DataAccess.EntityFramework
 {
     public abstract class EfEntityRepositoryBase<TDbContext, TEntity> : IEntityRepository<TEntity>
-     where TEntity : class, IEntity
+     where TEntity : class, IEntity,new()
         where TDbContext : CoreDbContext
     {
         protected IServiceProvider ServiceProvider { get; private set; }
@@ -728,7 +728,7 @@ namespace AspCore.DataAccess.EntityFramework
                         for (int i = start; i < count; i++)
                         {
                             JObject obj = (JObject)JsonConvert.DeserializeObject(list[i].Changed);
-                            EntityHistoryChanged<TEntity> historyChanged = obj.ToObject<EntityHistoryChanged<TEntity>>();
+                            var historyChanged = obj.ToObject<EntityHistoryChanged<TEntity>>();
                             if (i == 0)
                             {
                                 if (typeof(TEntity).IsAssignableTo(typeof(IBaseEntity)))
