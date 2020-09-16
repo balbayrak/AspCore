@@ -60,9 +60,7 @@ namespace AspCoreTest.WebApi
                         .AddAuthenticatedApiClient(option => { option.apiKey = "DocumentApi";
                             option.authenticationHandler = EnumAuthenticationHandler.Cache;
                         })
-                        .AddAuthenticatedApiClient(option => { option.apiKey = "ViewerApi";
-                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
-                        })
+                        .AddApiClient(option => { option.apiKey = "ViewerApi";})
                         .AddAuthenticatedApiClient(option => { option.apiKey = "DataSearchApi";
                             option.authenticationHandler = EnumAuthenticationHandler.Cache;
                         })
