@@ -512,7 +512,6 @@ namespace AspCore.DataAccess.EntityFramework
                     var updatedEntity = Context.Entry(item);
                     updatedEntity.State = EntityState.Deleted;
                 }
-
                 result = ProcessEntityWithStateNotTransaction(EntityState.Deleted, entities);
 
                 if (result.IsSucceeded && result.Result)

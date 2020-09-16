@@ -58,6 +58,8 @@ namespace AspCore.Business.Concrete
 
         private ITaskBuilder _taskBuilder;
         protected ITaskBuilder TaskBuilder => LazyGetRequiredService(ref _taskBuilder);
+        private ITaskFlowBuilder _taskFlowBuilder;
+        protected ITaskFlowBuilder TaskFlowBuilder => LazyGetRequiredService(ref _taskFlowBuilder);
 
         protected BaseEntityManager(IServiceProvider serviceProvider)
         {
@@ -84,7 +86,7 @@ namespace AspCore.Business.Concrete
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TUpdatedEntityDto[], TEntity[]>(entities);
 
-            if (entities.Length > 1)
+            if (entities.Length > 1) 
                 return DataAccess.UpdateWithTransaction(entityArray);
             else
                 return DataAccess.Update(entityArray);
