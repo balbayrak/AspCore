@@ -81,7 +81,7 @@ namespace AspCore.ApiClient
                 }
             }
 
-            var response = await client.GetAsync(_apiUrl).ConfigureAwait(false);
+            var response = await client.GetAsync(_apiUrl);
 
             response.EnsureSuccessStatusCode();
 

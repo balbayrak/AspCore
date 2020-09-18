@@ -50,17 +50,9 @@ namespace AspCore.Extension
         }
         public static ActionResult ToHttpResponse<TModel>(this ServiceResult<TModel> response)
         {
-            var status = HttpStatusCode.OK;
-
             if (!response.IsSucceeded && !string.IsNullOrEmpty(response.ExceptionMessage))
-                status = HttpStatusCode.InternalServerError;
-            else if (response.IsSucceeded && response.Result == null)
-                status = HttpStatusCode.NotFound;
-
-            return new ObjectResult(response)
-            {
-                StatusCode = (int)status
-            };
+                return new BadRequestObjectResult(response);
+            return new OkObjectResult(response);
         }
 
         public static ServiceResult<TDestionation> ChangeResult<TSource, TDestionation>(this ServiceResult<TSource> result, TDestionation entity)
