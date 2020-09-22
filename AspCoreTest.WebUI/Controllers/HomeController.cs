@@ -70,11 +70,11 @@ namespace AspCoreTest.WebUI.Controllers
             //    new PersonCvDto() {Id = Guid.NewGuid(), Name = "Bilal", DocumentUrl = "sadsadsada",Person = new PersonDto(){Name = "Bilal",Surname = "Aykaç"}}
             //};
             //_personCvBff.AddAsync(models);
-            var personcv = _personCvBff.GetByIdAsync(new EntityFilter()
-            {
-                id = Guid.NewGuid()
-            }).Result;
-            var personCvList = _personCvBff.GetByIdAsync(Guid.NewGuid()).Result;
+            //var personcv = _personCvBff.GetByIdAsync(new EntityFilter()
+            //{
+            //    id = Guid.NewGuid()
+            //}).Result;
+            //var personCvList = _personCvBff.GetByIdAsync(Guid.NewGuid()).Result;
             //foreach (var personCvDto in personCvList)
             //{
             //    personCvDto.Name = "Yusuf3";

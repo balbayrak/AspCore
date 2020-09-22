@@ -16,9 +16,10 @@ namespace testbusiness.Concrete
     [ExposedService(typeof(IPersonCVService))]
     public class PersonCVManager : BaseEntityManager<IPersonCvDAL,PersonCv, PersonCvDto>, IPersonCVService
     {
-        public PersonCVManager(IServiceProvider serviceProvider) : base(serviceProvider)
+        private IPersonDal personDal;
+        public PersonCVManager(IServiceProvider serviceProvider, IPersonDal personDal) : base(serviceProvider)
         {
-
+            this.personDal = personDal;
         }
 
         public async Task<ServiceResult<List<PersonCvDto>>> GetWithInclude()
@@ -32,6 +33,37 @@ namespace testbusiness.Concrete
             var data = AutoObjectMapper.Mapper.Map<List<PersonCvDto>>(result.Result);
             return result.ChangeResult(data);
 
+        }
+
+        public override async Task<ServiceResult<bool>> AddAsync(params PersonCvDto[] entities)
+        {
+            var entityArray = AutoObjectMapper.Mapper.Map<PersonCvDto[], PersonCv[]>(entities);
+            var entityPerson =new Person()
+            {
+                Id = Guid.NewGuid(),
+                Name = "asddasd",
+                Surname = "sdaasd",
+                
+            };
+
+            TransactionBuilder.BeginTransaction();
+            try
+            {
+                var result1 = await DataAccess.AddAsync(entityArray);
+                var result = await personDal.AddAsync(entityPerson);
+                TransactionBuilder.CommitTransaction();
+                return result;
+            }
+            catch (Exception e)
+            {
+                TransactionBuilder.RollbackTransaction();
+            }
+            finally
+            {
+                TransactionBuilder.DisposeTransaction();
+            }
+
+            return null;
         }
     }
   

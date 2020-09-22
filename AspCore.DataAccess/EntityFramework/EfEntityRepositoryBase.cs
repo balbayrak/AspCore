@@ -951,6 +951,7 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     result.IsSucceeded = true;
                     result.Result = true;
+                    DetachAllEntities();
                 }
                 else
                 {
@@ -965,7 +966,14 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
-
+        public void DetachAllEntities()
+        {
+            var list = Context.ChangeTracker.Entries<IEntity>().ToList();
+            foreach (EntityEntry<IEntity> entry in list)
+            {
+                entry.State = EntityState.Detached;
+            }
+        }
         private async Task<ServiceResult<bool>> ProcessEntityWithStateNotTransactionAsync(EntityState defaultState, TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -987,6 +995,7 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     result.IsSucceeded = true;
                     result.Result = true;
+                    DetachAllEntities();
                 }
                 else
                 {
