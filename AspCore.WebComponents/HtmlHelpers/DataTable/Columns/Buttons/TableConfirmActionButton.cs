@@ -25,5 +25,11 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons
             this.condition = expression.ToCondition(value);
             return _instance;
         }
+
+        public IConfirmActionButton HiddenFor(Expression<Func<TModel, bool>> expression)
+        {
+            this.condition = expression.ToCondition();
+            return _instance;
+        }
     }
 }

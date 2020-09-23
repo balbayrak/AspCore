@@ -146,5 +146,18 @@ namespace AspCore.WebComponents.HtmlHelpers.Extensions
             condition.value = value;
             return condition;
         }
+
+        public static Condition ToCondition<TModel>(this Expression<Func<TModel, bool>> expression)
+        {
+            Condition condition = new Condition();
+            if (expression.Body is BinaryExpression body)
+            {
+                var left = (body.Left as MemberExpression).ToString();
+                condition.property = left;
+                condition.IsEqual = body.NodeType == ExpressionType.Equal;
+                condition.value = (body.Right as ConstantExpression).Value.ToString();
+            }
+            return condition;
+        }
     }
 }

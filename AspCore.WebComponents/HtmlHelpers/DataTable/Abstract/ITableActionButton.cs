@@ -12,5 +12,6 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Abstract
         T Visible(bool visible);
 
         T Hidden<TProperty>(Expression<Func<TModel, TProperty>> expression, object value);
+        T HiddenFor(Expression<Func<TModel, bool>> expression);
     }
 }

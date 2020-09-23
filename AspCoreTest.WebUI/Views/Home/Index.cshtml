@@ -18,7 +18,7 @@
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
                       action.ModalButton()
-                               .Visible(true)
+                          .Visible(true)
                                .Text("Edit")
                                .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
                                .IClass("fa fa-edit")
@@ -28,7 +28,7 @@
                                .BackDropStatic();
 
                       action.ConfirmButton()
-                            .Visible(true)
+                          .HiddenFor(t=>t.Name!="Yusuf")
                             .Text("Delete")
                             .CssClass("btn btn-sm red btn-outline filter-submit margin-bottom red-haze")
                             .IClass("fa fa-trash-o")
