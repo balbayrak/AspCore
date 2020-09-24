@@ -7,8 +7,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons
     public class Condition
     {
         public string property { get; set; }
-
-        public bool IsEqual { get; set; }
+        public bool IsEqual { get; set; } = true;
         public object value { get; set; }
     }
 }
