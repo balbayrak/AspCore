@@ -12,7 +12,6 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
     {
         public TableCheckColumn(string propertyName) : base()
         {
-            this.columnTitle = string.Empty;
             this.propertyName = propertyName;
         }
         protected override ITableCheckColumn _instance
@@ -40,6 +39,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
 
         public ITableCheckColumn CheckAllEnabled()
         {
+            this.columnTitle = string.Empty;
             this.checkAllEnabled = true;
             return _instance;
         }

@@ -15,6 +15,13 @@ namespace AspCoreTest.WebUI.Controllers
         }
         public override string AuthenticationProviderName => "custom";
 
+
+       
+        public IActionResult Home()
+        {
+            return View();
+        }
+
         public IActionResult UserLogin()
         {
             return View();

@@ -5,6 +5,7 @@ using AspCore.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using AspCore.Utilities.ExpressionUtilities;
 
 namespace AspCore.Extension
 {

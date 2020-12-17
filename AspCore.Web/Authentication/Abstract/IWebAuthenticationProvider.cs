@@ -6,6 +6,7 @@ namespace AspCore.Web.Authentication.Abstract
         where TInput : AuthenticationInfo
     {
         string loginPageUrl { get; }
+        string firstPageUrl { get; }
 
         string apiAuthenticationType { get; }
 

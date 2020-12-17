@@ -6,6 +6,7 @@ using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.Expression;
 using AspCore.Utilities;
+using AspCore.Utilities.ExpressionUtilities;
 
 namespace AspCore.Extension
 {
