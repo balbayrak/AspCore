@@ -6,7 +6,6 @@ using AspCore.Entities.Authentication;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
-using AspCore.Storage.Abstract;
 using AspCore.Storage.Concrete;
 using AspCore.Utilities;
 using AspCore.Web.Authentication.Abstract;
@@ -214,7 +213,7 @@ namespace AspCore.Web.Concrete
             }
             else
             {
-                Response.Redirect(AuthenticationProvider.loginPageUrl);
+                Response.Redirect(AuthenticationProvider.firstPageUrl??AuthenticationProvider.loginPageUrl);
             }
         }
 

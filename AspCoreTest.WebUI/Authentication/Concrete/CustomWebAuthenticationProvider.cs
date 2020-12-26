@@ -10,6 +10,7 @@ namespace AspCoreTest.Authentication.Concrete
     {
 
         public string loginPageUrl => "/Account/UserLogin";
+        public string firstPageUrl => "/Account/Home";
 
         public string mainPageUrl => "/Home/Index";
 

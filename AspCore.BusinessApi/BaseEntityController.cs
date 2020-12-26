@@ -291,6 +291,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
+        [Route("{id}")]
         public IActionResult GetById(Guid id)
         {
             if (id == Guid.Empty)

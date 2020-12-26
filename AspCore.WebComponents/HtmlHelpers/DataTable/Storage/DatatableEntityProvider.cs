@@ -5,6 +5,7 @@ using AspCore.WebComponents.HtmlHelpers.DataTable.Rows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AspCore.Utilities.ExpressionUtilities;
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
 {
@@ -111,14 +112,29 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
         {
             object result = ExpressionBuilder.Evaluation(entity, condition.property);
             bool isEqueal = false;
-
-            if (result is string)
+            if (condition.IsEqual)
             {
-                isEqueal = ((string)result).Equals((string)condition.value, System.StringComparison.InvariantCultureIgnoreCase);
+                if (result is string)
+                {
+                    isEqueal = ((string) result).Equals((string) condition.value,
+                        System.StringComparison.InvariantCultureIgnoreCase);
+                }
+                else
+                {
+                    isEqueal = result.Equals(Convert.ChangeType(condition.value, result.GetType()));
+                }
             }
             else
             {
-                isEqueal = result.Equals(Convert.ChangeType(condition.value, result.GetType()));
+                if (result is string)
+                {
+                    isEqueal = !((string)result).Equals((string)condition.value,
+                        System.StringComparison.InvariantCultureIgnoreCase);
+                }
+                else
+                {
+                    isEqueal = !result.Equals(Convert.ChangeType(condition.value, result.GetType()));
+                }
             }
 
             return isEqueal;

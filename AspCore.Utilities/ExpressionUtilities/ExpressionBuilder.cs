@@ -5,7 +5,7 @@ using System.Reflection;
 using AspCore.Entities.EntityFilter;
 using AspCore.Entities.Expression;
 
-namespace AspCore.Utilities
+namespace AspCore.Utilities.ExpressionUtilities
 {
     public static class ExpressionBuilder
     {

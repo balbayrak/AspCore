@@ -1,15 +1,10 @@
 ﻿using AspCore.Entities.EntityFilter;
 using AspCore.Entities.General;
-using AspCore.Storage.Concrete;
 using AspCore.Web.Concrete;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using AspCoreTest.Bffs.Abstract;
-using AspCoreTest.DataSearch.Abstract;
 using AspCoreTest.Dtos.Dtos;
-using AspCoreTest.Entities.ModelFilters;
-using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 
@@ -75,21 +70,23 @@ namespace AspCoreTest.WebUI.Controllers
             //    new PersonCvDto() {Id = Guid.NewGuid(), Name = "Bilal", DocumentUrl = "sadsadsada",Person = new PersonDto(){Name = "Bilal",Surname = "Aykaç"}}
             //};
             //_personCvBff.AddAsync(models);
-
-            var personCvList = _personCvBff.GetWithInclude().Result.Result;
-
-            foreach (var personCvDto in personCvList)
-            {
-                personCvDto.Name = "Yusuf3";
-                personCvDto.Person.Surname = "Aykaç3";
-                personCvDto.Person.Admin.Description = "23223423432";
-            }
-            _personCvBff.UpdateAsync(personCvList);
-            ViewBag.Models = new List<Person>()
-            {
-                new Person() {Id = Guid.NewGuid(), Name = "Yusuf"},
-                new Person() {Id = Guid.NewGuid(), Name = "Bilal"}
-            };
+            //var personcv = _personCvBff.GetByIdAsync(new EntityFilter()
+            //{
+            //    id = Guid.NewGuid()
+            //}).Result;
+            //var personCvList = _personCvBff.GetByIdAsync(Guid.NewGuid()).Result;
+            //foreach (var personCvDto in personCvList)
+            //{
+            //    personCvDto.Name = "Yusuf3";
+            //    personCvDto.Person.Surname = "Aykaç3";
+            //    personCvDto.Person.Admin.Description = "23223423432";
+            //}
+            //_personCvBff.UpdateAsync(personCvList);
+            //ViewBag.Models = new List<Person>()
+            //{
+            //    new Person() {Id = Guid.NewGuid(), Name = "Yusuf"},
+            //    new Person() {Id = Guid.NewGuid(), Name = "Bilal"}
+            //};
             return View();
         }
     }

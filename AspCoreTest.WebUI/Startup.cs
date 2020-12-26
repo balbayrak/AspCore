@@ -31,9 +31,9 @@ namespace AspCoreTest.WebUI
         {
             services.ConfigureAspCoreServices(option =>
             {
-                option.AddDependencyResolver(option =>
+                option.AddDependencyResolver(interceptorOptionBuilder =>
                 {
-                    option.AutoBind();
+                    interceptorOptionBuilder.AutoBind();
                    // option.AutoBindModules();
                    // option.AddDependencyModule<WebDependencyModule2>();
                 })

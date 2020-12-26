@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using AspCore.Entities.EntityType;
 
-namespace AspCore.Utilities
+namespace AspCore.Utilities.ExpressionUtilities
 {
     public class IncludeExpression<TSource>
     {

@@ -19,6 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AspCore.Utilities.ExpressionUtilities;
 
 namespace AspCore.DataAccess.EntityFramework
 {
@@ -512,7 +513,6 @@ namespace AspCore.DataAccess.EntityFramework
                     var updatedEntity = Context.Entry(item);
                     updatedEntity.State = EntityState.Deleted;
                 }
-
                 result = ProcessEntityWithStateNotTransaction(EntityState.Deleted, entities);
 
                 if (result.IsSucceeded && result.Result)
@@ -952,6 +952,7 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     result.IsSucceeded = true;
                     result.Result = true;
+                    DetachAllEntities();
                 }
                 else
                 {
@@ -966,7 +967,14 @@ namespace AspCore.DataAccess.EntityFramework
 
             return result;
         }
-
+        public void DetachAllEntities()
+        {
+            var list = Context.ChangeTracker.Entries<IEntity>().ToList();
+            foreach (EntityEntry<IEntity> entry in list)
+            {
+                entry.State = EntityState.Detached;
+            }
+        }
         private async Task<ServiceResult<bool>> ProcessEntityWithStateNotTransactionAsync(EntityState defaultState, TEntity[] entities)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -988,6 +996,7 @@ namespace AspCore.DataAccess.EntityFramework
                 {
                     result.IsSucceeded = true;
                     result.Result = true;
+                    DetachAllEntities();
                 }
                 else
                 {

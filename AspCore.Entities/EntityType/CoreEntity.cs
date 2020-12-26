@@ -10,7 +10,6 @@ namespace AspCore.Entities.EntityType
         [NotMapped]
         public CoreEntityState? entityState { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [NotMapped]

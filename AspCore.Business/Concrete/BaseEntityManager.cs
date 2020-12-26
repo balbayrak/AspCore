@@ -1,6 +1,5 @@
 ﻿using AspCore.Business.Abstract;
 using AspCore.Business.Specifications.Abstract;
-using AspCore.Business.Task.Abstract;
 using AspCore.DataAccess.Abstract;
 using AspCore.DataAccess.General;
 using AspCore.Dtos.Dto;
@@ -8,18 +7,14 @@ using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
-using AspCore.Mapper.Abstract;
-using AspCore.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseEntityManager<TDataAccess, TEntity, TEntityDto, TCreatedEntityDto, TUpdatedEntityDto> : IEntityService<
+    public abstract class BaseEntityManager<TDataAccess, TEntity, TEntityDto, TCreatedEntityDto, TUpdatedEntityDto> : BaseBusinessManager, IEntityService<
             TEntity, TEntityDto, TCreatedEntityDto, TUpdatedEntityDto>
         where TDataAccess : IEntityRepository<TEntity>
         where TEntity : class, IEntity, new()
@@ -28,42 +23,11 @@ namespace AspCore.Business.Concrete
         where TUpdatedEntityDto : class, IEntityDto, new()
 
     {
-        protected readonly object ServiceProviderLock = new object();
-
-        protected TService LazyGetRequiredService<TService>(ref TService reference)
-            => LazyGetRequiredService(typeof(TService), ref reference);
-
-        protected TRef LazyGetRequiredService<TRef>(Type serviceType, ref TRef reference)
-        {
-            if (reference == null)
-            {
-                lock (ServiceProviderLock)
-                {
-                    if (reference == null)
-                    {
-                        reference = (TRef)ServiceProvider.GetRequiredService(serviceType);
-                    }
-                }
-            }
-
-            return reference;
-        }
-
-        protected IServiceProvider ServiceProvider { get; }
+       
         protected readonly TDataAccess DataAccess;
-        protected ITransactionBuilder TransactionBuilder;
-
-        private IAutoObjectMapper _autoObjectMapper;
-        protected IAutoObjectMapper AutoObjectMapper => LazyGetRequiredService(ref _autoObjectMapper);
-
-        private ITaskBuilder _taskBuilder;
-        protected ITaskBuilder TaskBuilder => LazyGetRequiredService(ref _taskBuilder);
-
-        protected BaseEntityManager(IServiceProvider serviceProvider)
+        protected BaseEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            ServiceProvider = serviceProvider;
             DataAccess = ServiceProvider.GetRequiredService<TDataAccess>();
-            TransactionBuilder = ServiceProvider.GetRequiredService<ITransactionBuilder>();
         }
 
         public virtual ServiceResult<bool> Add(params TCreatedEntityDto[] entities)
@@ -84,7 +48,7 @@ namespace AspCore.Business.Concrete
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TUpdatedEntityDto[], TEntity[]>(entities);
 
-            if (entities.Length > 1)
+            if (entities.Length > 1) 
                 return DataAccess.UpdateWithTransaction(entityArray);
             else
                 return DataAccess.Update(entityArray);
@@ -101,7 +65,8 @@ namespace AspCore.Business.Concrete
         public virtual Task<ServiceResult<bool>> AddAsync(params TCreatedEntityDto[] entities)
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TCreatedEntityDto[], TEntity[]>(entities);
-
+         
+          
             if (entities.Length > 1)
                 return DataAccess.AddWithTransactionAsync(entityArray);
             else
