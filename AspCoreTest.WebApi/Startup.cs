@@ -127,7 +127,7 @@ namespace AspCoreTest.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
+           
             app.UseAspCoreServices<ITokenValidator<ActiveUser>, ActiveUser>(option =>
             {
                 option.UseAuthentication(app).

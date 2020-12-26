@@ -17,21 +17,23 @@ namespace AspCore.ApiClient.Handlers
     {
         protected readonly IServiceProvider ServiceProvider;
         private readonly IConfigurationAccessor _configurationAccessor;
-        protected readonly TOption _configurationOption;
-        protected readonly HttpClient _tokenClient;
+        protected readonly TOption ConfigurationOption;
+        protected readonly HttpClient TokenClient;
+        protected readonly string ApiKey;
         private IHttpClientFactory _httpClientFactory;
         public AspCoreAuthenticationHandler(IServiceProvider serviceProvider, string apikey)
         {
             ServiceProvider = serviceProvider;
+            ApiKey = apikey;
             _configurationAccessor = ServiceProvider.GetRequiredService<IConfigurationAccessor>();
-            _configurationOption = _configurationAccessor.GetValueByKey<TOption>(apikey);
+            ConfigurationOption = _configurationAccessor.GetValueByKey<TOption>(apikey);
             _httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
-            if (_configurationOption == null)
+            if (ConfigurationOption == null)
                 throw new Exception("Girilen apikey ile configuration bilgileri alınamadı");
 
-            _tokenClient = _httpClientFactory.CreateClient($"{apikey}_tokenClient");
-            _tokenClient.BaseAddress = new Uri(_configurationOption.Authentication.BaseAddress);
+            TokenClient = _httpClientFactory.CreateClient($"{apikey}_tokenClient");
+            TokenClient.BaseAddress = new Uri(ConfigurationOption.Authentication.BaseAddress);
         }
         public abstract Task<AuthenticationTicketInfo> GetToken(HttpRequestMessage request = null, bool forceNewToken = false);
         public abstract Task<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo authenticationTicketInfo);

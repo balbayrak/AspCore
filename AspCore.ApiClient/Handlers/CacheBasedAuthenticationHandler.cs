@@ -17,30 +17,23 @@ namespace AspCore.ApiClient.Handlers
           where TOption : class, IApiClientConfiguration, new()
     {
         protected readonly ICacheService CacheService;
-        private readonly string _apikey;
 
         public CacheBasedAuthenticationHandler(IServiceProvider serviceProvider, string apikey) : base(serviceProvider, apikey)
         {
             CacheService = ServiceProvider.GetRequiredService<ICacheService>();
-            _apikey = apikey;
         }
 
         public override async Task<AuthenticationTicketInfo> GetToken(HttpRequestMessage request = null, bool forceNewToken = false)
         {
-            AuthenticationTicketInfo authenticationTicketInfo = await CacheService.GetObjectAsync<AuthenticationTicketInfo>(_apikey);
+            AuthenticationTicketInfo authenticationTicketInfo = await CacheService.GetObjectAsync<AuthenticationTicketInfo>(ApiKey);
 
             if (!forceNewToken && authenticationTicketInfo != null) return authenticationTicketInfo;
 
-
-            AuthenticationInfo authenticationInfo = new AuthenticationInfo();
-
-            authenticationInfo.UserName = _configurationOption.Authentication.Username;
-            authenticationInfo.Password = _configurationOption.Authentication.Password;
+            AuthenticationInfo authenticationInfo = GetAuthenticationInfo();
 
             JsonContent jsonContent = new JsonContent(authenticationInfo);
 
-
-            var response = await _tokenClient.PostAsync($"/{ _configurationOption.Authentication.TokenPath.TrimStart('/')}", jsonContent);
+            var response = await TokenClient.PostAsync($"/{ ConfigurationOption.Authentication.TokenPath.TrimStart('/')}", jsonContent);
             ServiceResult<AuthenticationTicketInfo> result = null;
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -64,7 +57,7 @@ namespace AspCore.ApiClient.Handlers
         public override async Task<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo authenticationTicketInfo)
         {
             JsonContent jsonContent = new JsonContent(authenticationTicketInfo);
-            var response = await _tokenClient.PostAsync("/" + _configurationOption.Authentication.RefreshTokenPath, jsonContent);
+            var response = await TokenClient.PostAsync("/" + ConfigurationOption.Authentication.RefreshTokenPath, jsonContent);
             ServiceResult<AuthenticationTicketInfo> result = null;
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -87,7 +80,18 @@ namespace AspCore.ApiClient.Handlers
 
         public override async Task AddorEditTokenStorage(AuthenticationTicketInfo authenticationTicketInfo)
         {
-            await CacheService.SetObjectAsync<AuthenticationTicketInfo>(_apikey, authenticationTicketInfo, authenticationTicketInfo.expires.AddMinutes(-1));
+            await CacheService.SetObjectAsync(ApiKey, authenticationTicketInfo, authenticationTicketInfo.expires.AddMinutes(-1));
+        }
+
+        public virtual AuthenticationInfo GetAuthenticationInfo()
+        {
+            AuthenticationInfo authenticationInfo = new AuthenticationInfo();
+
+            authenticationInfo.UserName = ConfigurationOption.Authentication.Username;
+            authenticationInfo.Password = ConfigurationOption.Authentication.Password;
+
+            return authenticationInfo;
+
         }
     }
 }
