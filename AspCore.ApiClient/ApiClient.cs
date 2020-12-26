@@ -52,7 +52,7 @@ namespace AspCore.ApiClient
 
         public string apiKey { get; private set; }
 
-        private static HttpClient Client { get; set; }
+        private HttpClient _client { get; set; }
 
         public ApiClient(IHttpClientFactory httpClientFactory, IConfigurationAccessor configurationAccessor, string apiKey)
         {
@@ -60,9 +60,9 @@ namespace AspCore.ApiClient
             ConfigurationHelper = configurationAccessor;
 
             InitializeBaseAddress(apiKey);
-            Client = httpClientFactory.CreateClient(this.apiKey);
+            _client = httpClientFactory.CreateClient(this.apiKey);
             
-            Client.BaseAddress = new Uri(_baseAddress);
+            _client.BaseAddress = new Uri(_baseAddress);
         }
 
         public virtual async Task<TResult> GetRequest<TResult>(Dictionary<string, string> headerValues = null)
@@ -74,15 +74,15 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!Client.DefaultRequestHeaders.Contains(key))
+                    if (!_client.DefaultRequestHeaders.Contains(key))
                     {
-                        Client.DefaultRequestHeaders.Remove(key);
-                        Client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                        _client.DefaultRequestHeaders.Remove(key);
+                        _client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
                 }
             }
 
-            var response = await Client.GetAsync(_apiUrl);
+            var response = await _client.GetAsync(_apiUrl);
 
             response.EnsureSuccessStatusCode();
 
@@ -108,16 +108,16 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!Client.DefaultRequestHeaders.Contains(key))
+                    if (!_client.DefaultRequestHeaders.Contains(key))
                     {
-                        Client.DefaultRequestHeaders.Remove(key);
-                        Client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                        _client.DefaultRequestHeaders.Remove(key);
+                        _client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
                 }
             }
 
             JsonContent jsonContent = new JsonContent(postObject);
-            var response = await Client.PostAsync(_apiUrl, jsonContent);
+            var response = await _client.PostAsync(_apiUrl, jsonContent);
 
             string responseString = await response.Content.ReadAsStringAsync();
             result = JsonConvert.DeserializeObject<TResult>(responseString);
@@ -134,16 +134,16 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!Client.DefaultRequestHeaders.Contains(key))
+                    if (!_client.DefaultRequestHeaders.Contains(key))
                     {
-                        Client.DefaultRequestHeaders.Remove(key);
-                        Client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                        _client.DefaultRequestHeaders.Remove(key);
+                        _client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
                 }
             }
             var formatter = new JsonMediaTypeFormatter() { SerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto } };
             formatter.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-            var response = Client.PostAsync(_apiUrl, postObject, formatter).Result;
+            var response = _client.PostAsync(_apiUrl, postObject, formatter).Result;
 
             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -160,7 +160,7 @@ namespace AspCore.ApiClient
         {
             TResult result = null;
 
-            var response = await Client.PostAsync(_apiUrl, content);
+            var response = await _client.PostAsync(_apiUrl, content);
             if (response.IsSuccessStatusCode)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
@@ -195,7 +195,7 @@ namespace AspCore.ApiClient
         {
             _baseAddress = null;
             _apiUrl = null;
-            Client.Dispose();
+            _client.Dispose();
         }
     }
 }
