@@ -50,7 +50,7 @@ namespace AspCore.ApiClient.Handlers
         {
 
             JsonContent jsonContent = new JsonContent(authenticationTicketInfo);
-            var response = await _tokenClient.PostAsync("/" + _configurationOption.Authentication.RefreshTokenPath, jsonContent);
+            var response = await TokenClient.PostAsync("/" + ConfigurationOption.Authentication.RefreshTokenPath, jsonContent);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
