@@ -155,6 +155,28 @@ namespace AspCore.ApiClient
             return result;
         }
 
+        public async Task<bool> DeleteAsync(string uri, Dictionary<string, string> headerValues = null)
+        {
+            bool isSuccess=false;
+            if (headerValues != null && headerValues.Count > 0)
+            {
+                foreach (var key in headerValues.Keys)
+                {
+                    if (!Client.DefaultRequestHeaders.Contains(key))
+                    {
+                        Client.DefaultRequestHeaders.Remove(key);
+                        Client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                    }
+                }
+            }
+            var response = await Client.DeleteAsync(uri);
+            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                isSuccess = true;
+            }
+            return isSuccess;
+        }
+
         public virtual async Task<TResult> PostRequest<TResult>(HttpContent content)
              where TResult : class, new()
         {

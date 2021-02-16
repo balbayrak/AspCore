@@ -1,9 +1,8 @@
-﻿using System;
+﻿using AspCore.AOP.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using AspCore.AOP.Abstract;
 
 namespace AspCore.AOP.Concrete
 {
@@ -35,7 +34,7 @@ namespace AspCore.AOP.Concrete
             foreach (var method in methods)
             {
                 var methodAttributes = method.GetCustomAttributes<InterceptorBase>(true);
-                if (methodAttributes != null && methodAttributes.Count() > 0)
+                if (methodAttributes.Any())
                 {
                     return true;
                 }
