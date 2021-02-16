@@ -162,14 +162,14 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!Client.DefaultRequestHeaders.Contains(key))
+                    if (!_client.DefaultRequestHeaders.Contains(key))
                     {
-                        Client.DefaultRequestHeaders.Remove(key);
-                        Client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                        _client.DefaultRequestHeaders.Remove(key);
+                        _client.DefaultRequestHeaders.Add(key, headerValues[key]);
                     }
                 }
             }
-            var response = await Client.DeleteAsync(uri);
+            var response = await _client.DeleteAsync(uri);
             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
             {
                 isSuccess = true;
