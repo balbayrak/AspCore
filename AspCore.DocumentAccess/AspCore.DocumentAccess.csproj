@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Company>AspCore.DocumentAccess</Company>
-    <Version>1.2.7</Version>
+    <Version>1.2.9</Version>
      <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
 

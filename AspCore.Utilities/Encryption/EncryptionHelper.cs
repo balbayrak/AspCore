@@ -32,7 +32,7 @@ namespace AspCore.Utilities
             // Hash the password with SHA256
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
 
-            var bytesEncrypted = EncryptionHelper.Encrypt(bytesToBeEncrypted, passwordBytes);
+            var bytesEncrypted = Encrypt(bytesToBeEncrypted, passwordBytes);
 
             return Convert.ToBase64String(bytesEncrypted);
         }
@@ -62,7 +62,7 @@ namespace AspCore.Utilities
 
                 passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
 
-                var bytesDecrypted = EncryptionHelper.Decrypt(bytesToBeDecrypted, passwordBytes);
+                var bytesDecrypted = Decrypt(bytesToBeDecrypted, passwordBytes);
 
                 return Encoding.UTF8.GetString(bytesDecrypted);
             }
