@@ -61,7 +61,7 @@ namespace AspCore.ApiClient
 
             InitializeBaseAddress(apiKey);
             _client = httpClientFactory.CreateClient(this.apiKey);
-            
+
             _client.BaseAddress = new Uri(_baseAddress);
         }
 
@@ -127,8 +127,6 @@ namespace AspCore.ApiClient
 
         public async Task<TResult> PostAsync<TResult>(object postObject, Dictionary<string, string> headerValues = null) where TResult : class, new()
         {
-            TResult result = null;
-
             if (headerValues != null && headerValues.Count > 0)
             {
                 foreach (var key in headerValues.Keys)
@@ -141,21 +139,16 @@ namespace AspCore.ApiClient
                 }
             }
             JsonContent jsonContent = new JsonContent(postObject);
-            var response = await _client.PostAsync(apiUrl,jsonContent);
-            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
-            {
-                string responseString = await response.Content.ReadAsStringAsync();
-
-                result = JsonConvert.DeserializeObject<TResult>(responseString);
-            }
-
+            var response = await _client.PostAsync(apiUrl, jsonContent);
+            string responseString = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<TResult>(responseString);
             return result;
         }
 
         public virtual async Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null)
             where TResult : class, new()
         {
-         
+
             TResult result = null;
 
             if (headerValues != null && headerValues.Count > 0)
@@ -180,14 +173,15 @@ namespace AspCore.ApiClient
                 result = JsonConvert.DeserializeObject<TResult>(responseString);
             }
 
+
             return result;
         }
 
-      
+
 
         public async Task<bool> DeleteAsync(string uri, Dictionary<string, string> headerValues = null)
         {
-            bool isSuccess=false;
+            bool isSuccess = false;
             if (headerValues != null && headerValues.Count > 0)
             {
                 foreach (var key in headerValues.Keys)

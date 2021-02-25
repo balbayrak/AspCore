@@ -5,7 +5,7 @@
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <Company>AspCore.Storage</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.1.3</Version>
+    <Version>5.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
