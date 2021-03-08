@@ -11,7 +11,7 @@ namespace AspCore.DataAccess.EntityFramework.Mapping
         {
             builder.HasKey(t => t.Id);
 
-            builder.Property(t => t.Id).HasColumnName("ID").HasDefaultValueSql("UUID()").ValueGeneratedOnAdd();
+            builder.Property(t => t.Id).HasColumnName("ID").HasDefaultValueSql("newid()").ValueGeneratedOnAdd();
         }
     }
 }

@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>5.0.1</Version>
+    <Version>5.0.2</Version>
     <PackageReleaseNotes>mysql added.</PackageReleaseNotes>
   </PropertyGroup>
 
