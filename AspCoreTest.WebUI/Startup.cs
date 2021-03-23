@@ -93,6 +93,7 @@ namespace AspCoreTest.WebUI
                  })
                 .AddMimeTypeService(option =>
                 {
+                   
                     option.Build();
                 })
                 .AddDataSearchLayer(option =>

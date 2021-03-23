@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using AspCore.WebComponents.ViewComponents.Alert.Abstract;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 
 namespace AspCore.Web.Concrete
 {
@@ -86,6 +88,8 @@ namespace AspCore.Web.Concrete
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private readonly IAuthenticationService _authenticationService;
+        protected IAlertService AlertService => LazyGetRequiredService(ref _alertService);
+        private IAlertService _alertService;
 
         private readonly CookieConfigurationBuilder _cookieConfigurationBuilder;
 
@@ -198,7 +202,7 @@ namespace AspCore.Web.Concrete
                          principal,
                          authticationProperties);
 
-
+                        StorageManager.CacheService.Remove(AuthenticationProviderName);
                         Response.Redirect(AuthenticationProvider.mainPageUrl);
                     }
                     else
@@ -208,6 +212,7 @@ namespace AspCore.Web.Concrete
                 }
                 else
                 {
+                    StorageManager.CacheService.SetObject(AuthenticationProviderName, authenticationResult.ErrorMessage, DateTime.Now.AddMinutes(1));
                     Response.Redirect(AuthenticationProvider.loginPageUrl);
                 }
             }

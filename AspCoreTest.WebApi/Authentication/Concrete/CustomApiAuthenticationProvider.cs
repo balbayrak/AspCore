@@ -38,6 +38,12 @@ namespace AspCoreTest.Authentication.Concrete
                     serviceResult.IsSucceeded = true;
                     serviceResult.Result = activeUser;
                 }
+                else
+                {
+                    serviceResult.IsSucceeded = false;
+                    serviceResult.Result = null;
+                    serviceResult.ErrorMessage = "Lütfen bilgilerinizi kontrol ediniz.";
+                }
             }
             catch
             {
