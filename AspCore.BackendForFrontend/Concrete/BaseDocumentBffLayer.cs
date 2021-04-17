@@ -42,6 +42,22 @@ namespace AspCore.BackendForFrontend.Concrete
             ApiClient.apiUrl = $"{_uploaderRoute}/{ApiConstants.Urls.READDOCUMENT}";
             return ApiClient.PostRequest<ServiceResult<TDocument>>(documentRequest).Result;
         }
+
+        public ServiceResult<TDocument> CreateDocument(IDocumentRequest<TDocument> documentRequest)
+        {
+            ApiClient.apiUrl = $"{_uploaderRoute}/{ApiConstants.Urls.ADDDOCUMENT}";
+            return ApiClient.PostRequest<ServiceResult<TDocument>>(documentRequest).Result;
+        }
+        public ServiceResult<bool> DeleteDocument(IDocumentRequest<TDocument> documentRequest)
+        {
+            ApiClient.apiUrl = $"{_uploaderRoute}/{ApiConstants.Urls.DELETEDOCUMENT}";
+            return ApiClient.PostRequest<ServiceResult<bool>>(documentRequest).Result;
+        }
+        public ServiceResult<bool> UpdateDocument(IDocumentRequest<TDocument> documentRequest)
+        {
+            ApiClient.apiUrl = $"{_uploaderRoute}/{ApiConstants.Urls.UPDATEDOCUMENT}";
+            return ApiClient.PostRequest<ServiceResult<bool>>(documentRequest).Result;
+        }
         public ServiceResult<string> ViewDocuments(IDocumentViewRequest<TDocument,ViewerToolbarSetting> viewRequest)
         {
             TViewRequest documentApiViewRequest = new TViewRequest();

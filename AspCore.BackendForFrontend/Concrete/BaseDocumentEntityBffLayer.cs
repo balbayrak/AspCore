@@ -10,11 +10,12 @@ using AspCore.Mapper.Abstract;
 
 namespace AspCore.BackendForFrontend.Concrete
 {
-    public abstract class BaseDocumentEntityBffLayer<TEntityDto, TEntity, TDocument> : BaseEntityBffLayer<TEntityDto>, IDocumentEntityBffLayer<TEntityDto, TEntity, TDocument>
-        
+    public abstract class BaseDocumentEntityBffLayer<TEntity, TDocument, TEntityDto,TCreateDto,TUpdateDto> : BaseEntityBffLayer<TEntityDto,TCreateDto,TUpdateDto>, IDocumentEntityBffLayer< TEntity, TDocument, TEntityDto,TCreateDto,TUpdateDto>
         where TEntity : class, IDocumentEntity, new()
         where TDocument : class, IDocument, new()
         where TEntityDto : class,IEntityDto,new()
+        where TCreateDto : class,IEntityDto,new()
+        where TUpdateDto : class,IEntityDto,new()
     {
         public BaseDocumentEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -48,6 +49,17 @@ namespace AspCore.BackendForFrontend.Concrete
             
             var result = await ApiClient.PostRequest<ServiceResult<bool>>(documentEntityRequest);
             return result;
+        }
+    }
+
+    public abstract class    BaseDocumentEntityBffLayer<TEntity, TDocument, TEntityDto> : BaseDocumentEntityBffLayer<TEntity, TDocument,
+            TEntityDto, TEntityDto, TEntityDto>
+        where TEntity : class, IDocumentEntity, new()
+        where TDocument : class, IDocument, new()
+        where TEntityDto : class, IEntityDto, new()
+    {
+        protected BaseDocumentEntityBffLayer(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
         }
     }
 }

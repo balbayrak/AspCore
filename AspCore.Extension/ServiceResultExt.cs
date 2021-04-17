@@ -48,7 +48,7 @@ namespace AspCore.Extension
                     result.ExceptionMessage = customExceptionMessage;
             }
         }
-        public static ActionResult ToHttpResponse<TModel>(this ServiceResult<TModel> response)
+        public static IActionResult ToHttpResponse<TModel>(this ServiceResult<TModel> response)
         {
             if (!response.IsSucceeded && !string.IsNullOrEmpty(response.ExceptionMessage))
                 return new BadRequestObjectResult(response);

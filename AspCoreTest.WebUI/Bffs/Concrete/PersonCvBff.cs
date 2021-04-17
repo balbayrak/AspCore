@@ -11,7 +11,7 @@ using AspCoreTest.Dtos.Dtos;
 
 namespace AspCoreTest.Bffs.Concrete
 {
-    public class PersonCvBff : BaseDocumentEntityBffLayer<PersonCvDto, PersonCv, Document>, IPersonCVBff
+    public class PersonCvBff : BaseDocumentEntityBffLayer< PersonCv, Document, PersonCvDto>, IPersonCVBff
     {
         public PersonCvBff(IServiceProvider serviceProvider) : base(serviceProvider)
         {

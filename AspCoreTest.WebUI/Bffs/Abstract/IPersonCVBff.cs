@@ -8,7 +8,7 @@ using AspCoreTest.Entities.Models;
 
 namespace AspCoreTest.Bffs.Abstract
 {
-    public interface IPersonCVBff : IDocumentEntityBffLayer<PersonCvDto, PersonCv, Document>
+    public interface IPersonCVBff : IDocumentEntityBffLayer< PersonCv, Document, PersonCvDto>
     {
         Task<ServiceResult<List<PersonCvDto>>> GetWithInclude();
 

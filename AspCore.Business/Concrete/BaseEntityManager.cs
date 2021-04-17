@@ -75,12 +75,25 @@ namespace AspCore.Business.Concrete
 
         public virtual Task<ServiceResult<bool>> UpdateAsync(params TUpdatedEntityDto[] entities)
         {
+
             var entityArray = AutoObjectMapper.Mapper.Map<TUpdatedEntityDto[], TEntity[]>(entities);
 
             if (entities.Length > 1)
                 return DataAccess.UpdateWithTransactionAsync(entityArray);
             else
                 return DataAccess.UpdateAsync(entityArray);
+        }
+
+        public async Task<ServiceResult<bool>> UpdateAsync(TUpdatedEntityDto entityDto)
+        {
+            var entity = await DataAccess.GetByIdAsync(entityDto.Id);
+            if (entity.IsSucceeded)
+            {
+                var data = AutoObjectMapper.Mapper.Map(entityDto, entity.Result);
+                var response = await DataAccess.UpdateWithTransactionAsync(data);
+                return response;
+            }
+            return entity.ChangeResult(false);
         }
 
         public virtual Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds)

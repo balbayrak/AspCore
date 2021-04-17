@@ -14,6 +14,7 @@ namespace AspCore.Entities.Constants
             public const string ADDAsync = "AddAsync";
             public const string UPDATE = "Update";
             public const string UPDATEAsync = "UpdateAsync";
+            public const string UPDATEEntityAsync = "UpdateEntityAsync";
             public const string DELETE = "Delete";
             public const string DELETEAsync = "DeleteAsync";
             public const string DELETE_WITH_IDs = "DeleteWithIDs";

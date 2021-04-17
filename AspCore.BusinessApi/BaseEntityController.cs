@@ -192,6 +192,27 @@ namespace AspCore.BusinessApi
             return response.ToHttpResponse();
         }
 
+        [ActionName(ApiConstants.Urls.UPDATEEntityAsync)]
+        [HttpPost]
+        [ProducesResponseType(typeof(ServiceResult<bool>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize()]
+        public async Task<IActionResult> UpdateEntityAsync([FromBody]TUpdatedDto entity)
+        {
+            if (entity == null)
+            {
+                return base.BadRequest(string.Format(BusinessConstants.BaseExceptionMessages.PARAMETER_IS_NULL, nameof(entity)));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return base.BadRequest(BusinessConstants.BaseExceptionMessages.MODEL_INVALID);
+            }
+
+            ServiceResult<bool> response = await Service.UpdateAsync(entity);
+            return response.ToHttpResponse();
+        }
 
         [ActionName(ApiConstants.Urls.DELETE_WITH_IDs)]
         [HttpPost]

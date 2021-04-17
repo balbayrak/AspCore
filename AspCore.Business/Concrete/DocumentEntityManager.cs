@@ -12,10 +12,12 @@ using AspCore.Dtos.Dto;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class DocumentEntityManager<TEntity,TEntityDto, TDataAccess> : BaseEntityManager<TDataAccess, TEntity,TEntityDto>, IDocumentEntityService<Document, TEntity, TEntityDto>
+    public abstract class DocumentEntityManager<TEntity,TEntityDto,TCreatedDto,TUpdatedDto, TDataAccess> : BaseEntityManager<TDataAccess, TEntity,TEntityDto,TCreatedDto,TUpdatedDto>, IDocumentEntityService<Document, TEntity, TEntityDto,TCreatedDto,TUpdatedDto>
         where TEntity : class, IDocumentEntity, new()
         where TDataAccess : IEntityRepository<TEntity>
         where TEntityDto : class, IEntityDto, new()
+        where TUpdatedDto : class, IEntityDto, new()
+        where TCreatedDto : class, IEntityDto, new()
     {
         private IDocumentUploader<Document> _documentUploader { get; set; }
 
@@ -105,6 +107,14 @@ namespace AspCore.Business.Concrete
                 result.ErrorMessage(BusinessConstants.DocumentUploaderErrorMessages.DOCUMENT_UPDATE_METHOD_ERROR, ex);
             }
             return result;
+        }
+    }
+
+    public abstract class   DocumentEntityManager<TEntity, TEntityDto, TDataAccess> : DocumentEntityManager<TEntity, TEntityDto, TEntityDto,
+            TEntityDto, TDataAccess> where TEntity : class, IDocumentEntity, new() where TEntityDto : class, IEntityDto, new() where TDataAccess : IEntityRepository<TEntity>
+    {
+        protected DocumentEntityManager(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
         }
     }
 }
