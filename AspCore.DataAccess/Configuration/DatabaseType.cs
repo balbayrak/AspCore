@@ -8,6 +8,7 @@ namespace AspCore.DataAccess.Configuration
     {
         MSSQL = 1,
         MySQL = 2,
-        Oracle = 3
+        Oracle = 3,
+
     }
 }

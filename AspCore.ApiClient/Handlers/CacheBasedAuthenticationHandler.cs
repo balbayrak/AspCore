@@ -29,29 +29,35 @@ namespace AspCore.ApiClient.Handlers
 
             if (!forceNewToken && authenticationTicketInfo != null) return authenticationTicketInfo;
 
-            AuthenticationInfo authenticationInfo = GetAuthenticationInfo();
+            AuthenticationInfo authenticationInfo = await GetAuthenticationInfo();
 
-            JsonContent jsonContent = new JsonContent(authenticationInfo);
-
-            var response = await TokenClient.PostAsync($"/{ ConfigurationOption.Authentication.TokenPath.TrimStart('/')}", jsonContent);
-            ServiceResult<AuthenticationTicketInfo> result = null;
-            if (response.StatusCode == HttpStatusCode.OK)
+            if (authenticationInfo != null)
             {
-                string responseString = await response.Content.ReadAsStringAsync();
+                JsonContent jsonContent = new JsonContent(authenticationInfo);
 
-                result = JsonConvert.DeserializeObject<ServiceResult<AuthenticationTicketInfo>>(responseString);
+                var response = await TokenClient.PostAsync($"/{ ConfigurationOption.Authentication.TokenPath.TrimStart('/')}", jsonContent);
+                ServiceResult<AuthenticationTicketInfo> result = null;
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    string responseString = await response.Content.ReadAsStringAsync();
 
-                await AddorEditTokenStorage(result.Result);
+                    result = JsonConvert.DeserializeObject<ServiceResult<AuthenticationTicketInfo>>(responseString);
 
-                return result.Result;
+                    await AddorEditTokenStorage(result.Result);
+
+                    return result.Result;
+                }
+
+                if (result != null && !result.IsSucceeded)
+                {
+                    throw new Exception($"{result.ErrorMessage} exception : {result.ExceptionMessage}");
+                }
+
+                throw new Exception(ApiConstants.Api_Keys.AUTHENTICATION_TOKEN_ERROR);
             }
+            else return null;
 
-            if (result != null && !result.IsSucceeded)
-            {
-                throw new Exception($"{result.ErrorMessage} exception : {result.ExceptionMessage}");
-            }
-
-            throw new Exception(ApiConstants.Api_Keys.AUTHENTICATION_TOKEN_ERROR);
+           
         }
 
         public override async Task<AuthenticationTicketInfo> RefreshToken(AuthenticationTicketInfo authenticationTicketInfo)
@@ -74,7 +80,7 @@ namespace AspCore.ApiClient.Handlers
             }
 
 
-            throw new Exception($"");
+            throw new Exception(ApiConstants.Api_Keys.REFRESH_TOKEN_ERROR);
 
         }
 
@@ -83,7 +89,7 @@ namespace AspCore.ApiClient.Handlers
             await CacheService.SetObjectAsync(ApiKey, authenticationTicketInfo, authenticationTicketInfo.expires.AddMinutes(-1));
         }
 
-        public virtual AuthenticationInfo GetAuthenticationInfo()
+        public virtual async Task<AuthenticationInfo> GetAuthenticationInfo()
         {
             AuthenticationInfo authenticationInfo = new AuthenticationInfo();
 

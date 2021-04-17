@@ -81,6 +81,8 @@ namespace AspCore.Entities.Constants
 
             public const string AUTHENTICATION_TOKEN_ERROR = "Authentication access token bilgisi alınamıyor, authentication bilgilerinizi kontrol ediniz!";
 
+            public const string REFRESH_TOKEN_ERROR = "Refresh Token ile  access token bilgisi alınamıyor, authentication bilgilerinizi kontrol ediniz!";
+
             public const string API_ACCESS_TOKEN = "ApiAccessToken";
 
             public const string TOKEN_EXPIRED_HEADER = "Token-Expired";
