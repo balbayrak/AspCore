@@ -1,12 +1,10 @@
 ﻿using AspCore.DataAccess.Abstract;
 using AspCore.DataAccess.EntityFramework.History;
 using AspCore.DataAccess.General;
-using AspCore.Dependency.Concrete;
-using AspCore.Entities.EntityFilter;
 using AspCore.Entities.EntityType;
 using AspCore.Entities.General;
 using AspCore.Extension;
-using AspCore.Utilities;
+using AspCore.Utilities.ExpressionUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -15,11 +13,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AspCore.Utilities.ExpressionUtilities;
 
 namespace AspCore.DataAccess.EntityFramework
 {

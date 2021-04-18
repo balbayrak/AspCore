@@ -1,7 +1,9 @@
-﻿using AspCore.DataAccess.EntityFramework;
+﻿using System;
+using AspCore.DataAccess.EntityFramework;
 using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace AspCoreTest.DataAccess.Concrete.EntityFramework
 {
@@ -32,8 +34,8 @@ namespace AspCoreTest.DataAccess.Concrete.EntityFramework
             base.OnConfiguring(optionsBuilder);
 
             //migration sırasında aşagıdaki satır açık olmalıdır
-           // optionsBuilder.UseSqlServer("Server=TESTSQLAGL04,44696;Database=AspCoreTestDb;MultipleActiveResultSets=true;User Id=testUserSQLAGL;Password=1a2s3d4f");
-
+            //optionsBuilder.UseSqlServer("Server=TESTSQLAGL04,44696;Database=AspCoreTestDb;MultipleActiveResultSets=true;User Id=testUserSQLAGL;Password=1a2s3d4f");
+           
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

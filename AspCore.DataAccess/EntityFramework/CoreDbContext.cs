@@ -25,11 +25,13 @@ namespace AspCore.DataAccess.EntityFramework
             _httpContextAccessor = httpContextAccessor;
         }
 
-        private Guid activeUserId
+        private Guid ActiveUserId
         {
             get
             {
-                return new Guid(_httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY.ACTIVE_USER_ID));
+                var value = _httpContextAccessor.HttpContext.GetHeaderValue(HttpContextConstant.HEADER_KEY
+                    .ACTIVE_USER_ID);
+                return !string.IsNullOrEmpty(value) ? new Guid(value) : Guid.Empty;
             }
         }
 
@@ -95,7 +97,7 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 this.EnsureAutoHistory(() => new AspCoreAutoHistory()
                 {
-                    ActiveUserID = activeUserId
+                    ActiveUserID = ActiveUserId
                 });
             }
 
@@ -112,7 +114,7 @@ namespace AspCore.DataAccess.EntityFramework
             {
                 this.EnsureAutoHistory(() => new AspCoreAutoHistory()
                 {
-                    ActiveUserID = activeUserId
+                    ActiveUserID = ActiveUserId
                 });
             }
 
@@ -145,7 +147,7 @@ namespace AspCore.DataAccess.EntityFramework
                     {
                         if (entry.Entity is IBaseEntity)
                         {
-                            ((IBaseEntity)entry.Entity).LastUpdatedUserId = activeUserId;
+                            ((IBaseEntity)entry.Entity).LastUpdatedUserId = ActiveUserId;
                             ((IBaseEntity)entry.Entity).CreatedDate = now;
                             ((IBaseEntity)entry.Entity).IsDeleted = false;
                         }
@@ -154,7 +156,7 @@ namespace AspCore.DataAccess.EntityFramework
                     {
                         if (entry.Entity is IBaseEntity)
                         {
-                            ((IBaseEntity)entry.Entity).LastUpdatedUserId = activeUserId;
+                            ((IBaseEntity)entry.Entity).LastUpdatedUserId = ActiveUserId;
                             base.Entry((IBaseEntity)entry.Entity).Property(x => x.CreatedDate).IsModified = false;
                             ((IBaseEntity)entry.Entity).LastUpdateDate = now;
                             if (entry.State == EntityState.Deleted)

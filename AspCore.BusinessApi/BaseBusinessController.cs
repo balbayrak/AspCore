@@ -7,12 +7,8 @@ namespace AspCore.BusinessApi
         where TService : IBusinessService
     {
         protected TService _service;
-
-        public BaseBusinessController()
-        {
-
-        }
-        public BaseBusinessController(TService service)
+      
+        protected BaseBusinessController(TService service)
         {
             _service = service;
         }

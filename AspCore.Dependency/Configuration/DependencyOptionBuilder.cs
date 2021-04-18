@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AspCore.Dependency.Abstract;
+using AspCore.Dependency.Concrete;
+using AspCore.Entities.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AspCore.Dependency.Abstract;
-using AspCore.Dependency.Concrete;
-using AspCore.Dependency.DependencyAttributes;
-using AspCore.Entities.Configuration;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AspCore.Dependency.Configuration
 {

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <Company>Bilal Albayrak, Yusuf Aykaç</Company>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
@@ -9,7 +9,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AssemblyVersion>1.0.1</AssemblyVersion>
     <FileVersion>1.0.1</FileVersion>
-    <Version>1.0.7</Version>
+    <Version>5.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

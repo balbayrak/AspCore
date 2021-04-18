@@ -61,7 +61,7 @@ namespace AspCore.ApiClient
 
             InitializeBaseAddress(apiKey);
             _client = httpClientFactory.CreateClient(this.apiKey);
-            
+
             _client.BaseAddress = new Uri(_baseAddress);
         }
 
@@ -125,9 +125,30 @@ namespace AspCore.ApiClient
             return result;
         }
 
+        public async Task<TResult> PostAsync<TResult>(object postObject, Dictionary<string, string> headerValues = null) where TResult : class, new()
+        {
+            if (headerValues != null && headerValues.Count > 0)
+            {
+                foreach (var key in headerValues.Keys)
+                {
+                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    {
+                        _client.DefaultRequestHeaders.Remove(key);
+                        _client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                    }
+                }
+            }
+            JsonContent jsonContent = new JsonContent(postObject);
+            var response = await _client.PostAsync(apiUrl, jsonContent);
+            string responseString = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<TResult>(responseString);
+            return result;
+        }
+
         public virtual async Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null)
             where TResult : class, new()
         {
+
             TResult result = null;
 
             if (headerValues != null && headerValues.Count > 0)
@@ -143,7 +164,7 @@ namespace AspCore.ApiClient
             }
             var formatter = new JsonMediaTypeFormatter() { SerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto } };
             formatter.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-            var response = _client.PostAsync(_apiUrl, postObject, formatter).Result;
+            var response = await _client.PostAsync(_apiUrl, postObject, formatter);
 
             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -152,7 +173,32 @@ namespace AspCore.ApiClient
                 result = JsonConvert.DeserializeObject<TResult>(responseString);
             }
 
+
             return result;
+        }
+
+
+
+        public async Task<bool> DeleteAsync(string uri, Dictionary<string, string> headerValues = null)
+        {
+            bool isSuccess = false;
+            if (headerValues != null && headerValues.Count > 0)
+            {
+                foreach (var key in headerValues.Keys)
+                {
+                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    {
+                        _client.DefaultRequestHeaders.Remove(key);
+                        _client.DefaultRequestHeaders.Add(key, headerValues[key]);
+                    }
+                }
+            }
+            var response = await _client.DeleteAsync(uri);
+            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                isSuccess = true;
+            }
+            return isSuccess;
         }
 
         public virtual async Task<TResult> PostRequest<TResult>(HttpContent content)

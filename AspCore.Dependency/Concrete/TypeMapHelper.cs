@@ -23,11 +23,7 @@ namespace AspCore.Dependency.Concrete
                 types = types.Where(t => t.IsNonAbstractClass(true) && t.Namespace.StartsWith(namespaceStr) && typeof(TInterface).IsAssignableFrom(t));
             }
 
-            Func<TypeInfo, IEnumerable<Type>> selector = t => t.ImplementedInterfaces
-                .Where(x => x.HasMatchingGenericParameterCount(t))
-                .Select(x => x.GetRegistrationType(t));
-
-            Func<Type, IEnumerable<Type>> selector1 = t => selector(t.GetTypeInfo());
+          
             if (getExposed)
             {
                 IEnumerable<TypeMap> maps = types.Select(t => new TypeMap(t, t.GetTypeInfo().GetInterfaces(), ExposedServiceHelper.GetExposedServices(t)));

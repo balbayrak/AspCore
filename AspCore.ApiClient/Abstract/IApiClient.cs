@@ -21,7 +21,10 @@ namespace AspCore.ApiClient.Abstract
 
         Task<TResult> PostRequest<TResult>(HttpContent content) where TResult : class, new();
 
+        Task<TResult> PostAsync<TResult>(object postObject, Dictionary<string, string> headerValues = null) where TResult:class,new();
+
         Task<TResult> PostRequest<TResult>(object postObject, Dictionary<string, string> headerValues = null) where TResult : class, new();
+        Task<bool> DeleteAsync(string uri, Dictionary<string, string> headerValues = null);
 
 
     }

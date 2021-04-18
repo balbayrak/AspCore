@@ -4,6 +4,7 @@ using AspCore.Entities.User;
 using AspCore.Web.Concrete;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 
 namespace AspCoreTest.WebUI.Controllers
 {
@@ -24,6 +25,11 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult UserLogin()
         {
+            var result = StorageManager.CacheService.GetObject<string>(AuthenticationProviderName);
+            if (!string.IsNullOrEmpty(result))
+            {
+                AlertService.Error("", result,AlertType.Toast);
+            }
             return View();
         }
 
@@ -35,7 +41,6 @@ namespace AspCoreTest.WebUI.Controllers
                 UserName = username,
                 Password = password
             });
-
             return View();
         }
     }

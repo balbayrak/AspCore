@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Authors>Bilal Albayrak, Yusuf Aykaç</Authors>
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>AspCore.ConnectedApi</Company>
-    <Version>1.2.8</Version>
-    <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
+    <Version>5.0.2</Version>
+    <PackageReleaseNotes>net 5 updated</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

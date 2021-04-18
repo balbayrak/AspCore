@@ -1,5 +1,4 @@
 ﻿using AspCore.DataSearchApi.ElasticSearch.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.ElasticSearchApiClient.QueryBuilder.Concrete;
 using AspCore.Entities.Constants;
 using AspCore.Entities.EntityType;

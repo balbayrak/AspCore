@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AspCore.WebComponents.ViewComponents.Alert.Abstract;
+﻿using AspCore.WebComponents.ViewComponents.Alert.Abstract;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace AspCore.WebComponents.ViewComponents
 {
