@@ -6,7 +6,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>5.0.5</Version>
+    <Version>5.0.6</Version>
     <Company>AspCore.Business</Company>
     <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>

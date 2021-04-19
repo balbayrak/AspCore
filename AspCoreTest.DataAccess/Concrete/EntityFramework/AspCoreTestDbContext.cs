@@ -1,9 +1,7 @@
-﻿using System;
-using AspCore.DataAccess.EntityFramework;
+﻿using AspCore.DataAccess.EntityFramework;
 using AspCoreTest.Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace AspCoreTest.DataAccess.Concrete.EntityFramework
 {

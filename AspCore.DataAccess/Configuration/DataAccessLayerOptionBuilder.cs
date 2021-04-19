@@ -8,10 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Linq;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace AspCore.DataAccess.Configuration
 {
@@ -59,13 +56,7 @@ namespace AspCore.DataAccess.Configuration
                         }
                         else if (databaseType == DatabaseType.MySQL)
                         {
-                            options.UseMySql(
-                                    dataAccessLayerOption.DatabaseSetting.MySQL_ConnectionString,
-                                    new MySqlServerVersion(new Version(8, 0, 21)), 
-                                    mySqlOptions => mySqlOptions
-                                        .CharSetBehavior(CharSetBehavior.NeverAppend))
-                                .EnableSensitiveDataLogging()
-                                .EnableDetailedErrors();
+                          
                             //dataAccessLayerOption.DatabaseSetting.MySQL_ConnectionString;
                         }
                         else
