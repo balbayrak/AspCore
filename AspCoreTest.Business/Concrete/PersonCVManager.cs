@@ -1,5 +1,8 @@
 ﻿using AspCore.Business.Concrete;
+using AspCore.DataAccess.General;
 using AspCore.Dependency.DependencyAttributes;
+using AspCore.Entities.General;
+using AspCore.Extension;
 using AspCoreTest.Business.Abstract;
 using AspCoreTest.DataAccess.Abstract;
 using AspCoreTest.Dtos.Dtos;
@@ -7,9 +10,8 @@ using AspCoreTest.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AspCore.Entities.General;
-using AspCore.Extension;
-using AspCore.DataAccess.General;
+using AspCore.Entities.Expression;
+using AspCore.Utilities;
 
 namespace testbusiness.Concrete
 {
@@ -26,15 +28,16 @@ namespace testbusiness.Concrete
         {
             var dataFilter = new DataAccessFilter<PersonCv>();
             dataFilter.Load(t => t.Person).Load(t=>t.Person.Admin);
-            dataFilter.query = t => t.Id == new Guid("e2845ff9-4f00-4c17-8e4b-0e5d8617197b") ||
-                       t.Id == new Guid("7553c60d-3495-4132-a160-0ede96e50618");
+            dataFilter.sorter = new SortingExpression<PersonCv>(t => t.Name, EnumSortingDirection.Descending);
+            dataFilter.page = 0;
+            dataFilter.pageSize = 10;
             var result =
                await DataAccess.GetListAsync(dataFilter);
             var data = AutoObjectMapper.Mapper.Map<List<PersonCvDto>>(result.Result);
             return result.ChangeResult(data);
 
         }
-
+        
         public override async Task<ServiceResult<bool>> AddAsync(params PersonCvDto[] entities)
         {
             var entityArray = AutoObjectMapper.Mapper.Map<PersonCvDto[], PersonCv[]>(entities);

@@ -3,10 +3,11 @@ using AspCore.DataAccess.Abstract;
 using AspCore.Mapper.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AspCore.Business.Abstract;
 
 namespace AspCore.Business.Concrete
 {
-    public abstract class BaseBusinessManager
+    public abstract class BaseBusinessManager:IBusinessService
     {
         protected readonly object ServiceProviderLock = new object();
         protected TService LazyGetRequiredService<TService>(ref TService reference)

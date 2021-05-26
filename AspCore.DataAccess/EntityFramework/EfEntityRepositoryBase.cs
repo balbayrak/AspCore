@@ -16,11 +16,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AspCore.Entities.Expression;
 
 namespace AspCore.DataAccess.EntityFramework
 {
     public abstract class EfEntityRepositoryBase<TDbContext, TEntity> : IEntityRepository<TEntity>
-     where TEntity : class, IEntity,new()
+     where TEntity : class, IEntity, new()
         where TDbContext : CoreDbContext
     {
         protected IServiceProvider ServiceProvider { get; private set; }
@@ -107,7 +108,11 @@ namespace AspCore.DataAccess.EntityFramework
                         searchTask = query.Count();
 
                         var skip = dataAccessFilter.page.Value * dataAccessFilter.pageSize.Value;
-
+                        if (dataAccessFilter.sorter != null)
+                        {
+                            var sortingExpression = dataAccessFilter.sorter;
+                            query = sortingExpression.SortDirection == EnumSortingDirection.Ascending ? query.OrderBy(sortingExpression.Property) : query.OrderByDescending(sortingExpression.Property);
+                        }
                         query = query.Skip(skip).Take(dataAccessFilter.pageSize.Value);
                     }
                     else
@@ -169,7 +174,11 @@ namespace AspCore.DataAccess.EntityFramework
                         searchTask = await query.CountAsync();
 
                         var skip = dataAccessFilter.page.Value * dataAccessFilter.pageSize.Value;
-
+                        if (dataAccessFilter.sorter != null)
+                        {
+                            var sortingExpression = dataAccessFilter.sorter;
+                            query = sortingExpression.SortDirection == EnumSortingDirection.Ascending ? query.OrderBy(sortingExpression.Property) : query.OrderByDescending(sortingExpression.Property);
+                        }
                         query = query.Skip(skip).Take(dataAccessFilter.pageSize.Value);
                     }
                     else
@@ -853,7 +862,7 @@ namespace AspCore.DataAccess.EntityFramework
                                 entry.State = GetEntityState(entity.entityState.Value);
                             else
                                 entry.State = defaultState;
-                           
+
                             Context.Entry(entity);
                         }
 

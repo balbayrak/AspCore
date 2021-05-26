@@ -8,7 +8,7 @@
 <div class="row">
     <div class="col-md-12">
         @(Html.DataTableHelper<PersonDto>("persontable")
-             .LoadAction("/Home/LoadTable")
+             .LoadAction("/Home/LoadTable2")
               .Columns(column =>
               {
                   column.CheckColumn(p => p.EncryptedId).CheckAllEnabled();
@@ -17,24 +17,19 @@
                   column.BoundColumn(p => p.Surname).Title("Surname").Searchable(Operation.StartsWith);
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
-                      action.ModalButton()
+                      action.ActionButton()
                           .Visible(true)
-                               .Text("Edit")
-                               .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
-                               .IClass("fa fa-edit")
-                               .ActionInfo(new ActionInfo { actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET })
-                               .BlockUI()
-                               .Modal(EnumModalSize.Large)
-                               .BackDropStatic();
+                          .Text("Edit")
+                          .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
+                          .IClass("fa fa-edit")
+                          .ActionInfo(new ActionInfo {actionUrl = "/Home/AddOrEdit", methodType = EnumHttpMethod.GET});
 
-                      action.ConfirmButton()
-                          .HiddenFor(t=>t.Name!="Yusuf")
-                            .Text("Delete")
-                            .CssClass("btn btn-sm red btn-outline filter-submit margin-bottom red-haze")
-                            .IClass("fa fa-trash-o")
-                            .ActionInfo(new ActionInfo { actionUrl = "/Home/Delete", methodType = EnumHttpMethod.POST,})
-                            .BlockUI()
-                            .ConfirmOption(new ConfirmOption("test", "Sil", ""));
+                      action.ActionButton()
+                          .Visible(true)
+                          .Text("Delete")
+                          .CssClass("btn btn-sm red btn-outline filter-submit margin-bottom red-haze")
+                          .IClass("fa fa-trash-o").ActionInfo(new ActionInfo())
+                          .AddHref(Url.Action("Add", "Home"),"fileUrl");
 
                   });
               })

@@ -7,6 +7,7 @@ using AspCoreTest.Dtos.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using AspCoreTest.Entities.Models;
 
 namespace AspCoreTest.WebUI.Controllers
 {
@@ -28,13 +29,12 @@ namespace AspCoreTest.WebUI.Controllers
             //    pageSize=5
 
             //}).Result;
-
-            ServiceResult<List<PersonDto>> histories = BffLayer.GetEntityHistoriesAsync(new EntityFilter
+            var person=new List<PersonDto>()
             {
-                id = new Guid("fe809d66-1e58-40cc-9050-012daff25a04"),
-                page = 0,
-                pageSize = 5
-            }).Result;
+                new PersonDto(){Surname = "asdasdas"}
+            };
+            BffLayer.AddAsync(person);
+            var data = _personCvBff.GetWithInclude();
             //StorageManager.CacheService.SetObject("test", "test");
             //StorageManager.CookieService.SetObject("test", "test");
 
@@ -54,6 +54,12 @@ namespace AspCoreTest.WebUI.Controllers
 
         public IActionResult Privacy()
         {
+            ServiceResult<List<PersonDto>> histories = BffLayer.GetEntityHistoriesAsync(new EntityFilter
+            {
+                id = new Guid("fe809d66-1e58-40cc-9050-012daff25a04"),
+                page = 0,
+                pageSize = 5
+            }).Result;
             AlertService.Error("Error!", "Toast!");
 
             AlertService.Error("Info!", "Alertify!", AlertType.Alertify);

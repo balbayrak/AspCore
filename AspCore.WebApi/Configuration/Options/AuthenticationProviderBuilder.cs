@@ -6,6 +6,7 @@ using AspCore.WebApi.Authentication.Providers.Abstract;
 using AspCore.WebApi.Authentication.Providers.Concrete;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AspCore.Entities.User;
 
 namespace AspCore.WebApi.Configuration.Options
 {
@@ -24,6 +25,8 @@ namespace AspCore.WebApi.Configuration.Options
             return new TokenGeneratorOption(services);
         }
 
+
+      
         public TokenGeneratorOption AddAppSettingAuthenticationProvider<TInput, TOutput, TOption, TAuthenticationProvider>(Action<AppSettingsAuthProviderOption<TOption>> option)
          where TAuthenticationProvider : AppSettingsAuthenticationProvider<TInput, TOutput, TOption>
          where TInput : AuthenticationInfo
@@ -62,5 +65,14 @@ namespace AspCore.WebApi.Configuration.Options
             return new TokenGeneratorOption(services);
         }
 
+        public TokenGeneratorOption AddAuthenticationProvider<T, TInput, TOutput>(Action<ServicesByNameBuilder<T>> builder)
+        where T: IApiAuthenticationProvider<TInput, TOutput>
+        where TInput : AuthenticationInfo
+        where TOutput : class, new()
+        {
+            ServicesByNameBuilder<T> servicesByNameBuilder = new ServicesByNameBuilder<T>(services, ServiceLifetime.Transient);
+            builder(servicesByNameBuilder);
+            return new TokenGeneratorOption(services);
+        }
     }
 }

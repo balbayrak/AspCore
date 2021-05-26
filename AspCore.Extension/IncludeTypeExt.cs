@@ -4,6 +4,7 @@ using AspCore.Entities.EntityType;
 using AspCore.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using AspCore.Utilities.ExpressionUtilities;
 
@@ -28,18 +29,18 @@ namespace AspCore.Extension
             return includes;
         }
 
-        public static List<SortingExpression<TEntity>> ToSortingExpressionList<TEntity>(this List<SortingType> list)
-        
+        public static SortingExpression<TEntity> ToSortingExpressionList<TEntity>(this List<SortingType> list)
+
         {
             List<SortingExpression<TEntity>> sorters = new List<SortingExpression<TEntity>>();
             foreach (var item in list)
             {
                 sorters.Add(new SortingExpression<TEntity>(ExpressionBuilder.GetExpression<TEntity>(item.PropertyName), item.SortDirection));
             }
-            return sorters;
+            return sorters.FirstOrDefault();
         }
 
-        
+
 
     }
 }

@@ -9,6 +9,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Abstract
         T Text(string text);
         T CssClass(string cssClass);
         T IClass(string iclass);
+        T AddHref(string href,string prop);
         T BlockUI(string blocktarget = null);
     }
 

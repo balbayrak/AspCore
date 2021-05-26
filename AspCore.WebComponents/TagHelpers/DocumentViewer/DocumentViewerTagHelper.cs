@@ -1,5 +1,4 @@
 ﻿using AspCore.BackendForFrontend.Abstract;
-using AspCore.Dependency.Concrete;
 using AspCore.Entities.DocumentType;
 using AspCore.Entities.General;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -61,7 +60,7 @@ namespace AspCore.WebComponents.TagHelpers.DocumentViewer
                     {
                         enabledDownload = enabledDownload,
                         enabledDownloadAll = enabledDownloadAll,
-                        enabledSign = enabledSign
+                        enabledSign = enabledSign,
                     }
                 });
 

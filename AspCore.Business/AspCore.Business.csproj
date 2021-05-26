@@ -6,7 +6,7 @@
     <PackageProjectUrl>https://github.com/balbayrak/AspCore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>5.0.6</Version>
+    <Version>5.0.7</Version>
     <Company>AspCore.Business</Company>
     <PackageReleaseNotes>bug fixed</PackageReleaseNotes>
   </PropertyGroup>
@@ -19,6 +19,10 @@
     <ProjectReference Include="..\AspCore.DocumentAccess\AspCore.DocumentAccess.csproj" />
     <ProjectReference Include="..\AspCore.Dtos\AspCore.Dtos.csproj" />
     <ProjectReference Include="..\AspCore.Mapper\AspCore.Mapper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="10.0.4" />
   </ItemGroup>
 
 </Project>

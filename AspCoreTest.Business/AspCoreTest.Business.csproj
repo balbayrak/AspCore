@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PostSharp" Version="6.9.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AspCore.Business\AspCore.Business.csproj" />
     <ProjectReference Include="..\AspCoreTest.DataAccess\AspCoreTest.DataAccess.csproj" />
     <ProjectReference Include="..\AspCoreTest.DataSearch\AspCoreTest.DataSearch.csproj" />

@@ -23,7 +23,7 @@ namespace AspCore.DataAccess.General
             }
             if (filter.sorters != null)
             {
-                dataAccessFilter.sorters = filter.sorters.ToSortingExpressionList<TEntity>();
+                dataAccessFilter.sorter = filter.sorters.ToSortingExpressionList<TEntity>();
             }
 
             return dataAccessFilter;

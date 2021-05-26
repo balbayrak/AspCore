@@ -65,6 +65,7 @@ namespace AspCoreTest.WebUI
                 .AddBffApiClient(option =>
                 {
                     option.apiKey = "Base";
+                    option.isCircuitBreaker = false;
                 })
                 .AddAutoMapper()
                 .AddNotifierSetting(option =>

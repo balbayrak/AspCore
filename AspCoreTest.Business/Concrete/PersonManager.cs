@@ -1,17 +1,15 @@
 ﻿using AspCore.Business.Concrete;
-using AspCore.Business.General;
-using AspCore.Business.Task.Abstract;
 using AspCore.Entities.General;
-using AspCoreTest.Business.Concrete.Tasks;
 using AspCoreTest.DataAccess.Abstract;
 using AspCoreTest.DataSearch.Abstract;
+using AspCoreTest.Dtos.Dtos;
 using AspCoreTest.Entities.Models;
 using AspCoreTest.Entities.SearchableEntities;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using AspCoreTest.Dtos.Dtos;
-using testbusiness.Abstract;
 using System.Threading.Tasks;
+using AspCoreTest.Business.Interceptors;
+using AspCoreTest.Business.Validators;
+using testbusiness.Abstract;
 
 namespace testbusiness.Concrete
 {
@@ -29,20 +27,22 @@ namespace testbusiness.Concrete
                 Result = AutoObjectMapper.Mapper.Map<Person, PersonSearchEntity>(entity)
             };
         }
-
         public override ServiceResult<bool> Add(params PersonDto[] entities)
         {
            entities[0].Admin=new AdminDto();
            entities[0].Admin.Description = "eewrew";
              return  base.Add(entities);
         }
-
         public override Task<ServiceResult<bool>> AddAsync(params PersonDto[] entities)
         {
             entities[0].Admin = new AdminDto();
             entities[0].Admin.Description = "eewrew";
             return base.AddAsync(entities);
         }
-        
+        [ValidationAspect(typeof(PersonValidator))]
+        public ServiceResult<bool> Add(PersonDto entities)
+        {
+           return AddAsync(entities).Result;
+        }
     }
 }

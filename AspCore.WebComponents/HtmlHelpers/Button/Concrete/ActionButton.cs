@@ -23,6 +23,7 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
         public string iclass { get; set; }
         public string id { get; set; }
         public string text { get; set; }
+        public string _href { get; set; }
         public Condition condition { get; set; }
 
         public T ActionInfo(ActionInfo action)
@@ -45,6 +46,19 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
         public T IClass(string iclass)
         {
             this.iclass = iclass;
+            return _instance;
+        }
+
+        public T AddHref(string href,string prop)
+        {
+            if (!string.IsNullOrEmpty(prop))
+            {
+                _href = href + "?" + prop + "={0}";
+            }
+            else
+            {
+                _href = href + "/{0}";
+            }
             return _instance;
         }
         public T Text(string text)
@@ -120,6 +134,10 @@ namespace AspCore.WebComponents.HtmlHelpers.Button.Concrete
                 link.Attributes.Add(HelperConstant.General.DATA_ID, "{0}");
             }
 
+            if (!string.IsNullOrEmpty(_href))
+            {
+                link.Attributes.Add(HelperConstant.General.ACTION_HREF, _href);
+            }
             var iClassTag = new TagBuilder("i");
             iClassTag.AddCssClass(this.iclass);
             if (string.IsNullOrEmpty(this.iclass))

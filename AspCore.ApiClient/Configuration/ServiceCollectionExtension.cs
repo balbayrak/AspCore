@@ -194,27 +194,53 @@ namespace AspCore.ApiClient.Configuration
 
         private static IHttpClientBuilder AddClientConfiguration(IServiceCollection services, ApiClientOption apiClientOption)
         {
-            return services.AddHttpClient(apiClientOption.apiKey, client =>
+            if (apiClientOption.isCircuitBreaker)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
-                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
-            })
-           .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMinutes(apiClientOption.timeout)))
-           .AddPolicyHandler(GetRetryPolicy(apiClientOption.retryCount))
-           .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(apiClientOption.circuitbreakerCount, TimeSpan.FromSeconds(30)))
-           .ConfigurePrimaryHttpMessageHandler(() =>
-           {
-               return new HttpClientHandler()
-               {
-                   AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-               };
-           })
-           .AddHttpMessageHandler(sp =>
-           {
-               IHttpContextAccessor httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-               return new CorrelationIdHandler(httpContextAccessor);
-           });
+                return services.AddHttpClient(apiClientOption.apiKey, client =>
+                    {
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
+                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
+                    })
+                    .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMinutes(apiClientOption.timeout)))
+                    .AddPolicyHandler(GetRetryPolicy(apiClientOption.retryCount))
+                    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(apiClientOption.circuitbreakerCount, TimeSpan.FromSeconds(30)))
+                    .ConfigurePrimaryHttpMessageHandler(() =>
+                    {
+                        return new HttpClientHandler()
+                        {
+                            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                        };
+                    })
+                    .AddHttpMessageHandler(sp =>
+                    {
+                        IHttpContextAccessor httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                        return new CorrelationIdHandler(httpContextAccessor);
+                    });
+            }
+            else
+            {
+                return services.AddHttpClient(apiClientOption.apiKey, client =>
+                    {
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApiConstants.Api_Keys.JSON_MEDIA_TYPE_QUALITY_HEADER));
+                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(ApiConstants.Api_Keys.GZIP_COMPRESSION_STRING_WITH_QUALITY_HEADER));
+                    }).ConfigurePrimaryHttpMessageHandler(() =>
+                    {
+                        return new HttpClientHandler()
+                        {
+                            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                        };
+                    })
+                    .AddHttpMessageHandler(sp =>
+                    {
+                        IHttpContextAccessor httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                        return new CorrelationIdHandler(httpContextAccessor);
+                    });
+            }
+
+
+
 
         }
 

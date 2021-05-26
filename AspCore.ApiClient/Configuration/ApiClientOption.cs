@@ -22,5 +22,6 @@ namespace AspCore.ApiClient.Configuration
         /// </summary>
         public int circuitbreakerCount { get; set; } = 5;
 
+        public bool isCircuitBreaker { get; set; } = true;
     }
 }

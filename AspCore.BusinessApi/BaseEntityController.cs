@@ -132,7 +132,7 @@ namespace AspCore.BusinessApi
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public async Task<IActionResult> AddAsync([FromBody] TCreatedDto[] entities)
+        public virtual async Task<IActionResult> AddAsync([FromBody] TCreatedDto[] entities)
         {
             if (entities == null)
             {

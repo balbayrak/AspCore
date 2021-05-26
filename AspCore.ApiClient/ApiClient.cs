@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AspCore.ApiClient
@@ -74,7 +75,7 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    if (_client.DefaultRequestHeaders.Contains(key))
                     {
                         _client.DefaultRequestHeaders.Remove(key);
                         _client.DefaultRequestHeaders.Add(key, headerValues[key]);
@@ -83,7 +84,7 @@ namespace AspCore.ApiClient
             }
 
             var response = await _client.GetAsync(_apiUrl);
-
+            
             response.EnsureSuccessStatusCode();
 
             await response.Content.ReadAsStringAsync().ContinueWith((Task<string> x) =>
@@ -108,7 +109,7 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    if (_client.DefaultRequestHeaders.Contains(key))
                     {
                         _client.DefaultRequestHeaders.Remove(key);
                         _client.DefaultRequestHeaders.Add(key, headerValues[key]);
@@ -131,7 +132,7 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    if (_client.DefaultRequestHeaders.Contains(key))
                     {
                         _client.DefaultRequestHeaders.Remove(key);
                         _client.DefaultRequestHeaders.Add(key, headerValues[key]);
@@ -155,7 +156,7 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    if (_client.DefaultRequestHeaders.Contains(key))
                     {
                         _client.DefaultRequestHeaders.Remove(key);
                         _client.DefaultRequestHeaders.Add(key, headerValues[key]);
@@ -186,7 +187,7 @@ namespace AspCore.ApiClient
             {
                 foreach (var key in headerValues.Keys)
                 {
-                    if (!_client.DefaultRequestHeaders.Contains(key))
+                    if (_client.DefaultRequestHeaders.Contains(key))
                     {
                         _client.DefaultRequestHeaders.Remove(key);
                         _client.DefaultRequestHeaders.Add(key, headerValues[key]);

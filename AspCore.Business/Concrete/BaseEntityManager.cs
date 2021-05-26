@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+
 namespace AspCore.Business.Concrete
 {
     public abstract class BaseEntityManager<TDataAccess, TEntity, TEntityDto, TCreatedEntityDto, TUpdatedEntityDto> : BaseBusinessManager, IEntityService<
@@ -54,6 +55,7 @@ namespace AspCore.Business.Concrete
                 return DataAccess.Update(entityArray);
         }
 
+      
         public virtual ServiceResult<bool> Delete(params Guid[] entityIds)
         {
             if (entityIds.Length > 1)
@@ -61,7 +63,7 @@ namespace AspCore.Business.Concrete
             else
                 return DataAccess.Delete(entityIds);
         }
-
+       
         public virtual Task<ServiceResult<bool>> AddAsync(params TCreatedEntityDto[] entities)
         {
             var entityArray = AutoObjectMapper.Mapper.Map<TCreatedEntityDto[], TEntity[]>(entities);
@@ -84,7 +86,7 @@ namespace AspCore.Business.Concrete
                 return DataAccess.UpdateAsync(entityArray);
         }
 
-        public async Task<ServiceResult<bool>> UpdateAsync(TUpdatedEntityDto entityDto)
+        public virtual async Task<ServiceResult<bool>> UpdateAsync(TUpdatedEntityDto entityDto)
         {
             var entity = await DataAccess.GetByIdAsync(entityDto.Id);
             if (entity.IsSucceeded)

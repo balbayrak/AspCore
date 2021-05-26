@@ -31,78 +31,84 @@ namespace AspCoreTest.WebApi
             services.ConfigureAspCoreServices(option =>
             {
                 option.AddDependencyResolver(option =>
-                {
-                    option.AutoBind();
-                })
-                .AddConfigurationManager(option =>
-                {
-                    option.AddConfigurationHelper(option =>
                     {
-                        option.type = EnumConfigurationAccessorType.AppSettingJson;
-                    });
-                })
-                .AddDataAccessLayer(option =>
-                {
-                    option.ConfigureDataAccessLayer<AspCoreTestDbContext>("DataAccessLayerInfo");
-                })
-                .AddApiClientSetting(option =>
-                {
-                    option.AddCacheService(option=>
-                    {
-                        option.AddMemoryCache();
+                        option.AutoBind();
                     })
-                    .AddApiClients(option =>
+                    .AddConfigurationManager(option =>
                     {
-                        option.AddAuthenticatedApiClient(option => { 
-                            option.apiKey = "YetkiApi";
-                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                        option.AddConfigurationHelper(option =>
+                        {
+                            option.type = EnumConfigurationAccessorType.AppSettingJson;
+                        });
+                    })
+                    .AddDataAccessLayer(option =>
+                    {
+                        option.ConfigureDataAccessLayer<AspCoreTestDbContext>("DataAccessLayerInfo");
+                    })
+                    .AddApiClientSetting(option =>
+                    {
+                        option.AddCacheService(option =>
+                            {
+                                option.AddMemoryCache();
                             })
-                        .AddAuthenticatedApiClient(option => { option.apiKey = "DocumentApi";
-                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
-                        })
-                        .AddApiClient(option => { option.apiKey = "ViewerApi";})
-                        .AddAuthenticatedApiClient(option => { option.apiKey = "DataSearchApi";
-                            option.authenticationHandler = EnumAuthenticationHandler.Cache;
-                        })
-                        .Build();
-                    });
-                })
-                .AddJWTAuthentication(option =>
-                {
-                    option.AddAuthenticationProvider(builder =>
-                    {
-                        builder.Add(typeof(CustomApiAuthenticationProvider))
-                         .Build();
+                            .AddApiClients(option =>
+                            {
+                                option.AddAuthenticatedApiClient(option =>
+                                    {
+                                        option.apiKey = "YetkiApi";
+                                        option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                                    })
+                                    .AddAuthenticatedApiClient(option =>
+                                    {
+                                        option.apiKey = "DocumentApi";
+                                        
+                                        option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                                    })
+                                    .AddApiClient(option => { option.apiKey = "ViewerApi"; })
+                                    .AddAuthenticatedApiClient(option =>
+                                    {
+                                        option.apiKey = "DataSearchApi";
+                                        option.authenticationHandler = EnumAuthenticationHandler.Cache;
+                                    })
+                                    .Build();
+                            });
                     })
-                    .AddActiveUserTokenGenerator<ActiveUserJwtGenerator, ActiveUserTokenValidator>(option =>
-                     {
-                         option.configurationKey = "TokenSettingOption";
-                     });
-                })
-                .AddAutoMapper()
-                .AddSwaggerSetting(option =>
-                {
-                    option.swaggerDoc = new SwaggerDoc
+                    .AddJWTAuthentication(option =>
                     {
-                        title = "Service API",
-                        version = "1.0",
-                        description = "Service API Description",
-                        contactName = "Bilal ALBAYRAK",
-                        contactUrl = "http.google.com.tr",
-                        apiVersion = "v1",
-                        contactEmail = "balbayrak87@gmail.com"
-                    };
-                })
-                .AddDataProtectorHelper(option =>
-                {
-                    option.dataProtectorKey = "tsesecretkey";
-                    option.persistFileSytemPath = @"bin\debug\configuration";
-                    option.lifeTime = 10;
-                })
-                .AddDataSearchAccessLayer("DataSearchApi", option =>
-                 {
-                     option.AddDataSearchEngine<PersonSearchEntity>("api/PersonCache");
-                 });
+                        option.AddAuthenticationProvider(builder =>
+                            {
+                                builder.Add(typeof(CustomApiAuthenticationProvider))
+                                    .Build();
+                            })
+                            .AddActiveUserTokenGenerator<ActiveUserJwtGenerator, ActiveUserTokenValidator>(option =>
+                            {
+                                option.configurationKey = "TokenSettingOption";
+                            });
+                    })
+                    .AddAutoMapper()
+                    .AddSwaggerSetting(option =>
+                    {
+                        option.swaggerDoc = new SwaggerDoc
+                        {
+                            title = "Service API",
+                            version = "1.0",
+                            description = "Service API Description",
+                            contactName = "Bilal ALBAYRAK",
+                            contactUrl = "http.google.com.tr",
+                            apiVersion = "v1",
+                            contactEmail = "balbayrak87@gmail.com"
+                        };
+                    })
+                    .AddDataProtectorHelper(option =>
+                    {
+                        option.dataProtectorKey = "tsesecretkey";
+                        option.persistFileSytemPath = @"bin\debug\configuration";
+                        option.lifeTime = 10;
+                    })
+                    .AddDataSearchAccessLayer("DataSearchApi", option =>
+                    {
+                        option.AddDataSearchEngine<PersonSearchEntity>("api/PersonCache");
+                    });
                 //.AddDocumentAccessLayer(option =>
                 //{
                 //    option.AddDocumentUploader<Document, TseDocumentUploaderOption, TseDocumentUploader, TseDocumentValidator>(option =>
@@ -118,7 +124,27 @@ namespace AspCoreTest.WebApi
                 //    });
                 //});
             });
+
+            //var containerBuilder = new ContainerBuilder();
+            //
+
+            //containerBuilder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces()
+            //    .EnableInterfaceInterceptors(new ProxyGenerationOptions()
+            //    {
+            //        Selector = new AspectInterceptorSelector()
+            //    }).SingleInstance();
+
+            //var container = containerBuilder.Build();
+
+           
+            //services.AddAutofac(t =>
+            //{
+            //    t.RegisterModule(new AutofacModule());
+            //});
+
         }
+
+   
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -145,6 +171,7 @@ namespace AspCoreTest.WebApi
 
                 });
             });
+            
         }
     }
 }
