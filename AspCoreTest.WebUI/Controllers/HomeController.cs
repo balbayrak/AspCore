@@ -7,17 +7,21 @@ using AspCoreTest.Dtos.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using AspCore.BackendForFrontend.Concrete.Security.User;
+using AspCore.Entities.User;
 using AspCoreTest.Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AspCoreTest.WebUI.Controllers
 {
     public class HomeController : BaseWebEntityController<PersonDto, IPersonBff>
     {
         private readonly IPersonCVBff _personCvBff;
-
-        public HomeController(IServiceProvider serviceProvider, IPersonBff personBff,IPersonCVBff personCvBff) :base(serviceProvider, personBff)
+        private readonly ICurrentUser _currentUser;
+        public HomeController(IServiceProvider serviceProvider, IPersonBff personBff,IPersonCVBff personCvBff, ICurrentUser currentUser) :base(serviceProvider, personBff)
         {
             _personCvBff = personCvBff;
+            _currentUser = currentUser;
         }
 
         public IActionResult Index()
@@ -29,6 +33,8 @@ namespace AspCoreTest.WebUI.Controllers
             //    pageSize=5
 
             //}).Result;
+
+            var user = _currentUser.UserInfo<ActiveUser>();
             var person=new List<PersonDto>()
             {
                 new PersonDto(){Surname = "asdasdas"}
@@ -52,6 +58,7 @@ namespace AspCoreTest.WebUI.Controllers
             return View();
         }
 
+        [Authorize(Policy = "Employee")]
         public IActionResult Privacy()
         {
             ServiceResult<List<PersonDto>> histories = BffLayer.GetEntityHistoriesAsync(new EntityFilter

@@ -26,6 +26,7 @@ namespace AspCore.Business.Abstract
 
         Task<ServiceResult<bool>> UpdateAsync(params TUpdatedDto[] entities);
         Task<ServiceResult<bool>> UpdateAsync(TUpdatedDto entity);
+  
 
         Task<ServiceResult<bool>> DeleteAsync(params Guid[] entityIds);
 

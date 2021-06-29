@@ -8,8 +8,8 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>5.0.5</Version>
-    <PackageReleaseNotes>active user  fixed.</PackageReleaseNotes>
+    <Version>5.0.7</Version>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

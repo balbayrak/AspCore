@@ -24,6 +24,7 @@ namespace AspCoreTest.Authentication.Concrete
                     activeUser.name = "Bilal";
                     activeUser.surname = "Albayrak";
                     activeUser.tckn = "11111111111";
+                    activeUser.roles=new List<string>(){"admin"};
                 }
                 else if (input.UserName == "Admin2" && input.Password == "Admin2")
                 {
@@ -32,6 +33,7 @@ namespace AspCoreTest.Authentication.Concrete
                     activeUser.name = "Yusuf";
                     activeUser.surname = "Aykaç";
                     activeUser.tckn = "22222222222";
+                    activeUser.roles = new List<string>() { "admin2" };
                 }
                 if (activeUser != null)
                 {

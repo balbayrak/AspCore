@@ -36,6 +36,7 @@ namespace AspCore.Web.Configuration.Options
 
             return new AuthenticationProviderBuilder(services);
         }
+       
 
         public AuthenticationProviderBuilder AddCookieSetting([NotNull] Action<AuthCookieOption> option)
         {
@@ -71,7 +72,10 @@ namespace AspCore.Web.Configuration.Options
             services.AddTransient<IPrincipal>(
        provider => provider.GetService<IHttpContextAccessor>().HttpContext.User);
 
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Employee",policy=>policy.RequireRole("admin"));
+            });
 
             services.ConfigureOptions<ConfigureCookieOption>();
         }

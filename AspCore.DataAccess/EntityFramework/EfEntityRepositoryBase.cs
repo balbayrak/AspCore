@@ -694,10 +694,9 @@ namespace AspCore.DataAccess.EntityFramework
         public async Task<ServiceResult<TEntity>> GetByIdAsync(Guid id)
         {
             ServiceResult<TEntity> result = new ServiceResult<TEntity>();
-
             try
             {
-                result.Result = await Entities.FindAsync(id);
+                result.Result = await TableNoTracking.SingleOrDefaultAsync(t=>t.Id==id);
                 result.IsSucceeded = true;
             }
             catch (Exception ex)

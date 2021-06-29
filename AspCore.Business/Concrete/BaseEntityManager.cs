@@ -92,7 +92,7 @@ namespace AspCore.Business.Concrete
             if (entity.IsSucceeded)
             {
                 var data = AutoObjectMapper.Mapper.Map(entityDto, entity.Result);
-                var response = await DataAccess.UpdateWithTransactionAsync(data);
+                var response = await DataAccess.UpdateAsync(data);
                 return response;
             }
             return entity.ChangeResult(false);

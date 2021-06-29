@@ -25,6 +25,7 @@ namespace AspCore.Authentication.JWT.Concrete
                 tckn = claims.FirstOrDefault(t => t.Type == ClaimTypes.SerialNumber)?.Value,
                 telephone = claims.FirstOrDefault(t => t.Type == ClaimTypes.HomePhone)?.Value,
                 address = claims.FirstOrDefault(t => t.Type == ClaimTypes.StreetAddress)?.Value,
+                roles = claims.Where(t => t.Type == ClaimTypes.Role).Select(t => t.Value).ToList(),
             };
         }
     }

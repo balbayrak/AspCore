@@ -151,6 +151,7 @@ namespace AspCore.Web.Concrete
 
                         claims.Add(new Claim(AspCoreSecurityType.UserId, userIdClaim.Value));
                         claims.Add(new Claim(AspCoreSecurityType.UserName, userNameClaim.Value));
+                        claims.Add(new Claim(AspCoreSecurityType.UserName, userNameClaim.Value));
                         claims.Add(new Claim(AspCoreSecurityType.UserInfo, JsonConvert.SerializeObject(userResult.Result).CompressString()));
 
                         var claimsIdentity = new ClaimsIdentity(

@@ -119,6 +119,11 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
                     isEqueal = ((string) result).Equals((string) condition.value,
                         System.StringComparison.InvariantCultureIgnoreCase);
                 }
+                else if(result.GetType().BaseType==typeof(Enum))
+                {
+                    var resultInt = Convert.ToInt32(result);
+                    isEqueal = resultInt.Equals(Convert.ChangeType(condition.value, resultInt.GetType()));
+                }
                 else
                 {
                     isEqueal = result.Equals(Convert.ChangeType(condition.value, result.GetType()));
@@ -130,6 +135,11 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
                 {
                     isEqueal = !((string)result).Equals((string)condition.value,
                         System.StringComparison.InvariantCultureIgnoreCase);
+                }
+                else if (result.GetType().BaseType == typeof(Enum))
+                {
+                    var resultInt = Convert.ToInt32(result);
+                    isEqueal = resultInt.Equals(Convert.ChangeType(condition.value, resultInt.GetType()));
                 }
                 else
                 {

@@ -3,6 +3,7 @@ using AspCore.Authentication.JWT.Concrete;
 using AspCore.BackendForFrontend.Concrete;
 using AspCore.ConfigurationAccess.Configuration;
 using AspCore.Entities.DocumentType;
+using AspCore.Entities.User;
 using AspCore.Web.Configuration;
 using AspCore.WebComponents.HtmlHelpers.ConfirmBuilder;
 using AspCore.WebComponents.ViewComponents.Alert.Concrete;

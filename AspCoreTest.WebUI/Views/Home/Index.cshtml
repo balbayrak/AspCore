@@ -8,7 +8,7 @@
 <div class="row">
     <div class="col-md-12">
         @(Html.DataTableHelper<PersonDto>("persontable")
-             .LoadAction("/Home/LoadTable2")
+             .LoadAction("/Home/LoadTable")
               .Columns(column =>
               {
                   column.CheckColumn(p => p.EncryptedId).CheckAllEnabled();
@@ -18,7 +18,7 @@
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
                       action.ActionButton()
-                          .Visible(true)
+                          .Hidden(t=>t.PersonStatus,PersonStatus.Open)
                           .Text("Edit")
                           .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
                           .IClass("fa fa-edit")

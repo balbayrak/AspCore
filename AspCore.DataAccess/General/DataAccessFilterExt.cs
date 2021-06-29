@@ -21,10 +21,12 @@ namespace AspCore.DataAccess.General
             {
                 dataAccessFilter.searchQuery = filter.GetSearchExpression<TEntity>();
             }
-            if (filter.sorters != null)
-            {
-                dataAccessFilter.sorter = filter.sorters.ToSortingExpressionList<TEntity>();
-            }
+
+            //todo extensions update heryeri etkiliyor.
+            //if (filter.sorters != null)
+            //{
+            //    dataAccessFilter.sorter = filter.sorters.ToSortingExpressionList<TEntity>();
+            //}
 
             return dataAccessFilter;
         }
