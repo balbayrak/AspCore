@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using AspCore.WebComponents.HtmlHelpers.DataTable.Columns.Buttons;
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
 {
@@ -10,6 +12,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
         public string column_Property_Exp { get; set; }
         public string orderByDirection { get; set; }
         public string searchable { get; set; }
+        public Condition condition { get; set; }
 
     }
 }

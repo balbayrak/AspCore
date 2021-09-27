@@ -34,13 +34,7 @@ namespace AspCoreTest.WebUI.Controllers
 
             //}).Result;
 
-            var user = _currentUser.UserInfo<ActiveUser>();
-            var person=new List<PersonDto>()
-            {
-                new PersonDto(){Surname = "asdasdas"}
-            };
-            BffLayer.AddAsync(person);
-            var data = _personCvBff.GetWithInclude();
+          
             //StorageManager.CacheService.SetObject("test", "test");
             //StorageManager.CookieService.SetObject("test", "test");
 

@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/balbayrak/AspCore</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>5.0.4</Version>
+    <Version>5.0.6</Version>
     <PackageReleaseNotes>net 5 updated</PackageReleaseNotes>
   </PropertyGroup>
 

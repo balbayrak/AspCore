@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using UnaryExpression = System.Linq.Expressions.UnaryExpression;
 
 namespace AspCore.WebComponents.HtmlHelpers.Extensions
 {
@@ -150,14 +151,31 @@ namespace AspCore.WebComponents.HtmlHelpers.Extensions
         public static Condition ToCondition<TModel>(this Expression<Func<TModel, bool>> expression)
         {
             Condition condition = new Condition();
+         
             if (expression.Body is BinaryExpression body)
             {
-                var left = (body.Left as MemberExpression).ToString();
-                condition.property = left;
+                condition.property = body.GetProperty();
                 condition.IsEqual = body.NodeType == ExpressionType.Equal;
                 condition.value = (body.Right as ConstantExpression).Value.ToString();
             }
             return condition;
+        }
+
+        private static string GetProperty(this Expression expression)
+        {
+            string property = string.Empty;
+            if (expression is BinaryExpression body)
+            {
+                if (body.Left is UnaryExpression)
+                {
+                    property = ((UnaryExpression)body.Left).Operand.ToString();
+                }
+                else
+                {
+                    property = (body.Left as MemberExpression).ToString();
+                }
+            }
+            return property;
         }
     }
 }

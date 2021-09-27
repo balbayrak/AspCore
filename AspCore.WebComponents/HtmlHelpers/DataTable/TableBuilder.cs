@@ -153,6 +153,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable
                             column_Property_Exp = boundColumn.columnPropertyExp,
                             orderByDirection = boundColumn.orderByDirection,
                             searchable = boundColumn.searchable,
+                            condition = boundColumn.condition
                         };
 
                         datatableStorageObject.DatatableProperties.Add(bcolumn);

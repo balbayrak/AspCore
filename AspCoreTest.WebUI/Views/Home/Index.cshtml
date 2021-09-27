@@ -14,11 +14,11 @@
                   column.CheckColumn(p => p.EncryptedId).CheckAllEnabled();
                   column.BoundColumn(p => p.EncryptedId).Title("ID").IsPrimaryKey(true);
                   column.BoundColumn(p => p.Name).Title("Name").Searchable(Operation.StartsWith);
-                  column.BoundColumn(p => p.Surname).Title("Surname").Searchable(Operation.StartsWith);
+                  column.BoundColumn(p => p.Surname).Title("Surname").Searchable(Operation.StartsWith).HiddenFor(t=>t.PersonStatus==PersonStatus.Open);
                   column.ActionColumn().Title("Actions").Actions(action =>
                   {
                       action.ActionButton()
-                          .Hidden(t=>t.PersonStatus,PersonStatus.Open)
+                          .HiddenFor(t=>t.PersonStatus==PersonStatus.Open)
                           .Text("Edit")
                           .CssClass("btn btn-sm green btn-outline filter-submit margin-bottom green-haze")
                           .IClass("fa fa-edit")

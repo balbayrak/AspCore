@@ -50,14 +50,23 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
                 foreach (var property in datatableProperties)
                 {
                     var result = ExpressionBuilder.Evaluation(_entities[i], property.column_Property_Exp);
-                    if (property.columnIsPrimaryKey)
+                    if (property.condition!=null && IsConditionEqual(_entities[i], property.condition))
                     {
-                        primarykey = result == null ? string.Empty : result.ToString();
+                        dictionary[property.columnProperty] = string.Empty;
                     }
                     else
                     {
-                        dictionary[property.columnProperty] = result == null ? string.Empty : result.ToString();
+                        if (property.columnIsPrimaryKey)
+                        {
+                            primarykey = result == null ? string.Empty : result.ToString();
+                        }
+                        else
+                        {
+                            dictionary[property.columnProperty] = result == null ? string.Empty : result.ToString();
+                        }
                     }
+
+                    
                 }
 
 
@@ -139,7 +148,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Storage
                 else if (result.GetType().BaseType == typeof(Enum))
                 {
                     var resultInt = Convert.ToInt32(result);
-                    isEqueal = resultInt.Equals(Convert.ChangeType(condition.value, resultInt.GetType()));
+                    isEqueal = !resultInt.Equals(Convert.ChangeType(condition.value, resultInt.GetType()));
                 }
                 else
                 {

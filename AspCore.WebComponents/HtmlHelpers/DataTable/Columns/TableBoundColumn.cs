@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using AspCore.WebComponents.HtmlHelpers.Extensions;
 
 namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
 {
@@ -45,7 +46,7 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
             this.columnTitle = Regex.Replace(this.columnProperty, "([a-z])([A-Z])", "$1 $2");
             this.orderByDirection = string.Empty;
             this.searchable = null;
-            this.condition = null;
+            this.condition = condition;
         }
 
         public ITableBoundColumn<TModel, TProperty> IsPrimaryKey(bool value)
@@ -84,5 +85,10 @@ namespace AspCore.WebComponents.HtmlHelpers.DataTable.Columns
 
         }
 
+        public ITableBoundColumn<TModel, TProperty> HiddenFor(Expression<Func<TModel, bool>> expression)
+        {
+            this.condition = expression.ToCondition();
+            return _instance;
+        }
     }
 }
